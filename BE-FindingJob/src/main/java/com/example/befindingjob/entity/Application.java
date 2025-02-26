@@ -1,6 +1,6 @@
-package com.example.befindingjob.model;
+package com.example.befindingjob.entity;
 
-import com.example.befindingjob.model.enumModel.ApplicationStatus;
+import com.example.befindingjob.entity.enumm.ApplicationStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

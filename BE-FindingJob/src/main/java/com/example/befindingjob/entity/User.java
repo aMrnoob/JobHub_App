@@ -1,6 +1,6 @@
-package com.example.befindingjob.model;
+package com.example.befindingjob.entity;
 
-import com.example.befindingjob.model.enumModel.Role;
+import com.example.befindingjob.entity.enumm.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,6 +17,9 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer userId;
+
+    @Column(nullable = true)
+    private String fullname;
 
     @Column(nullable = false, unique = true)
     private String username;

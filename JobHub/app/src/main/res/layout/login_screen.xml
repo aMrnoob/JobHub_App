@@ -15,7 +15,7 @@
         android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -28,20 +28,21 @@
         android:textAlignment="center"
         android:textSize="22sp"
         app:layout_constraintEnd_toEndOf="@+id/textView3"
-        app:layout_constraintHorizontal_bias="0.458"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@+id/textView3"
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
     <EditText
-        android:id="@+id/edtEmail"
+        android:id="@+id/edtUsername"
         android:layout_width="315dp"
         android:layout_height="50dp"
         android:layout_marginTop="84dp"
         android:background="@drawable/edittext_background"
         android:ems="10"
-        android:hint="Email"
+        android:hint="Tên đăng nhập"
         android:inputType="textEmailAddress"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
@@ -54,23 +55,37 @@
         android:ems="10"
         android:hint="Mật khẩu"
         android:inputType="textPassword"
-        app:layout_constraintEnd_toEndOf="@+id/edtEmail"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/edtEmail"
-        app:layout_constraintTop_toBottomOf="@+id/edtEmail" />
+        app:layout_constraintEnd_toEndOf="@+id/edtUsername"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@+id/edtUsername"
+        app:layout_constraintTop_toBottomOf="@+id/edtUsername" />
 
     <Button
         android:id="@+id/btnForgetPwd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:background="none"
+        android:background="@android:color/transparent"
         android:text="Quên mật khẩu"
         android:textColor="@color/blue"
-        android:textSize="14sp"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="@+id/edtPassword"
-        app:layout_constraintHorizontal_bias="0.95"
+        app:layout_constraintHorizontal_bias="0.99"
         app:layout_constraintStart_toStartOf="@+id/edtPassword"
+        app:layout_constraintTop_toBottomOf="@+id/edtPassword" />
+
+    <Button
+        android:id="@+id/btnLogin"
+        android:layout_width="315dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="90dp"
+        android:background="@drawable/rounded_button"
+        android:text="Đăng nhập"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/edtPassword" />
 
     <Button
@@ -78,27 +93,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:background="@null"
+        android:background="@android:color/transparent"
         android:text="Tạo tài khoản mới"
-        android:textSize="18sp"
+        android:textSize="20sp"
+        android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.548"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnLogin" />
-
-    <Button
-        android:id="@+id/btnLogin"
-        android:layout_width="315dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="76dp"
-        android:background="@drawable/rounded_button"
-        android:text="Đăng nhập"
-        android:textColor="@color/white"
-        android:textSize="22sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.708"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtPassword" />
 
     <TextView
         android:id="@+id/textView5"
@@ -108,7 +110,7 @@
         android:text="Hoặc đăng nhập với"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="@+id/btnRegister"
-        app:layout_constraintHorizontal_bias="0.407"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@+id/btnRegister"
         app:layout_constraintTop_toBottomOf="@+id/btnRegister" />
 
@@ -116,7 +118,7 @@
         android:id="@+id/btnGoogle"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:layout_marginStart="124dp"
+        android:layout_marginStart="135dp"
         android:layout_marginTop="20dp"
         android:background="@null"
         android:scaleType="fitCenter"
@@ -129,7 +131,7 @@
         android:layout_width="85dp"
         android:layout_height="85dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="104dp"
+        android:layout_marginEnd="120dp"
         android:background="@null"
         android:scaleType="fitCenter"
         android:src="@drawable/facebook_icon"

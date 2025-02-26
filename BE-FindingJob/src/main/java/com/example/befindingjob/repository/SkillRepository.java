@@ -1,6 +1,6 @@
 package com.example.befindingjob.repository;
 
-import com.example.befindingjob.model.Skill;
+import com.example.befindingjob.entity.Skill;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

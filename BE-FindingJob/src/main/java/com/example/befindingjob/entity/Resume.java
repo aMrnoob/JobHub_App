@@ -1,4 +1,4 @@
-package com.example.befindingjob.model;
+package com.example.befindingjob.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
