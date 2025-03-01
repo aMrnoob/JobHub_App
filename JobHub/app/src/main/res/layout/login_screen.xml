@@ -2,44 +2,56 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/welcome_background">
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/jobHubImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/jobhub_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+    </ImageView>
 
     <TextView
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="156dp"
-        android:text="Đăng nhập"
-        android:textColor="@color/blue"
+        android:layout_marginTop="-10dp"
+        android:text="JobHub"
+        android:textColor="@color/blue_700"
         android:textSize="30sp"
         android:textStyle="bold"
+        android:letterSpacing="0.1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/jobHubImage" />
 
     <TextView
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
-        android:text="Chào mừng bạn trở lại\nhy vọng bạn có một ngày tuyệt vời!"
+        android:layout_marginTop="50dp"
+        android:text="Sign in to your account"
         android:textAlignment="center"
-        android:textSize="22sp"
+        android:textSize="26sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@+id/textView3"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@+id/textView3"
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
     <EditText
-        android:id="@+id/edtUsername"
+        android:id="@+id/edtEmail"
         android:layout_width="315dp"
         android:layout_height="50dp"
-        android:layout_marginTop="84dp"
+        android:layout_marginTop="70dp"
         android:background="@drawable/edittext_background"
         android:ems="10"
-        android:hint="Tên đăng nhập"
+        android:hint="Email"
+        android:textColor="@color/gray_600"
         android:inputType="textEmailAddress"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -53,34 +65,45 @@
         android:layout_marginTop="40dp"
         android:background="@drawable/edittext_background"
         android:ems="10"
-        android:hint="Mật khẩu"
+        android:hint="Password"
         android:inputType="textPassword"
-        app:layout_constraintEnd_toEndOf="@+id/edtUsername"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="@+id/edtUsername"
-        app:layout_constraintTop_toBottomOf="@+id/edtUsername" />
+        app:layout_constraintEnd_toEndOf="@+id/edtEmail"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/edtEmail"
+        app:layout_constraintTop_toBottomOf="@+id/edtEmail" />
+
+    <ImageView
+        android:id="@+id/invisiblePwd"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="11dp"
+        app:layout_constraintEnd_toEndOf="@+id/edtPassword"
+        app:layout_constraintHorizontal_bias="0.94"
+        app:layout_constraintStart_toStartOf="@+id/edtPassword"
+        app:layout_constraintTop_toTopOf="@+id/edtPassword"
+        app:srcCompat="@drawable/invisibility_icon" />
 
     <Button
         android:id="@+id/btnForgetPwd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="8dp"
         android:background="@android:color/transparent"
-        android:text="Quên mật khẩu"
-        android:textColor="@color/blue"
+        android:text="Forgot the password?"
+        android:textColor="@color/blue_800"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="@+id/edtPassword"
         app:layout_constraintHorizontal_bias="0.99"
         app:layout_constraintStart_toStartOf="@+id/edtPassword"
-        app:layout_constraintTop_toBottomOf="@+id/edtPassword" />
+        app:layout_constraintTop_toBottomOf="@+id/edtPassword"/>
 
     <Button
         android:id="@+id/btnLogin"
         android:layout_width="315dp"
         android:layout_height="60dp"
         android:layout_marginTop="90dp"
-        android:background="@drawable/rounded_button"
-        android:text="Đăng nhập"
+        android:backgroundTint="@color/blue_700"
+        android:text="Login"
         android:textColor="@color/white"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -94,7 +117,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:background="@android:color/transparent"
-        android:text="Tạo tài khoản mới"
+        android:text="Create a new account"
         android:textSize="20sp"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
@@ -107,7 +130,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:text="Hoặc đăng nhập với"
+        android:text="Or continue with"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="@+id/btnRegister"
         app:layout_constraintHorizontal_bias="0.5"
@@ -118,7 +141,7 @@
         android:id="@+id/btnGoogle"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:layout_marginStart="135dp"
+        android:layout_marginStart="120dp"
         android:layout_marginTop="20dp"
         android:background="@null"
         android:scaleType="fitCenter"
@@ -131,7 +154,7 @@
         android:layout_width="85dp"
         android:layout_height="85dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="120dp"
+        android:layout_marginEnd="110dp"
         android:background="@null"
         android:scaleType="fitCenter"
         android:src="@drawable/facebook_icon"

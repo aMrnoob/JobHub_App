@@ -2,33 +2,45 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/welcome_background">
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/jobHubImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/jobhub_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+    </ImageView>
 
     <TextView
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="110dp"
-        android:text="Tạo tài khoản"
-        android:textColor="@color/blue"
+        android:layout_marginTop="-10dp"
+        android:text="JobHub"
+        android:letterSpacing="0.1"
+        android:textColor="@color/blue_700"
         android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/jobHubImage" />
 
     <TextView
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="Tạo một tài khoản để bạn có thể\n khám phá\ntất cả các công việc hiện có"
+        android:layout_marginTop="50dp"
+        android:text="Sign up for free"
         android:textAlignment="center"
-        android:textSize="22sp"
+        android:textSize="26sp"
+        android:textStyle="bold"
+        android:letterSpacing="0.08"
         app:layout_constraintEnd_toEndOf="@+id/textView3"
-        app:layout_constraintHorizontal_bias="0.458"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@+id/textView3"
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
@@ -46,31 +58,29 @@
         app:layout_constraintTop_toBottomOf="@+id/textView4" />
 
     <EditText
-        android:id="@+id/edtUsername"
-        android:layout_width="315dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="40dp"
-        android:background="@drawable/edittext_background"
-        android:ems="10"
-        android:hint="Tên đăng nhập"
-        app:layout_constraintEnd_toEndOf="@+id/edtEmail"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/edtEmail"
-        app:layout_constraintTop_toBottomOf="@+id/edtEmail" />
-
-    <EditText
         android:id="@+id/edtPassword"
         android:layout_width="315dp"
         android:layout_height="50dp"
         android:layout_marginTop="40dp"
         android:background="@drawable/edittext_background"
         android:ems="10"
-        android:hint="Mật khẩu"
+        android:hint="Password"
         android:inputType="textPassword"
-        app:layout_constraintEnd_toEndOf="@+id/edtUsername"
+        app:layout_constraintEnd_toEndOf="@+id/edtEmail"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/edtUsername"
-        app:layout_constraintTop_toBottomOf="@+id/edtUsername" />
+        app:layout_constraintStart_toStartOf="@+id/edtEmail"
+        app:layout_constraintTop_toBottomOf="@+id/edtEmail" />
+
+    <ImageView
+        android:id="@+id/invisiblePwd"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="11dp"
+        app:layout_constraintEnd_toEndOf="@+id/edtPassword"
+        app:layout_constraintHorizontal_bias="0.94"
+        app:layout_constraintStart_toStartOf="@+id/edtPassword"
+        app:layout_constraintTop_toTopOf="@+id/edtPassword"
+        app:srcCompat="@drawable/invisibility_icon" />
 
     <EditText
         android:id="@+id/edtConfirmPwd"
@@ -79,7 +89,7 @@
         android:layout_marginTop="40dp"
         android:background="@drawable/edittext_background"
         android:ems="10"
-        android:hint="Xác nhận mật khẩu"
+        android:hint="Confirm password"
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="@+id/edtPassword"
         app:layout_constraintHorizontal_bias="0.0"
@@ -87,13 +97,24 @@
         app:layout_constraintTop_toBottomOf="@+id/edtPassword">
     </EditText>
 
+    <ImageView
+        android:id="@+id/invisibleConfirmPwd"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="11dp"
+        app:layout_constraintEnd_toEndOf="@+id/edtConfirmPwd"
+        app:layout_constraintHorizontal_bias="0.94"
+        app:layout_constraintStart_toStartOf="@+id/edtConfirmPwd"
+        app:layout_constraintTop_toTopOf="@+id/edtConfirmPwd"
+        app:srcCompat="@drawable/invisibility_icon" />
+
     <Button
         android:id="@+id/btnSignUp"
         android:layout_width="315dp"
         android:layout_height="50dp"
         android:layout_marginTop="40dp"
-        android:background="@drawable/rounded_button"
-        android:text="Đăng ký"
+        android:backgroundTint="@color/blue_700"
+        android:text="Sign Up"
         android:textColor="@color/white"
         android:textSize="22sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -106,11 +127,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:background="@android:color/transparent"
-        android:text="Đã có tài khoản"
+        android:text="Have an account? Sign in"
         android:textSize="18sp"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="@+id/btnSignUp"
-        app:layout_constraintHorizontal_bias="0.551"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@+id/btnSignUp"
         app:layout_constraintTop_toBottomOf="@+id/btnSignUp" />
 
@@ -118,11 +139,11 @@
         android:id="@+id/textView5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="Hoặc đăng nhập với"
+        android:layout_marginTop="30dp"
+        android:text="Or continue with"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="@+id/btnHaveAccount"
-        app:layout_constraintHorizontal_bias="0.407"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@+id/btnHaveAccount"
         app:layout_constraintTop_toBottomOf="@+id/btnHaveAccount" />
 
@@ -130,7 +151,7 @@
         android:id="@+id/btnGoogle"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:layout_marginStart="128dp"
+        android:layout_marginStart="120dp"
         android:layout_marginTop="4dp"
         android:background="@null"
         android:scaleType="fitCenter"
@@ -143,7 +164,7 @@
         android:layout_width="85dp"
         android:layout_height="85dp"
         android:layout_marginTop="0dp"
-        android:layout_marginEnd="112dp"
+        android:layout_marginEnd="110dp"
         android:background="@null"
         android:scaleType="fitCenter"
         android:src="@drawable/facebook_icon"

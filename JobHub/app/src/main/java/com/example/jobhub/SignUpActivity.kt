@@ -6,8 +6,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.CreateAccountBinding
-import com.example.jobhub.dto.auth.LoginResponse
-import com.example.jobhub.dto.auth.RegisterRequest
+import com.example.jobhub.dto.auth.Register_ResetPwdRequest
 import com.example.jobhub.model.ApiResponse
 import com.example.jobhub.service.UserService
 import retrofit2.Call
@@ -20,6 +19,8 @@ class SignUpActivity : AppCompatActivity() {
     private val userService: UserService by lazy {
         RetrofitClient.createRetrofit().create(UserService::class.java)
     }
+    private var isPasswordVisible = false
+    private var isConfirmPasswordVisible = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,23 +28,27 @@ class SignUpActivity : AppCompatActivity() {
         binding = CreateAccountBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.invisiblePwd.setOnClickListener {
+            togglePasswordVisibility(true)
+        }
+
+        binding.invisibleConfirmPwd.setOnClickListener {
+            togglePasswordVisibility(false)
+        }
+
         binding.btnSignUp.setOnClickListener {
             val email = binding.edtEmail.text.toString()
-            val username = binding.edtUsername.text.toString()
             val password = binding.edtPassword.text.toString()
             val confirmPwd = binding.edtConfirmPwd.text.toString()
 
             if (email.isBlank()) {
-                Toast.makeText(this@SignUpActivity, "Vui lòng điền email", Toast.LENGTH_SHORT)
-            } else if (username.isBlank()) {
-                Toast.makeText(this@SignUpActivity, "Vui lòng điền tên đăng nhập", Toast.LENGTH_SHORT)
+                Toast.makeText(this@SignUpActivity, "Please enter your email.", Toast.LENGTH_SHORT).show()
             } else if(password.isBlank()) {
-                Toast.makeText(this@SignUpActivity, "Vui lòng điền mật khẩu", Toast.LENGTH_SHORT)
-            } else if(!password.equals(confirmPwd)) {
-                Toast.makeText(this@SignUpActivity, "Xác nhận mật khẩu không đúng", Toast.LENGTH_SHORT)
+                Toast.makeText(this@SignUpActivity, "Please enter your password", Toast.LENGTH_SHORT).show()
+            } else if(password != confirmPwd) {
+                Toast.makeText(this@SignUpActivity, "Confirm password does not match.", Toast.LENGTH_SHORT).show()
             } else {
-                signUp(email,username,password)
-
+                signUp(email,password)
             }
         }
 
@@ -61,8 +66,8 @@ class SignUpActivity : AppCompatActivity() {
         }
     }
 
-    private fun signUp(email: String, username: String, password: String) {
-        val registerRequest = RegisterRequest(email, username, password)
+    private fun signUp(email: String, password: String) {
+        val registerRequest = Register_ResetPwdRequest(email, password)
         userService.register(registerRequest).enqueue(object : Callback<ApiResponse<Void>> {
             override fun onResponse(
                 call: Call<ApiResponse<Void>>,
@@ -79,5 +84,36 @@ class SignUpActivity : AppCompatActivity() {
                 Toast.makeText(this@SignUpActivity, "Lỗi kết nối: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+
+    private fun togglePasswordVisibility(isPasswordField: Boolean) {
+
+        if (isPasswordField) {
+            if (isPasswordVisible) {
+                binding.edtPassword.inputType =
+                    android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+                binding.invisiblePwd.setImageResource(R.drawable.invisibility_icon)
+            } else {
+                binding.edtPassword.inputType =
+                    android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                binding.invisiblePwd.setImageResource(R.drawable.visibility_icon)
+            }
+            binding.edtPassword.setSelection(binding.edtPassword.text.length)
+            binding.edtPassword.transformationMethod = binding.edtPassword.transformationMethod
+            isPasswordVisible = !isPasswordVisible
+        } else {
+            if (isConfirmPasswordVisible) {
+                binding.edtConfirmPwd.inputType =
+                    android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+                binding.invisibleConfirmPwd.setImageResource(R.drawable.invisibility_icon)
+            } else {
+                binding.edtConfirmPwd.inputType =
+                    android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                binding.invisibleConfirmPwd.setImageResource(R.drawable.visibility_icon)
+            }
+            binding.edtConfirmPwd.setSelection(binding.edtConfirmPwd.text.length)
+            binding.edtConfirmPwd.transformationMethod = binding.edtConfirmPwd.transformationMethod
+            isConfirmPasswordVisible = !isConfirmPasswordVisible
+        }
     }
 }

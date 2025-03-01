@@ -1,8 +1,6 @@
 package com.example.befindingjob.controller.auth;
 
-import com.example.befindingjob.dto.auth.LoginRequest;
-import com.example.befindingjob.dto.auth.LoginResponse;
-import com.example.befindingjob.dto.auth.RegisterRequest;
+import com.example.befindingjob.dto.auth.*;
 import com.example.befindingjob.model.ApiResponse;
 import com.example.befindingjob.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +17,28 @@ public class AuthenticationController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ApiResponse<Void> registerUser(@RequestBody RegisterRequest registerRequest) {
+    public ApiResponse<Void> registerUser(@RequestBody Register_ResetPwdRequest registerRequest) {
         return userService.register(registerRequest);
     }
 
     @PostMapping("/login")
-    public ApiResponse<LoginResponse> registerUser(@RequestBody LoginRequest loginRequest) {
+    public ApiResponse<LoginResponse> loginUser(@RequestBody LoginRequest loginRequest) {
         return userService.login(loginRequest);
+    }
+
+    @PostMapping("/request")
+    public ApiResponse<Void> resetPasswordRequest(@RequestBody ForgetPwdRequest forgetPwdRequest) {
+        return userService.forgetPwdRequest(forgetPwdRequest);
+    }
+
+
+    @PostMapping("/verify")
+    public ApiResponse<Void> verifyOtp(@RequestBody OtpVerifyRequest otpRequestResponse) {
+        return userService.verifyOtpRequest(otpRequestResponse);
+    }
+
+    @PostMapping("/reset")
+    public ApiResponse<Void> passwordReset(@RequestBody Register_ResetPwdRequest resetPwdRequest) {
+        return userService.passwordReset(resetPwdRequest);
     }
 }

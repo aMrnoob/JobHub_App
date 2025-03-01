@@ -5,7 +5,6 @@ import java.time.LocalDateTime
 
 data class User(
     val userId: Int?,
-    val username: String,
     val email: String,
     val password: String,
     val role: Role,

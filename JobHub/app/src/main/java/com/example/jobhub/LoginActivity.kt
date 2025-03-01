@@ -20,6 +20,7 @@ class LoginActivity : AppCompatActivity() {
     private val userService: UserService by lazy {
         RetrofitClient.createRetrofit().create(UserService::class.java)
     }
+    private var isPasswordVisible = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,16 +28,25 @@ class LoginActivity : AppCompatActivity() {
         binding = LoginScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.invisiblePwd.setOnClickListener {
+            togglePasswordVisibility()
+        }
+
+        binding.btnForgetPwd.setOnClickListener {
+            val intent = Intent(this, ForgetPwdActivity::class.java)
+            startActivity(intent)
+        }
+
         binding.btnLogin.setOnClickListener {
-            val username = binding.edtUsername.text.toString()
+            val email = binding.edtEmail.text.toString()
             val password = binding.edtPassword.text.toString()
 
-            if(username.isBlank()) {
-                Toast.makeText(this@LoginActivity, "Vui lòng điền tên đăng nhập", Toast.LENGTH_SHORT).show()
+            if(email.isBlank()) {
+                Toast.makeText(this@LoginActivity, "Please enter your email.", Toast.LENGTH_SHORT).show()
             } else if (password.isBlank()){
-                Toast.makeText(this@LoginActivity, "Vui lòng điền mật khẩu", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@LoginActivity, "Please enter your password", Toast.LENGTH_SHORT).show()
             } else {
-                login(username, password)
+                login(email, password)
             }
         }
 
@@ -46,27 +56,44 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun login(username: String, password: String) {
-        val loginRequest = LoginRequest(username, password)
+    private fun login(email: String, password: String) {
+        val loginRequest = LoginRequest(email, password)
         userService.login(loginRequest).enqueue(object : Callback<ApiResponse<LoginResponse>> {
             override fun onResponse(
                 call: Call<ApiResponse<LoginResponse>>,
                 response: Response<ApiResponse<LoginResponse>>
             ) {
                 if (response.isSuccessful && response.body()?.isSuccess == true) {
-                    Toast.makeText(this@LoginActivity, response.body()?.message ?: "Đăng nhập thành công", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@LoginActivity, response.body()?.message ?: "Login successfully", Toast.LENGTH_SHORT).show()
 
                     val intent = Intent(this@LoginActivity, HomeActivity::class.java)
                     startActivity(intent)
                     finish()
                 } else {
-                    Toast.makeText(this@LoginActivity, response.body()?.message ?: "Đăng nhập thất bại", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@LoginActivity, response.body()?.message ?: "Login failed", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<ApiResponse<LoginResponse>>, t: Throwable) {
-                Toast.makeText(this@LoginActivity, "Lỗi kết nối: ${t.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@LoginActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+
+    private fun togglePasswordVisibility() {
+
+        if (isPasswordVisible) {
+            binding.edtPassword.inputType =
+                android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+            binding.invisiblePwd.setImageResource(R.drawable.invisibility_icon)
+        } else {
+            binding.edtPassword.inputType =
+                android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+            binding.invisiblePwd.setImageResource(R.drawable.visibility_icon)
+        }
+
+        binding.edtPassword.setSelection(binding.edtPassword.text.length)
+        binding.edtPassword.transformationMethod = binding.edtPassword.transformationMethod
+        isPasswordVisible = !isPasswordVisible
     }
 }

@@ -1,7 +1,6 @@
 package com.example.jobhub.dto.auth
 
-data class RegisterRequest(
+data class Register_ResetPwdRequest(
     val email: String,
-    val username: String,
     val password: String
 )

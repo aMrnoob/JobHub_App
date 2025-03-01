@@ -3,7 +3,10 @@ package com.example.befindingjob.service.impl;
 import com.example.befindingjob.dto.auth.*;
 import com.example.befindingjob.entity.User;
 import com.example.befindingjob.model.ApiResponse;
+import com.example.befindingjob.model.OtpEntry;
+import com.example.befindingjob.model.OtpStorage;
 import com.example.befindingjob.repository.UserRepository;
+import com.example.befindingjob.service.EmailService;
 import com.example.befindingjob.service.JwtService;
 import com.example.befindingjob.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,59 +22,102 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Autowired
+    private EmailService emailService;
+
+    @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
     private JwtService jwtService;
 
-    public ApiResponse<Void> register (RegisterRequest registerRequest) {
+    @Override
+    public ApiResponse<Void> register (Register_ResetPwdRequest registerRequest) {
         if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
-            return new ApiResponse<>(false, "Email đã dùng để đăng ký", null);
-        } else if (userRepository.findByUsername(registerRequest.getUsername()).isPresent()) {
-            return new ApiResponse<>(false, "Tên tài khoản đã tồn tại", null);
+            return new ApiResponse<>(false, "Email exist. Can not register!", null);
         }
 
         User user = new User();
-        user.setUsername(registerRequest.getUsername());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setEmail(registerRequest.getEmail());
         user.setCreatedAt(java.time.LocalDateTime.now());
 
         userRepository.save(user);
 
-        return new ApiResponse<>(true, "Đăng ký tài khoản thành công");
+        return new ApiResponse<>(true, "Register successfully");
     }
 
     @Override
     public ApiResponse<LoginResponse> login(LoginRequest loginRequest) {
-        var userOptional = userRepository.findByUsername(loginRequest.getUsername());
+        var userOptional = userRepository.findByEmail(loginRequest.getEmail());
 
         if (userOptional.isEmpty()) {
-            return new ApiResponse<>(false, "Username không tồn tại");
+            return new ApiResponse<>(false, "Email does not exist");
         }
 
         User user = userOptional.get();
 
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            return new ApiResponse<>(false, "Mật khẩu không chính xác");
+            return new ApiResponse<>(false, "Password is incorrect");
         }
 
         String token = jwtService.generateToken(user.getUserId(), user.getFullname());
 
         LoginResponse loginResponse = new LoginResponse(token, user.getRole());
 
-        return new ApiResponse<>(true, "Đăng nhập thành công", loginResponse);
+        return new ApiResponse<>(true, "Login successfully", loginResponse);
     }
 
     @Override
-    public ApiResponse<OtpResponse> forgetPwd(ForgetPwdRequest forgetPwdRequest) {
+    public ApiResponse<Void> forgetPwdRequest(ForgetPwdRequest forgetPwdRequest) {
+        var email = forgetPwdRequest.getEmail();
         Optional<User> userOptional = userRepository.findByEmail(forgetPwdRequest.getEmail());
         if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            user.setPassword(newPassword);
-            userRepository.save(user);
-            return true;
+            String otp = emailService.generateOtp();
+
+            long expiryTime = System.currentTimeMillis() + 60 * 1000;
+            OtpStorage.otpStorage.put(email, new OtpEntry(otp, expiryTime));
+
+            boolean isSent = emailService.sendOtp(email, otp);
+            if (isSent) {
+                return new ApiResponse<>(true, "OTP has sent. Please check your email.");
+            } else {
+                return new ApiResponse<>(false, "OTP can not send. Please retry.");
+            }
         }
-        return new ApiResponse<>(true, "Đăng nhập thành công", loginResponse);
+        return new ApiResponse<>(false, "Email does not exist");
+    }
+
+    @Override
+    public ApiResponse<Void> verifyOtpRequest(OtpVerifyRequest otpVerifyResponse) {
+        String email = otpVerifyResponse.getEmail();
+        String otp = otpVerifyResponse.getOtp();
+
+        OtpEntry otpEntry = OtpStorage.otpStorage.get(email);
+
+        if (otpEntry != null) {
+            long currentTime = System.currentTimeMillis();
+
+            if (otpEntry.getOtp().equals(otp) && otpEntry.getExpiryTime() > currentTime) {
+                OtpStorage.otpStorage.remove(email);
+                return new ApiResponse<>(true, "OTP is valid. You can change your password.");
+            } else if (otpEntry.getExpiryTime() <= currentTime) {
+                OtpStorage.otpStorage.remove(email);
+                return new ApiResponse<>(false, "OTP expired.");
+            }
+        }
+
+        return new ApiResponse<>(false, "OTP is invalid. Please try again.");
+    }
+
+    @Override
+    public ApiResponse<Void> passwordReset(Register_ResetPwdRequest resetPwdRequest) {
+        String email = resetPwdRequest.getEmail();
+        String newPassword = resetPwdRequest.getPassword();
+
+        return userRepository.findByEmail(email).map(user -> {
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(user);
+            return new ApiResponse<Void>(true, "Reset your password successfully.");
+        }).orElseGet(() -> new ApiResponse<>(false, "Reset your password failed. Please try again."));
     }
 }
