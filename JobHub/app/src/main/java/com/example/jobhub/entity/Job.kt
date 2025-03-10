@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 
 data class Job(
     val jobId: Int,
-    val title: String,
+    var title: String,
     val description: String,
     val requirements: String?,
     val salary: String?,

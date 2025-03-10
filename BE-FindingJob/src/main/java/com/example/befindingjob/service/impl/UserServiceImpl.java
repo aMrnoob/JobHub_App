@@ -2,6 +2,7 @@ package com.example.befindingjob.service.impl;
 
 import com.example.befindingjob.dto.auth.*;
 import com.example.befindingjob.entity.User;
+import com.example.befindingjob.entity.enumm.Role;
 import com.example.befindingjob.model.ApiResponse;
 import com.example.befindingjob.model.OtpEntry;
 import com.example.befindingjob.model.OtpStorage;
@@ -39,6 +40,7 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setEmail(registerRequest.getEmail());
+        user.setRole(Role.UNDEFINED);
         user.setCreatedAt(java.time.LocalDateTime.now());
 
         userRepository.save(user);

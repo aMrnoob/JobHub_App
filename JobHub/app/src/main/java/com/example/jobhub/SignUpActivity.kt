@@ -24,6 +24,7 @@ class SignUpActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.navigationBarColor = resources.getColor(android.R.color.black)
 
         binding = CreateAccountBinding.inflate(layoutInflater)
         setContentView(binding.root)

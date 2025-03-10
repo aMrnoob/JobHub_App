@@ -2,7 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/white">
 
     <ImageButton
         android:id="@+id/btnComeBack"
@@ -38,6 +39,7 @@
         android:layout_marginTop="300dp"
         android:text="Enter OTP Code"
         android:textSize="26sp"
+        android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -62,7 +64,8 @@
             android:gravity="center"
             android:inputType="number"
             android:maxLength="1"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:textColor="@color/black"/>
 
         <EditText
             android:id="@+id/otp2"
@@ -73,7 +76,8 @@
             android:gravity="center"
             android:inputType="number"
             android:maxLength="1"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:textColor="@color/black"/>
 
         <EditText
             android:id="@+id/otp3"
@@ -84,7 +88,8 @@
             android:gravity="center"
             android:inputType="number"
             android:maxLength="1"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:textColor="@color/black" />
 
         <EditText
             android:id="@+id/otp4"
@@ -95,7 +100,8 @@
             android:gravity="center"
             android:inputType="number"
             android:maxLength="1"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:textColor="@color/black"/>
 
         <EditText
             android:id="@+id/otp5"
@@ -106,7 +112,8 @@
             android:gravity="center"
             android:inputType="number"
             android:maxLength="1"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:textColor="@color/black"/>
 
         <EditText
             android:id="@+id/otp6"
@@ -117,7 +124,8 @@
             android:gravity="center"
             android:inputType="number"
             android:maxLength="1"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:textColor="@color/black"/>
     </LinearLayout>
 
     <Button
@@ -140,6 +148,7 @@
         android:layout_marginTop="75dp"
         android:text="Resend code in s"
         android:textSize="20sp"
+        android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout">

@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F4E7F8">
+    android:background="#F4E7F8"
+    android:fitsSystemWindows="true">
 
     <ImageView
         android:layout_width="37dp"
         android:layout_height="37dp"
-        android:layout_marginTop="88dp"
+        android:layout_marginTop="44dp"
         android:src="@drawable/icon_snow_flake"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.374"
+        app:layout_constraintHorizontal_bias="0.379"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:layout_width="17dp"
         android:layout_height="17dp"
-        android:layout_marginTop="228dp"
+        android:layout_marginTop="208dp"
         android:src="@drawable/icon_snow_flake"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.169"
@@ -29,7 +29,7 @@
     <ImageView
         android:layout_width="22dp"
         android:layout_height="22dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="44dp"
         android:src="@drawable/icon_snow_flake"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.684"
@@ -39,48 +39,48 @@
     <ImageView
         android:layout_width="65dp"
         android:layout_height="65dp"
-        android:layout_marginTop="180dp"
+        android:layout_marginTop="132dp"
         android:src="@drawable/icon_snow_flake"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.897"
+        app:layout_constraintHorizontal_bias="0.907"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/imageView3"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:layout_marginTop="440dp"
+        android:layout_marginTop="50dp"
         android:src="@drawable/icon_snow_flake"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@+id/jobHubImage" />
 
     <ImageView
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginTop="392dp"
+        android:layout_marginTop="362dp"
         android:src="@drawable/icon_snow_flake"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.846"
+        app:layout_constraintHorizontal_bias="0.886"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_marginTop="120dp"
+        android:layout_marginTop="104dp"
         android:src="@drawable/icon_snow_flake"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.097"
+        app:layout_constraintHorizontal_bias="0.141"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:layout_width="60dp"
         android:layout_height="50dp"
-        android:layout_marginTop="356dp"
+        android:layout_marginTop="336dp"
         android:src="@drawable/icon_snow_flake"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.105"
@@ -89,26 +89,30 @@
 
     <ImageView
         android:id="@+id/jobHubImage"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_marginTop="150dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:srcCompat="@drawable/icon_app"
         android:scaleType="fitXY"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintWidth_percent="0.55"
+        app:layout_constraintHeight_percent="0.25"
         app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintVertical_bias="0.16"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/icon_app" />
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
-        android:layout_height="440dp"
-        android:layout_marginTop="150dp"
+        android:layout_height="0dp"
         android:background="@drawable/card_shadow"
+        app:layout_constraintVertical_bias="1"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHeight_percent="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/jobHubImage">
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/imageView2"
@@ -129,6 +133,7 @@
             android:text="What are you looking for?"
             android:textSize="22sp"
             android:textStyle="bold"
+            android:textColor="@color/black"
             app:layout_constraintEnd_toEndOf="@+id/imageView2"
             app:layout_constraintStart_toStartOf="@+id/imageView2"
             app:layout_constraintTop_toBottomOf="@+id/imageView2" />
@@ -154,7 +159,8 @@
                 android:gravity="center"
                 android:text="I want a job"
                 android:textSize="20sp"
-                android:textStyle="bold"/>
+                android:textColor="@color/black"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvFindingStaff"
@@ -166,7 +172,8 @@
                 android:gravity="center"
                 android:text="I want an employee"
                 android:textSize="20sp"
-                android:textStyle="bold"/>
+                android:textColor="@color/black"
+                android:textStyle="bold" />
 
         </LinearLayout>
 

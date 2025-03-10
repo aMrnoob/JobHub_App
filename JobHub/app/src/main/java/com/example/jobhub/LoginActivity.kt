@@ -8,6 +8,7 @@ import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.LoginScreenBinding
 import com.example.jobhub.dto.auth.LoginRequest
 import com.example.jobhub.dto.auth.LoginResponse
+import com.example.jobhub.entity.enumm.Role
 import com.example.jobhub.model.ApiResponse
 import com.example.jobhub.service.UserService
 import retrofit2.Call
@@ -24,6 +25,7 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.navigationBarColor = resources.getColor(android.R.color.black)
 
         binding = LoginScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -66,9 +68,15 @@ class LoginActivity : AppCompatActivity() {
                 if (response.isSuccessful && response.body()?.isSuccess == true) {
                     Toast.makeText(this@LoginActivity, response.body()?.message ?: "Login successfully", Toast.LENGTH_SHORT).show()
 
-                    val intent = Intent(this@LoginActivity, HomeActivity::class.java)
-                    startActivity(intent)
-                    finish()
+                    val loginResponse = response.body()?.data
+
+                    if(loginResponse?.role == Role.UNDEFINED) {
+                        val intent = Intent(this@LoginActivity, ChooseProfileActivity::class.java)
+                        intent.putExtra("loginResponse", loginResponse)
+                        startActivity(intent)
+                    } else {
+                        Toast.makeText(this@LoginActivity, response.body()?.message ?: "Login failed", Toast.LENGTH_SHORT).show()
+                    }
                 } else {
                     Toast.makeText(this@LoginActivity, response.body()?.message ?: "Login failed", Toast.LENGTH_SHORT).show()
                 }

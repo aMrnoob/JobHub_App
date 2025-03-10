@@ -7,7 +7,7 @@ data class User(
     val userId: Int?,
     val email: String,
     val password: String,
-    val role: Role,
+    var role: Role,
     val phone: String?,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime?,

@@ -1,144 +1,172 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:fitsSystemWindows="true">
 
     <ImageView
         android:id="@+id/jobHubImage"
-        android:layout_width="wrap_content"
-        android:layout_height="200dp"
-        android:layout_marginTop="32dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:src="@drawable/icon_app"
+        app:layout_constraintWidth_percent="0.6"
+        app:layout_constraintHeight_percent="0.2"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintVertical_bias="0.05"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <TextView
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:letterSpacing="0.08"
         android:text="Sign up for free"
         android:textAlignment="center"
         android:textSize="26sp"
         android:textStyle="bold"
-        android:letterSpacing="0.08"
-        app:layout_constraintEnd_toEndOf="@+id/jobHubImage"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="@+id/jobHubImage"
-        app:layout_constraintTop_toBottomOf="@+id/jobHubImage" />
+        android:textColor="@color/black"
+        app:layout_constraintVertical_bias="0.05"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/jobHubImage"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <EditText
         android:id="@+id/edtEmail"
-        android:layout_width="315dp"
+        android:layout_width="0dp"
         android:layout_height="50dp"
-        android:layout_marginTop="60dp"
         android:background="@drawable/edittext_background"
         android:ems="10"
         android:hint="Email"
+        android:textColor="@color/black"
+        android:textColorHint="@color/gray_600"
         android:inputType="textEmailAddress"
+        app:layout_constraintWidth_percent="0.86"
+        app:layout_constraintVertical_bias="0.1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView4" />
+        app:layout_constraintTop_toBottomOf="@+id/textView4"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <EditText
         android:id="@+id/edtPassword"
-        android:layout_width="315dp"
+        android:layout_width="0dp"
         android:layout_height="50dp"
-        android:layout_marginTop="40dp"
         android:background="@drawable/edittext_background"
         android:ems="10"
         android:hint="Password"
+        android:textColor="@color/black"
+        android:textColorHint="@color/gray_600"
         android:inputType="textPassword"
-        app:layout_constraintEnd_toEndOf="@+id/edtEmail"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/edtEmail"
-        app:layout_constraintTop_toBottomOf="@+id/edtEmail" />
+        app:layout_constraintWidth_percent="0.86"
+        app:layout_constraintVertical_bias="0.05"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edtEmail"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <ImageView
         android:id="@+id/invisiblePwd"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_marginTop="11dp"
-        app:layout_constraintEnd_toEndOf="@+id/edtPassword"
-        app:layout_constraintHorizontal_bias="0.94"
-        app:layout_constraintStart_toStartOf="@+id/edtPassword"
-        app:layout_constraintTop_toTopOf="@+id/edtPassword"
-        app:srcCompat="@drawable/invisibility_icon" />
+        app:srcCompat="@drawable/invisibility_icon"
+        app:layout_constraintWidth_percent="0.8"
+        app:layout_constraintVertical_bias="0.07"
+        app:layout_constraintHorizontal_bias="0.89"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edtEmail"
+        app:layout_constraintBottom_toBottomOf="parent"  />
 
     <EditText
         android:id="@+id/edtConfirmPwd"
-        android:layout_width="315dp"
+        android:layout_width="0dp"
         android:layout_height="50dp"
-        android:layout_marginTop="40dp"
         android:background="@drawable/edittext_background"
         android:ems="10"
         android:hint="Confirm password"
+        android:textColor="@color/black"
+        android:textColorHint="@color/gray_600"
         android:inputType="textPassword"
-        app:layout_constraintEnd_toEndOf="@+id/edtPassword"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/edtPassword"
-        app:layout_constraintTop_toBottomOf="@+id/edtPassword">
+        app:layout_constraintWidth_percent="0.86"
+        app:layout_constraintVertical_bias="0.05"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edtPassword"
+        app:layout_constraintBottom_toBottomOf="parent" >
     </EditText>
 
     <ImageView
         android:id="@+id/invisibleConfirmPwd"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_marginTop="11dp"
-        app:layout_constraintEnd_toEndOf="@+id/edtConfirmPwd"
-        app:layout_constraintHorizontal_bias="0.94"
-        app:layout_constraintStart_toStartOf="@+id/edtConfirmPwd"
-        app:layout_constraintTop_toTopOf="@+id/edtConfirmPwd"
-        app:srcCompat="@drawable/invisibility_icon" />
+        app:srcCompat="@drawable/invisibility_icon"
+        app:layout_constraintWidth_percent="0.8"
+        app:layout_constraintVertical_bias="0.07"
+        app:layout_constraintHorizontal_bias="0.89"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edtPassword"
+        app:layout_constraintBottom_toBottomOf="parent"  />
 
     <Button
         android:id="@+id/btnSignUp"
-        android:layout_width="315dp"
+        android:layout_width="0dp"
         android:layout_height="50dp"
-        android:layout_marginTop="40dp"
         android:backgroundTint="@color/blue_700"
         android:text="Sign Up"
         android:textColor="@color/white"
         android:textSize="22sp"
+        app:layout_constraintWidth_percent="0.8"
+        app:layout_constraintVertical_bias="0.13"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtConfirmPwd" />
+        app:layout_constraintTop_toBottomOf="@+id/edtConfirmPwd"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
     <Button
         android:id="@+id/btnHaveAccount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
         android:background="@android:color/transparent"
         android:text="Have an account? Sign in"
         android:textSize="18sp"
         android:textColor="@color/black"
-        app:layout_constraintEnd_toEndOf="@+id/btnSignUp"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="@+id/btnSignUp"
-        app:layout_constraintTop_toBottomOf="@+id/btnSignUp" />
+        app:layout_constraintWidth_percent="0.8"
+        app:layout_constraintVertical_bias="0.1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnSignUp"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <TextView
         android:id="@+id/textView5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
         android:text="Or continue with"
         android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="@+id/btnHaveAccount"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="@+id/btnHaveAccount"
-        app:layout_constraintTop_toBottomOf="@+id/btnHaveAccount" />
+        android:textColor="@color/black"
+        app:layout_constraintVertical_bias="0.1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnHaveAccount"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        app:layout_constraintVertical_bias="0.5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView5"
-        android:layout_margin="20dp">
+        app:layout_constraintBottom_toBottomOf="parent" >
 
         <TextView
             android:id="@+id/btnGoogle"
@@ -149,12 +177,12 @@
             android:paddingStart="20dp"
             android:background="@drawable/otp_box"
             android:text="Google"
+            android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold"
             android:gravity="center"
-            android:drawableStart="@drawable/google_icon"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView5" />
+            app:drawableStartCompat="@drawable/google_icon"
+            tools:ignore="RtlSymmetry" />
 
         <TextView
             android:id="@+id/btnFacebook"
@@ -165,11 +193,10 @@
             android:background="@drawable/otp_box"
             android:text="Facebook"
             android:textSize="20sp"
+            android:textColor="@color/black"
             android:textStyle="bold"
             android:gravity="center"
-            android:drawableStart="@drawable/facebook_icon"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView5" />
+            app:drawableStartCompat="@drawable/facebook_icon"
+            tools:ignore="RtlSymmetry" />
     </LinearLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

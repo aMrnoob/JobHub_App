@@ -20,7 +20,7 @@
             <solid android:color="@android:color/white"/>
             <stroke
                 android:width="2dp"
-                android:color="@android:color/darker_gray"/>
+                android:color="@color/gray_600"/>
             <corners android:radius="8dp"/>
             <padding
                 android:left="8dp"
