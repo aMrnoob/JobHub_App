@@ -3,8 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/white"
-    android:fitsSystemWindows="true">
+    android:background="@color/white">
 
     <ImageButton
         android:id="@+id/btnComeBack"
@@ -63,9 +62,10 @@
         <TextView
             android:id="@+id/tvWriter"
             android:layout_width="0dp"
-            android:layout_height="130dp"
+            android:layout_height="wrap_content"
             android:layout_marginEnd="30dp"
             android:layout_weight="1"
+            android:padding="4dp"
             android:background="@drawable/border_select_profile"
             android:drawableTop="@drawable/icon_writer"
             android:gravity="center"
@@ -77,8 +77,9 @@
         <TextView
             android:id="@+id/tvArtDesign"
             android:layout_width="0dp"
-            android:layout_height="130dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:padding="4dp"
             android:background="@drawable/border_select_profile"
             android:drawableTop="@drawable/icon_art_design"
             android:gravity="center"
@@ -104,9 +105,10 @@
         <TextView
             android:id="@+id/tvHR"
             android:layout_width="0dp"
-            android:layout_height="130dp"
+            android:layout_height="wrap_content"
             android:layout_marginEnd="30dp"
             android:layout_weight="1"
+            android:padding="4dp"
             android:background="@drawable/border_select_profile"
             android:drawableTop="@drawable/icon_human_resources"
             android:gravity="center"
@@ -118,8 +120,9 @@
         <TextView
             android:id="@+id/tvProgramer"
             android:layout_width="0dp"
-            android:layout_height="130dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:padding="4dp"
             android:background="@drawable/border_select_profile"
             android:drawableTop="@drawable/icon_programer"
             android:gravity="center"
@@ -145,9 +148,10 @@
         <TextView
             android:id="@+id/tvFinance"
             android:layout_width="0dp"
-            android:layout_height="130dp"
+            android:layout_height="wrap_content"
             android:layout_marginEnd="30dp"
             android:layout_weight="1"
+            android:padding="4dp"
             android:background="@drawable/border_select_profile"
             android:drawableTop="@drawable/icon_finance"
             android:gravity="center"
@@ -159,8 +163,9 @@
         <TextView
             android:id="@+id/tvCustomerService"
             android:layout_width="0dp"
-            android:layout_height="130dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:padding="4dp"
             android:background="@drawable/border_select_profile"
             android:drawableTop="@drawable/icon_customer_service"
             android:gravity="center"
@@ -186,9 +191,10 @@
         <TextView
             android:id="@+id/tvFoodRestaurant"
             android:layout_width="0dp"
-            android:layout_height="130dp"
+            android:layout_height="wrap_content"
             android:layout_marginEnd="30dp"
             android:layout_weight="1"
+            android:padding="4dp"
             android:background="@drawable/border_select_profile"
             android:drawableTop="@drawable/icon_food_restaurant"
             android:gravity="center"
@@ -200,8 +206,9 @@
         <TextView
             android:id="@+id/tvMusicProducer"
             android:layout_width="0dp"
-            android:layout_height="130dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:padding="4dp"
             android:background="@drawable/border_select_profile"
             android:drawableTop="@drawable/icon_music_producer"
             android:gravity="center"
@@ -214,12 +221,13 @@
     <Button
         android:id="@+id/btnNext"
         android:layout_width="0dp"
-        android:layout_height="60dp"
+        android:layout_height="wrap_content"
         android:backgroundTint="@color/blue_700"
         android:text="Next"
         android:textSize="24sp"
         android:textColor="@color/white"
-        app:layout_constraintVertical_bias="0.3"
+        android:padding="10dp"
+        app:layout_constraintVertical_bias="0.5"
         app:layout_constraintWidth_percent="0.6"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

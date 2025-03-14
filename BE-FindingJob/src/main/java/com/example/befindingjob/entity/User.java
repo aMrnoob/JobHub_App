@@ -4,6 +4,7 @@ import com.example.befindingjob.entity.enumm.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,29 +15,39 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Integer userId;
 
-    @Column(nullable = true)
+    @Column(name = "fullname", nullable = false)
     private String fullname;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "password", nullable = false)
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = true)
+    @Column(name = "role", nullable = false)
     private Role role;
 
+    @Column(name = "address")
+    private String address;
+
+    @Column(name = "date_of_birth")
+    private LocalDateTime dateOfBirth;
+
+    @Column(name = "phone")
     private String phone;
 
-    @Column(nullable = false, updatable = false)
-    private java.time.LocalDateTime createdAt;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
-    private java.time.LocalDateTime updatedAt;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Company> companies = new HashSet<>();

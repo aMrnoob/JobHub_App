@@ -3,8 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/white"
-    android:fitsSystemWindows="true">
+    android:background="@color/white">
 
     <ImageView
         android:id="@+id/btnPenguin"
@@ -40,7 +39,7 @@
         android:padding="10dp"
         android:background="@drawable/simple_border"
         android:elevation="5dp"
-        app:layout_constraintVertical_bias="0.16"
+        app:layout_constraintVertical_bias="0.155"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -50,8 +49,8 @@
         android:orientation="vertical">
 
         <ImageView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_marginBottom="10dp"
             android:src="@drawable/icon_upload_image" />
         
@@ -70,12 +69,12 @@
         android:textColor="@color/gray_700"
         android:textSize="20sp"
         app:layout_constraintHorizontal_bias="0.15"
-        app:layout_constraintVertical_bias="0.05"
+        app:layout_constraintVertical_bias="0.35"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/uploadImage"/>
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <EditText
         android:id="@+id/edtFullName"
@@ -85,12 +84,13 @@
         android:hint="Full name"
         android:textColorHint="@color/gray_500"
         android:textColor="@color/black"
-        app:layout_constraintVertical_bias="0.1"
+        android:inputType="text"
+        app:layout_constraintVertical_bias="0.4"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/uploadImage" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -98,13 +98,13 @@
         android:text="Email*"
         android:textColor="@color/gray_700"
         android:textSize="20sp"
-        app:layout_constraintHorizontal_bias="0.13"
-        app:layout_constraintVertical_bias="0.21"
+        app:layout_constraintHorizontal_bias="0.14"
+        app:layout_constraintVertical_bias="0.47"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/uploadImage"/>
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <EditText
         android:id="@+id/edtEmail"
@@ -114,12 +114,12 @@
         android:hint="Email"
         android:textColorHint="@color/gray_500"
         android:textColor="@color/black"
-        app:layout_constraintVertical_bias="0.26"
+        app:layout_constraintVertical_bias="0.52"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/uploadImage" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -128,12 +128,12 @@
         android:textColor="@color/gray_700"
         android:textSize="20sp"
         app:layout_constraintHorizontal_bias="0.15"
-        app:layout_constraintVertical_bias="0.36"
+        app:layout_constraintVertical_bias="0.588"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/uploadImage"/>
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <EditText
         android:id="@+id/edtDateOfBirth"
@@ -143,12 +143,14 @@
         android:hint="Date of birth"
         android:textColorHint="@color/gray_500"
         android:textColor="@color/black"
-        app:layout_constraintVertical_bias="0.42"
+        android:inputType="none"
+        android:focusable="false"
+        app:layout_constraintVertical_bias="0.64"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/uploadImage" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -157,12 +159,12 @@
         android:textColor="@color/gray_700"
         android:textSize="20sp"
         app:layout_constraintHorizontal_bias="0.14"
-        app:layout_constraintVertical_bias="0.515"
+        app:layout_constraintVertical_bias="0.708"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/uploadImage"/>
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <EditText
         android:id="@+id/edtPhone"
@@ -172,12 +174,13 @@
         android:hint="Phone number"
         android:textColorHint="@color/gray_500"
         android:textColor="@color/black"
-        app:layout_constraintVertical_bias="0.575"
+        android:inputType="phone"
+        app:layout_constraintVertical_bias="0.763"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/uploadImage" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -186,12 +189,12 @@
         android:textColor="@color/gray_700"
         android:textSize="20sp"
         app:layout_constraintHorizontal_bias="0.14"
-        app:layout_constraintVertical_bias="0.663"
+        app:layout_constraintVertical_bias="0.825"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/uploadImage"/>
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <EditText
         android:id="@+id/edtAddress"
@@ -201,25 +204,27 @@
         android:hint="Address"
         android:textColorHint="@color/gray_500"
         android:textColor="@color/black"
-        app:layout_constraintVertical_bias="0.732"
+        android:inputType="text"
+        app:layout_constraintVertical_bias="0.883"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/uploadImage" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/btnConfirm"
+        android:id="@+id/btnNext"
         android:layout_width="0dp"
         android:layout_height="60dp"
         android:backgroundTint="@color/blue_700"
-        android:text="Confirm"
+        android:text="Next"
         android:textColor="@color/white"
         android:textSize="24sp"
         app:layout_constraintWidth_percent="0.8"
-        app:layout_constraintVertical_bias="0.3"
+        app:layout_constraintVertical_bias="0.9"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtAddress"
+        app:layout_constraintTop_toTopOf="@+id/edtAddress"
         app:layout_constraintBottom_toBottomOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

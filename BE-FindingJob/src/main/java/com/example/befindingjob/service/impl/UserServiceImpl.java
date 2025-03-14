@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -121,5 +123,32 @@ public class UserServiceImpl implements UserService {
             userRepository.save(user);
             return new ApiResponse<Void>(true, "Reset your password successfully.");
         }).orElseGet(() -> new ApiResponse<>(false, "Reset your password failed. Please try again."));
+    }
+
+    @Override
+    public ApiResponse<User> getUserInfo(String token) {
+        System.out.println(token);
+        Integer userId = jwtService.extractUserId(token);
+        String fullName = jwtService.extractFullname(token);
+
+        User user = new User();
+        user.setUserId(userId);
+        user.setFullname(fullName);
+
+        return new ApiResponse<User>(true, "Get userInfo.");
+    }
+
+    @Override
+    public ApiResponse<Void> updateUser(User user) {
+        return userRepository.findById(user.getUserId()).map(existingUser -> {
+            existingUser.setFullname(user.getFullname());
+            existingUser.setAddress(user.getAddress());
+            existingUser.setDateOfBirth(user.getDateOfBirth());
+            existingUser.setPhone(user.getPhone());
+            existingUser.setUpdatedAt(java.time.LocalDateTime.now());
+
+            userRepository.save(existingUser);
+            return new ApiResponse<Void>(true, "User updated successfully", null);
+        }).orElseGet(() -> new ApiResponse<>(false, "User not found", null));
     }
 }

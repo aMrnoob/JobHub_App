@@ -13,7 +13,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class SignUpActivity : AppCompatActivity() {
+class SignUpActivity : BaseActivity() {
 
     private lateinit var binding: CreateAccountBinding
     private val userService: UserService by lazy {
@@ -24,7 +24,6 @@ class SignUpActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.navigationBarColor = resources.getColor(android.R.color.black)
 
         binding = CreateAccountBinding.inflate(layoutInflater)
         setContentView(binding.root)

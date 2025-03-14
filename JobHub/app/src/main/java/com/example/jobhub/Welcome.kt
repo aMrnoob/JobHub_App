@@ -5,13 +5,12 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.jobhub.databinding.WelcomeScreenBinding
 
-class Welcome : AppCompatActivity() {
+class Welcome : BaseActivity() {
 
     private lateinit var binding: WelcomeScreenBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.navigationBarColor = resources.getColor(android.R.color.black)
 
         binding = WelcomeScreenBinding.inflate((layoutInflater))
         setContentView(binding.root)

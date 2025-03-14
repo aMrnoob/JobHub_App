@@ -20,7 +20,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class ForgetPwdActivity : AppCompatActivity() {
+class ForgetPwdActivity : BaseActivity() {
 
     private var isPasswordVisible = false
     private var isConfirmPasswordVisible = false
@@ -48,7 +48,6 @@ class ForgetPwdActivity : AppCompatActivity() {
             1 -> {
                 bindingForgetPwd = ForgetPwdBinding.inflate(layoutInflater)
                 setContentView(bindingForgetPwd.root)
-                window.navigationBarColor = resources.getColor(android.R.color.black)
 
                 bindingForgetPwd.btnComeBack.setOnClickListener {
                     startActivity(Intent(this, LoginActivity::class.java))
@@ -66,7 +65,6 @@ class ForgetPwdActivity : AppCompatActivity() {
             2 -> {
                 bindingVerify = VerifyOtpBinding.inflate(layoutInflater)
                 setContentView(bindingVerify.root)
-                window.navigationBarColor = resources.getColor(android.R.color.black)
 
                 val otpFields = listOf(
                     bindingVerify.otp1,
@@ -105,7 +103,6 @@ class ForgetPwdActivity : AppCompatActivity() {
             3 -> {
                 bindingNewPwd = ResetPasswordBinding.inflate(layoutInflater)
                 setContentView(bindingNewPwd.root)
-                window.navigationBarColor = resources.getColor(android.R.color.black)
 
                 isPasswordVisible = false
                 isConfirmPasswordVisible = false

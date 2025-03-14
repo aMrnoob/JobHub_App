@@ -3,7 +3,6 @@ package com.example.jobhub
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.LoginScreenBinding
 import com.example.jobhub.dto.auth.LoginRequest
@@ -15,7 +14,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : BaseActivity() {
 
     private lateinit var binding: LoginScreenBinding
     private val userService: UserService by lazy {
@@ -25,7 +24,6 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.navigationBarColor = resources.getColor(android.R.color.black)
 
         binding = LoginScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -70,9 +68,12 @@ class LoginActivity : AppCompatActivity() {
 
                     val loginResponse = response.body()?.data
 
+                    loginResponse?.token?.let { token ->
+                        saveToken(token)
+                    }
+
                     if(loginResponse?.role == Role.UNDEFINED) {
-                        val intent = Intent(this@LoginActivity, ChooseProfileActivity::class.java)
-                        intent.putExtra("loginResponse", loginResponse)
+                        val intent = Intent(this@LoginActivity, SelectProfileActivity::class.java)
                         startActivity(intent)
                     } else {
                         Toast.makeText(this@LoginActivity, response.body()?.message ?: "Login failed", Toast.LENGTH_SHORT).show()
@@ -86,6 +87,11 @@ class LoginActivity : AppCompatActivity() {
                 Toast.makeText(this@LoginActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+
+    private fun saveToken(token: String) {
+        val sharedPreferences = getSharedPreferences("JobHubPrefs", MODE_PRIVATE)
+        sharedPreferences.edit().putString("authToken", token).apply()
     }
 
     private fun togglePasswordVisibility() {

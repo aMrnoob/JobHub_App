@@ -5,6 +5,7 @@ import com.example.jobhub.dto.auth.LoginRequest
 import com.example.jobhub.dto.auth.LoginResponse
 import com.example.jobhub.dto.auth.OtpVerifyRequest
 import com.example.jobhub.dto.auth.Register_ResetPwdRequest
+import com.example.jobhub.entity.User
 import com.example.jobhub.model.ApiResponse
 import retrofit2.Call
 import retrofit2.http.Body
@@ -25,4 +26,10 @@ interface UserService {
 
     @POST("api/auth/reset")
     fun passwordReset(@Body resetPwdRequest: Register_ResetPwdRequest): Call<ApiResponse<Void>>
+
+    @POST("api/admin/get-user-info")
+    fun getUserInfo(@Body token: String): Call<ApiResponse<User>>
+
+    @POST("api/admin/update-user")
+    fun updateUser(@Body user: User): Call<ApiResponse<Void>>
 }
