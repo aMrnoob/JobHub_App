@@ -72,11 +72,10 @@ class LoginActivity : BaseActivity() {
                         saveToken(token)
                     }
 
-                    if(loginResponse?.role == Role.UNDEFINED) {
-                        val intent = Intent(this@LoginActivity, SelectProfileActivity::class.java)
-                        startActivity(intent)
-                    } else {
-                        Toast.makeText(this@LoginActivity, response.body()?.message ?: "Login failed", Toast.LENGTH_SHORT).show()
+                    when (loginResponse?.role) {
+                        Role.UNDEFINED -> startActivity(Intent(this@LoginActivity, SelectProfileActivity::class.java))
+                        Role.EMPLOYER, Role.JOB_SEEKER, Role.ADMIN -> startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                        else -> Toast.makeText(this@LoginActivity, response.body()?.message ?: "Login failed", Toast.LENGTH_SHORT).show()
                     }
                 } else {
                     Toast.makeText(this@LoginActivity, response.body()?.message ?: "Login failed", Toast.LENGTH_SHORT).show()

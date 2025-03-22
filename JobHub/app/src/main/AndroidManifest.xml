@@ -20,7 +20,7 @@
             android:name=".BaseActivity"
             android:exported="true" />
         <activity
-            android:name=".HomeActivity"
+            android:name=".MainActivity"
             android:exported="true" />
         <activity
             android:name=".ForgetPwdActivity"

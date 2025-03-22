@@ -76,12 +76,12 @@ class SignUpActivity : BaseActivity() {
                 if (response.isSuccessful && response.body()?.isSuccess == true) {
                     Toast.makeText(this@SignUpActivity, response.body()?.message, Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(this@SignUpActivity, response.body()?.message ?: "Đăng ký thất bại", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@SignUpActivity, response.body()?.message ?: "Sign up failed", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<ApiResponse<Void>>, t: Throwable) {
-                Toast.makeText(this@SignUpActivity, "Lỗi kết nối: ${t.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@SignUpActivity, "Error connection: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }

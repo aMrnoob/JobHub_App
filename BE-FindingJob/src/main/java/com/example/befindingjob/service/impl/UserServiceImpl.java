@@ -1,5 +1,6 @@
 package com.example.befindingjob.service.impl;
 
+import com.example.befindingjob.dto.admin.UserInfo;
 import com.example.befindingjob.dto.auth.*;
 import com.example.befindingjob.entity.User;
 import com.example.befindingjob.entity.enumm.Role;
@@ -14,8 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Optional;
 
 @Service
@@ -126,25 +129,77 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ApiResponse<User> getUserInfo(String token) {
-        System.out.println(token);
+    public ApiResponse<UserInfo> getUserInfo(String token) {
+        if (token == null || !token.startsWith("Bearer ")) {
+            return new ApiResponse<>(false, "Invalid token format. Token must start with 'Bearer '.");
+        }
+
+        token = token.substring(7);
+
+        if (!jwtService.isTokenValid(token)) {
+            return new ApiResponse<>(false, "Invalid or expired token.");
+        }
+
         Integer userId = jwtService.extractUserId(token);
-        String fullName = jwtService.extractFullname(token);
+        if (userId == null) {
+            return new ApiResponse<>(false, "Invalid token: Missing user information.");
+        }
 
-        User user = new User();
-        user.setUserId(userId);
-        user.setFullname(fullName);
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            return new ApiResponse<>(false, "User not found.");
+        }
 
-        return new ApiResponse<User>(true, "Get userInfo.");
+        User user = userOptional.get();
+        UserInfo userInfo = new UserInfo();
+        userInfo.setUserId(user.getUserId());
+        userInfo.setFullName(user.getFullname());
+        userInfo.setEmail(user.getEmail());
+        userInfo.setRole(user.getRole());
+        userInfo.setAddress(user.getAddress());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        if (user.getDateOfBirth() != null) {
+            userInfo.setDateOfBirth(user.getDateOfBirth().format(formatter));
+        } else {
+            userInfo.setDateOfBirth(null);
+        }
+
+        if (user.getCreatedAt() != null) {
+            userInfo.setCreated_at(user.getCreatedAt().format(formatter));
+        } else {
+            userInfo.setCreated_at(null);
+        }
+
+        if (user.getUpdatedAt() != null) {
+            userInfo.setUpdated_at(user.getUpdatedAt().format(formatter));
+        } else {
+            userInfo.setUpdated_at(null);
+        }
+
+        userInfo.setPhone(user.getPhone());
+
+
+        return new ApiResponse<>(true, "Get userInfo successfully.", userInfo);
     }
 
     @Override
-    public ApiResponse<Void> updateUser(User user) {
-        return userRepository.findById(user.getUserId()).map(existingUser -> {
-            existingUser.setFullname(user.getFullname());
-            existingUser.setAddress(user.getAddress());
-            existingUser.setDateOfBirth(user.getDateOfBirth());
-            existingUser.setPhone(user.getPhone());
+    public ApiResponse<Void> updateUser(UserInfo userInfo) {
+        return userRepository.findById(userInfo.getUserId()).map(existingUser -> {
+            existingUser.setEmail(userInfo.getEmail());
+            if (userInfo.getPassword() != null && !userInfo.getPassword().isBlank()) {
+                existingUser.setPassword(passwordEncoder.encode(userInfo.getPassword()));
+            }
+            existingUser.setRole(userInfo.getRole());
+            existingUser.setFullname(userInfo.getFullName());
+            existingUser.setAddress(userInfo.getAddress());
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy");
+            LocalDate dateOfBirth = LocalDate.parse(userInfo.getDateOfBirth(), formatter);
+            existingUser.setDateOfBirth(dateOfBirth.atStartOfDay());
+            System.out.println(userInfo.getRole());
+            existingUser.setPhone(userInfo.getPhone());
             existingUser.setUpdatedAt(java.time.LocalDateTime.now());
 
             userRepository.save(existingUser);

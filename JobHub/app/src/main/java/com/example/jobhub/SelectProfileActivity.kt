@@ -10,16 +10,15 @@ import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.ChooseJobBinding
 import com.example.jobhub.databinding.ChooseProfileBinding
 import com.example.jobhub.databinding.ProfileBinding
-import com.example.jobhub.entity.User
+import com.example.jobhub.dto.admin.UserInfo
 import com.example.jobhub.entity.enumm.Role
 import com.example.jobhub.model.ApiResponse
 import com.example.jobhub.service.UserService
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.Calendar
+import kotlin.properties.Delegates
 
 
 class SelectProfileActivity : BaseActivity() {
@@ -29,7 +28,8 @@ class SelectProfileActivity : BaseActivity() {
     private lateinit var bindingProfile: ProfileBinding
     private lateinit var binding: ChooseProfileBinding
 
-    private var user: User = User()
+    private var userId by Delegates.notNull<Int>()
+    private lateinit var role: Role
 
     private var currentStep = 1
     private var lastClickTime: Long = 0
@@ -50,25 +50,16 @@ class SelectProfileActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val sharedPreferences = getSharedPreferences("JobHubPrefs", MODE_PRIVATE)
-        val token = sharedPreferences.getString("authToken", null)
-
-        if (token != null && token.isNotBlank()) {
-            val cleanedToken = token.trim()
-            Log.d("Token", "'$token'")
-            decryptedToken(cleanedToken)
-        } else {
-            Log.e("SelectProfileActivity", "Invalid or empty token")
-        }
-
         binding = ChooseProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         binding.tvFindingJob.setOnClickListener {
+            role = Role.JOB_SEEKER
             handleClick(it, Role.JOB_SEEKER)
         }
 
         binding.tvFindingStaff.setOnClickListener {
+            role = Role.EMPLOYER
             handleClick(it, Role.EMPLOYER)
         }
     }
@@ -80,11 +71,11 @@ class SelectProfileActivity : BaseActivity() {
                 setContentView(bindingChooseProfile.root)
 
                 bindingChooseProfile.tvFindingJob.setOnClickListener {
-                    handleClick(it, Role.EMPLOYER)
+                    handleClick(it, Role.JOB_SEEKER)
                 }
 
                 bindingChooseProfile.tvFindingStaff.setOnClickListener {
-                    handleClick(it, Role.JOB_SEEKER)
+                    handleClick(it, Role.EMPLOYER)
                 }
             }
             2 -> {
@@ -107,7 +98,16 @@ class SelectProfileActivity : BaseActivity() {
                 bindingProfile = ProfileBinding.inflate(layoutInflater)
                 setContentView(bindingProfile.root)
 
-                bindingProfile.edtEmail.setText(user.email)
+                val sharedPreferences = getSharedPreferences("JobHubPrefs", MODE_PRIVATE)
+                val token = sharedPreferences.getString("authToken", null)
+
+                if (token != null && token.isNotBlank()) {
+                    val cleanedToken = token.trim()
+                    Log.d("Token", "'$token'")
+                    decryptedToken(cleanedToken)
+                } else {
+                    Log.e("SelectProfileActivity", "Invalid or empty token")
+                }
 
                 bindingProfile.edtDateOfBirth.setOnClickListener {
                     val calendar = Calendar.getInstance()
@@ -124,33 +124,32 @@ class SelectProfileActivity : BaseActivity() {
                 }
 
                 bindingProfile.btnNext.setOnClickListener {
-                    user.fullName = bindingProfile.edtFullName.text.toString()
+                    val fullName = bindingProfile.edtFullName.text.toString()
+                    val email = bindingProfile.edtEmail.text.toString()
                     val dateString = bindingProfile.edtDateOfBirth.text.toString()
-                    if (dateString.isNotEmpty()) {
-                        val formatter = DateTimeFormatter.ofPattern("d/M/yyyy")
-                        val localDate = LocalDate.parse(dateString, formatter)
-                        user.dateOfBirth = localDate.atStartOfDay()
-                    }
-                    user.phone = bindingProfile.edtPhone.text.toString()
-                    user.address = bindingProfile.edtAddress.text.toString()
+                    val phone = bindingProfile.edtPhone.text.toString()
+                    val address = bindingProfile.edtAddress.text.toString()
+                    val userInfo = UserInfo(userId = userId, fullName = fullName, role = role,
+                        email = email, phone = phone, address = address, dateOfBirth = dateString
+                    )
 
-                    updateUser()
+                    updateUser(userInfo)
 
                     currentStep = 4
                     showStep(currentStep)
                 }
             }
             4 -> {
-                val intent = Intent(this, HomeActivity::class.java)
+                val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
                 finish()
             }
         }
     }
 
-    private fun updateUser() {
+    private fun updateUser(userInfo: UserInfo) {
         val apiService = RetrofitClient.createRetrofit().create(UserService::class.java)
-        apiService.updateUser(user).enqueue(object : Callback<ApiResponse<Void>> {
+        apiService.updateUser(userInfo).enqueue(object : Callback<ApiResponse<Void>> {
             override fun onResponse(call: Call<ApiResponse<Void>>, response: Response<ApiResponse<Void>>) {
                 if (response.isSuccessful && response.body()?.isSuccess == true) {
                     response.body()?.let {
@@ -170,17 +169,34 @@ class SelectProfileActivity : BaseActivity() {
 
     private fun decryptedToken(token: String) {
         val apiService = RetrofitClient.createRetrofit().create(UserService::class.java)
-        apiService.getUserInfo(token).enqueue(object : Callback<ApiResponse<User>> {
-            override fun onResponse(call: Call<ApiResponse<User>>, response: Response<ApiResponse<User>>) {
-                if (response.isSuccessful && response.body()?.isSuccess == true) {
-                    response.body()?.data?.let {
-                        user = it
+        apiService.getUserInfo("Bearer $token").enqueue(object : Callback<ApiResponse<UserInfo>> {
+            override fun onResponse(call: Call<ApiResponse<UserInfo>>, response: Response<ApiResponse<UserInfo>>) {
+                if (response.isSuccessful) {
+                    Log.d("decryptedToken", "API call successful. Code: ${response.code()}")
+
+                    val apiResponse = response.body()
+                    if (apiResponse != null && apiResponse.isSuccess) {
+                        Log.d("decryptedToken", "User info: ${apiResponse.data}")
+
+                        apiResponse.data?.let {
+                            runOnUiThread {
+                                it.userId?.let { id -> userId = id } ?: Log.e("decryptedToken", "User ID is null")
+                                bindingProfile.edtEmail.setText(it.email)
+                            }
+                        } ?: run {
+                            Log.e("decryptedToken", "User data is null in the response.")
+                        }
+                    } else {
+                        Log.e("decryptedToken", "API response is not successful. Message: ${apiResponse?.message}")
                     }
+                } else {
+                    Log.e("decryptedToken", "API call failed. Code: ${response.code()}, Message: ${response.message()}")
+                    Log.e("decryptedToken", "Error body: ${response.errorBody()?.string()}")
                 }
             }
 
-            override fun onFailure(call: Call<ApiResponse<User>>, t: Throwable) {
-
+            override fun onFailure(call: Call<ApiResponse<UserInfo>>, t: Throwable) {
+                Log.e("decryptedToken", "API call failed: ${t.message}", t)
             }
         })
     }
@@ -189,7 +205,7 @@ class SelectProfileActivity : BaseActivity() {
         val currentTime = System.currentTimeMillis()
 
         if (currentTime - lastClickTime < 300) {
-            user.role = selectedRole
+            role = selectedRole
             selectRole()
         } else {
             toggleSelection(view)
@@ -205,11 +221,11 @@ class SelectProfileActivity : BaseActivity() {
     }
 
     private fun selectRole() {
-        if (user.role == Role.EMPLOYER) {
-            currentStep = 2
+        if (role == Role.EMPLOYER) {
+            currentStep = 3
             showStep(currentStep)
         } else {
-            currentStep = 3
+            currentStep = 2
             showStep(currentStep)
         }
     }
@@ -217,8 +233,6 @@ class SelectProfileActivity : BaseActivity() {
     private fun jobSelectionListeners() {
         jobTitleMap.forEach { (_, textView) ->
             textView.setOnClickListener {
-                val jobTitle = textView.text.toString()
-
                 highlightSelectedJob(textView)
             }
         }

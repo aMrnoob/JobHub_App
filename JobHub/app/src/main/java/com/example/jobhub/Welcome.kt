@@ -2,7 +2,6 @@ package com.example.jobhub
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import com.example.jobhub.databinding.WelcomeScreenBinding
 
 class Welcome : BaseActivity() {

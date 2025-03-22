@@ -1,6 +1,7 @@
 package com.example.befindingjob.entity;
 
 import com.example.befindingjob.entity.enumm.Role;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,7 +22,7 @@ public class User {
     @Column(name = "user_id")
     private Integer userId;
 
-    @Column(name = "fullname", nullable = false)
+    @Column(name = "fullname", nullable = true)
     private String fullname;
 
     @Column(name = "email", nullable = false, unique = true)
@@ -31,7 +32,7 @@ public class User {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false)
+    @Column(name = "role", nullable = true)
     private Role role;
 
     @Column(name = "address")

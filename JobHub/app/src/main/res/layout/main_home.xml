@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     android:fitsSystemWindows="true">
 
     <ImageView
         android:id="@+id/btnPenguin"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="15dp"
         android:scaleType="fitXY"
         android:src="@drawable/icon_penguin"
         android:background="@null"
@@ -23,10 +23,10 @@
         android:id="@+id/tvName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="55dp"
+        android:layout_marginTop="26dp"
         android:text="Hello, John !"
         android:textColor="@color/black"
-        android:textSize="28sp"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.06"
@@ -34,15 +34,16 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:layout_width="55dp"
-        android:layout_height="55dp"
-        android:layout_marginTop="48dp"
+        android:id="@+id/ivNotification"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="15dp"
         android:src="@drawable/icon_bell"
         android:padding="10dp"
         android:background="@drawable/otp_box"
         android:backgroundTint="#D4E3FF"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.7"
+        app:layout_constraintHorizontal_bias="0.8"
         app:layout_constraintStart_toEndOf="@+id/tvName"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -56,7 +57,7 @@
         android:textColorHint="@color/gray_600"
         android:textColor="@color/black"
         app:layout_constraintWidth_percent="0.7"
-        app:layout_constraintVertical_bias="0.175"
+        app:layout_constraintVertical_bias="0.12"
         app:layout_constraintHorizontal_bias="0.2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -68,7 +69,7 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:src="@drawable/icon_search"
-        app:layout_constraintVertical_bias="0.18"
+        app:layout_constraintVertical_bias="0.126"
         app:layout_constraintHorizontal_bias="0.7"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -79,8 +80,8 @@
         android:id="@+id/ivMenu"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:src="@drawable/icon_menu"
-        app:layout_constraintVertical_bias="0.175"
+        android:src="@drawable/icon_filter"
+        app:layout_constraintVertical_bias="0.123"
         app:layout_constraintHorizontal_bias="0.9"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -88,13 +89,14 @@
         app:layout_constraintBottom_toBottomOf="parent"/>
 
     <TextView
+        android:id="@+id/tvTips"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Tips for you"
         android:textColor="@color/black"
         android:textStyle="bold"
         android:textSize="20sp"
-        app:layout_constraintVertical_bias="0.27"
+        app:layout_constraintVertical_bias="0.22"
         app:layout_constraintHorizontal_bias="0.08"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -102,13 +104,14 @@
         app:layout_constraintBottom_toBottomOf="parent"/>
 
     <TextView
+        android:id="@+id/tvViewMore"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="See all"
         android:textColor="@color/blue_600"
         android:textStyle="bold"
         android:textSize="19sp"
-        app:layout_constraintVertical_bias="0.27"
+        app:layout_constraintVertical_bias="0.22"
         app:layout_constraintHorizontal_bias="0.9"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -119,7 +122,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_margin="15dp"
-        app:layout_constraintVertical_bias="0.37"
+        app:layout_constraintVertical_bias="0.31"
         app:layout_constraintHorizontal_bias="0.9"
         app:layout_constraintHeight_percent="0.2"
         app:layout_constraintEnd_toEndOf="parent"
@@ -174,7 +177,7 @@
         android:textColor="@color/black"
         android:textStyle="bold"
         android:textSize="20sp"
-        app:layout_constraintVertical_bias="0.56"
+        app:layout_constraintVertical_bias="0.51"
         app:layout_constraintHorizontal_bias="0.08"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -182,13 +185,14 @@
         app:layout_constraintBottom_toBottomOf="parent"/>
 
     <TextView
+        android:id="@+id/tvViewMore1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="See all"
         android:textColor="@color/blue_600"
         android:textStyle="bold"
         android:textSize="19sp"
-        app:layout_constraintVertical_bias="0.56"
+        app:layout_constraintVertical_bias="0.51"
         app:layout_constraintHorizontal_bias="0.9"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -201,7 +205,7 @@
         android:fillViewport="true"
         android:layout_marginStart="15dp"
         android:scrollbars="none"
-        app:layout_constraintVertical_bias="0.62"
+        app:layout_constraintVertical_bias="0.57"
         app:layout_constraintHorizontal_bias="0.9"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -211,9 +215,10 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal" >
+            android:orientation="horizontal">
 
             <TextView
+                android:id="@+id/tvAllJob"
                 android:layout_width="90dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
@@ -226,6 +231,7 @@
                 android:gravity="center"/>
 
             <TextView
+                android:id="@+id/tvWriter"
                 android:layout_width="90dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
@@ -238,6 +244,7 @@
                 android:gravity="center"/>
 
             <TextView
+                android:id="@+id/tvDesign"
                 android:layout_width="90dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
@@ -250,6 +257,7 @@
                 android:gravity="center"/>
 
             <TextView
+                android:id="@+id/tvHR"
                 android:layout_width="80dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
@@ -262,6 +270,7 @@
                 android:gravity="center"/>
 
             <TextView
+                android:id="@+id/tvProgramer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
@@ -273,6 +282,7 @@
                 android:background="@drawable/selected_box" />
 
             <TextView
+                android:id="@+id/tvFinance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
@@ -284,6 +294,7 @@
                 android:background="@drawable/selected_box"/>
 
             <TextView
+                android:id="@+id/tvCustomerService"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
@@ -295,6 +306,7 @@
                 android:background="@drawable/selected_box"/>
 
             <TextView
+                android:id="@+id/tvFoodRestaurant"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
@@ -306,6 +318,7 @@
                 android:background="@drawable/selected_box"/>
 
             <TextView
+                android:id="@+id/tvMusicProducer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
@@ -318,49 +331,15 @@
         </LinearLayout>
     </HorizontalScrollView>
 
-    <LinearLayout
+    <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintVertical_bias="0.87"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="20dp"
+        app:layout_constraintHeight_percent="0.29"
+        app:layout_constraintVertical_bias="0.88"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:orientation="vertical"
-        android:layout_marginHorizontal="25dp">
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="2">
-        </androidx.recyclerview.widget.RecyclerView>
-        
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:orientation="horizontal"
-            android:layout_weight="1">
-            
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                tools:ignore="NestedWeights" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"/>
-        </LinearLayout>
-    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -11,13 +11,4 @@ public class BeFindingJobApplication {
     public static void main(String[] args) {
         SpringApplication.run(BeFindingJobApplication.class, args);
     }
-
-    @RestController
-    public class HelloController {
-
-        @GetMapping("/hello")
-        public String sayHello() {
-            return "Hello, world!";
-        }
-    }
 }
