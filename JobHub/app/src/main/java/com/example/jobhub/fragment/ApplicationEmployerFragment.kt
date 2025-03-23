@@ -1,60 +1,45 @@
 package com.example.jobhub.fragment
 
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
+import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.jobhub.R
+import androidx.fragment.app.Fragment
+import com.example.jobhub.activity.CompanyActivity
+import com.example.jobhub.activity.JobActivity
+import com.example.jobhub.databinding.MainApplicationEmployerBinding
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [ApplicationEmployerFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class ApplicationEmployerFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private var _binding: MainApplicationEmployerBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.main_application_employer, container, false)
+        _binding = MainApplicationEmployerBinding.inflate(inflater, container, false)
+
+        binding.ivAddCompany.setOnClickListener {
+            animateView(it)
+            val intent = Intent(requireContext(), JobActivity::class.java)
+            startActivity(intent)
+        }
+
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ApplicationEmployerFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ApplicationEmployerFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    private fun animateView(view: View) {
+        ObjectAnimator.ofPropertyValuesHolder(
+            view,
+            PropertyValuesHolder.ofFloat(View.SCALE_X, 1f, 1.1f, 1f),
+            PropertyValuesHolder.ofFloat(View.SCALE_Y, 1f, 1.1f, 1f)
+        ).apply {
+            duration = 300
+            start()
+        }
     }
 }
