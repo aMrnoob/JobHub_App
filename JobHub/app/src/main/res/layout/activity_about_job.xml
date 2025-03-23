@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -24,7 +25,7 @@
         android:id="@+id/tvCompany"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Create Job"
+        android:text="About Job"
         android:textColor="@color/black"
         android:textSize="18sp"
         android:textStyle="bold"
@@ -37,10 +38,11 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintHorizontal_bias="0.168"
-        app:layout_constraintVertical_bias="0.55"
+        app:layout_constraintVertical_bias="0.45"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -135,6 +137,7 @@
                 android:layout_height="40dp"
                 android:layout_marginBottom="20dp"
                 android:background="@drawable/edittext_background"
+                android:drawableEnd="@drawable/icon_dollar"
                 android:hint="Salary"
                 android:textColorHint="@color/gray_500"
                 android:textColor="@color/black"
@@ -152,32 +155,16 @@
             <EditText
                 android:id="@+id/edtLocation"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginBottom="20dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="35dp"
+                android:paddingTop="5dp"
                 android:background="@drawable/edittext_background"
                 android:hint="Work's address"
                 android:textColorHint="@color/gray_500"
                 android:textColor="@color/black"
-                android:inputType="text" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="5dp"
-                android:text="Experience Required*"
-                android:textColor="@color/gray_700"
-                android:textSize="20sp" />
-
-            <Spinner
-                android:id="@+id/spinnerExperience"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginBottom="15dp"
-                android:theme="@style/SpinnerTextStyle"
-                android:popupBackground="@color/gray_100"
-                android:background="@drawable/edittext_background"
-                android:entries="@array/experience_options" />
+                android:inputType="text"
+                android:minHeight="70dp"
+                android:gravity="top"/>
 
             <Button
                 android:id="@+id/btnNext"

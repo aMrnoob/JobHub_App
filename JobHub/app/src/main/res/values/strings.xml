@@ -53,4 +53,10 @@
         <item>Above 3 years</item>
     </string-array>
 
+    <string-array name="job_type">
+        <item>Full Time</item>
+        <item>Part Time</item>
+        <item>Internship</item>
+        <item>Contract</item>
+    </string-array>
 </resources>

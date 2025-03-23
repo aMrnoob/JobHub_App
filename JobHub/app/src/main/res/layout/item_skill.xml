@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="30dp"
+    android:orientation="horizontal">
+
+    <EditText
+        android:id="@+id/edtSkill"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:hint="Enter skill"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:padding="10dp"
+        android:paddingStart="50dp"
+        android:background="@drawable/edittext_background" />
+
+    <ImageView
+        android:id="@+id/btnRemoveSkill"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:src="@drawable/icon_remove"
+        android:padding="8dp" />
+</LinearLayout>

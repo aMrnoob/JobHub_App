@@ -7,9 +7,9 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import com.example.jobhub.config.RetrofitClient
+import com.example.jobhub.databinding.ActivityProfileBinding
 import com.example.jobhub.databinding.ChooseJobBinding
 import com.example.jobhub.databinding.ChooseProfileBinding
-import com.example.jobhub.databinding.ProfileBinding
 import com.example.jobhub.dto.admin.UserInfo
 import com.example.jobhub.entity.enumm.Role
 import com.example.jobhub.model.ApiResponse
@@ -25,7 +25,7 @@ class SelectProfileActivity : BaseActivity() {
 
     private lateinit var bindingChooseProfile: ChooseProfileBinding
     private lateinit var bindingChooseJob: ChooseJobBinding
-    private lateinit var bindingProfile: ProfileBinding
+    private lateinit var bindingProfile: ActivityProfileBinding
     private lateinit var binding: ChooseProfileBinding
 
     private var userId by Delegates.notNull<Int>()
@@ -95,7 +95,7 @@ class SelectProfileActivity : BaseActivity() {
                 }
             }
             3 -> {
-                bindingProfile = ProfileBinding.inflate(layoutInflater)
+                bindingProfile = ActivityProfileBinding.inflate(layoutInflater)
                 setContentView(bindingProfile.root)
 
                 val sharedPreferences = getSharedPreferences("JobHubPrefs", MODE_PRIVATE)
