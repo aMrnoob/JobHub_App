@@ -1,4 +1,4 @@
-package com.example.jobhub
+package com.example.jobhub.activity
 
 import android.graphics.Color
 import android.os.Bundle

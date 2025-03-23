@@ -7,9 +7,10 @@ data class Company(
     val user: User,
     val companyName: String,
     val description: String?,
+    val address: String?,
     val logoUrl: String?,
     val website: String?,
     val createdAt: LocalDateTime?,
     val updatedAt: LocalDateTime?,
-    val jobs: Set<Job> = emptySet()
+    val jobs: Set<Job> = emptySet(),
 )

@@ -1,4 +1,4 @@
-package com.example.jobhub
+package com.example.jobhub.activity
 
 import android.content.Intent
 import android.os.Bundle

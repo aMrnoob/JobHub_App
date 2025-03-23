@@ -1,4 +1,4 @@
-package com.example.jobhub
+package com.example.jobhub.activity
 
 import android.app.DatePickerDialog
 import android.content.Intent
@@ -222,7 +222,7 @@ class SelectProfileActivity : BaseActivity() {
 
     private fun selectRole() {
         if (role == Role.EMPLOYER) {
-            currentStep = 3
+            currentStep = 2
             showStep(currentStep)
         } else {
             currentStep = 2

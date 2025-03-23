@@ -30,7 +30,13 @@ public class Company {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String address;
+
+    @Column(columnDefinition = "TEXT")
     private String logoUrl;
+
+    @Column(columnDefinition = "TEXT")
     private String website;
 
     private java.time.LocalDateTime createdAt;

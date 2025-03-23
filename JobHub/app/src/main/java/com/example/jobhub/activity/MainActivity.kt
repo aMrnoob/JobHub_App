@@ -1,4 +1,4 @@
-package com.example.jobhub
+package com.example.jobhub.activity
 
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
+import com.example.jobhub.R
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.ActivityMainBinding
 import com.example.jobhub.dto.admin.UserInfo
@@ -36,6 +37,7 @@ class MainActivity : BaseActivity() {
 
         getAuthToken()?.let { decryptedToken(it) } ?: Log.e("MainActivity", "Invalid or empty token")
         setupBottomNavigation()
+
         setupAnimation()
     }
 
@@ -74,24 +76,12 @@ class MainActivity : BaseActivity() {
 
     private fun setupBottomNavigation() {
         if (userInfo?.role == Role.EMPLOYER) {
-            binding.tvApply.visibility = View.GONE
-            binding.tvCompany.visibility = View.VISIBLE
-        } else {
             binding.tvApply.visibility = View.VISIBLE
             binding.tvCompany.visibility = View.GONE
+        } else {
+            binding.tvApply.visibility = View.GONE
+            binding.tvCompany.visibility = View.VISIBLE
         }
-
-        binding.tvHome.setOnClickListener { loadFragment(HomeFragment()) }
-        binding.tvApplication.setOnClickListener {
-            if (userInfo?.role == Role.EMPLOYER) {
-                loadFragment(ApplicationEmployerFragment())
-            } else {
-                loadFragment(ApplicationJobSeekerFragment())
-            }
-        }
-        binding.tvApply.setOnClickListener { loadFragment(ApplyFragment()) }
-        binding.tvCompany.setOnClickListener { loadFragment(CompanyFragment()) }
-        binding.tvProfile.setOnClickListener { loadFragment(ProfileFragment()) }
 
         if (supportFragmentManager.findFragmentById(R.id.fragmentContainer) == null) {
             loadFragment(HomeFragment())
@@ -105,11 +95,28 @@ class MainActivity : BaseActivity() {
     }
 
     private fun setupAnimation() {
-        binding.tvHome.setOnClickListener { animateView(it) }
-        binding.tvApplication.setOnClickListener { animateView(it) }
-        binding.tvApply.setOnClickListener { animateView(it) }
-        binding.tvCompany.setOnClickListener { animateView(it) }
-        binding.tvProfile.setOnClickListener { animateView(it) }
+        listOf(binding.tvHome, binding.tvApplication, binding.tvApply, binding.tvCompany, binding.tvProfile)
+            .forEach { view ->
+                view.setOnClickListener {
+                    animateView(it)
+                    val fragment = when (it) {
+                        binding.tvHome -> HomeFragment()
+                        binding.tvApplication -> {
+                            if (userInfo?.role == Role.EMPLOYER) {
+                                ApplicationEmployerFragment()
+                            } else {
+                                ApplicationJobSeekerFragment()
+                            }
+                        }
+                        binding.tvApply -> ApplyFragment()
+                        binding.tvCompany -> CompanyFragment()
+                        binding.tvProfile -> ProfileFragment()
+                        else -> return@setOnClickListener
+                    }
+
+                    loadFragment(fragment)
+                }
+            }
     }
 
     private fun animateView(view: View) {

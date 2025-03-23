@@ -56,6 +56,7 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("com.google.android.material:material:1.6.0")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation(libs.material)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.navigation.fragment.ktx)

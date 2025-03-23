@@ -1,4 +1,4 @@
-package com.example.jobhub
+package com.example.jobhub.activity
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.widget.EditText
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import com.example.jobhub.R
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.ForgetPwdBinding
 import com.example.jobhub.databinding.ResetPasswordBinding

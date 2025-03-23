@@ -1,7 +1,6 @@
 package com.example.befindingjob.entity;
 
 import com.example.befindingjob.entity.enumm.Role;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 

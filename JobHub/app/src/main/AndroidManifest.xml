@@ -17,25 +17,32 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".BaseActivity"
+            android:name=".activity.JobActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.CompanyActivity"
             android:exported="true" />
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.BaseActivity"
             android:exported="true" />
         <activity
-            android:name=".ForgetPwdActivity"
+            android:name=".activity.MainActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustNothing" />
+        <activity
+            android:name=".activity.ForgetPwdActivity"
             android:exported="true" />
         <activity
-            android:name=".SelectProfileActivity"
+            android:name=".activity.SelectProfileActivity"
             android:exported="true" />
         <activity
-            android:name=".SignUpActivity"
+            android:name=".activity.SignUpActivity"
             android:exported="true" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".activity.LoginActivity"
             android:exported="true" />
         <activity
-            android:name=".Welcome"
+            android:name=".activity.Welcome"
             android:exported="true"
             android:theme="@style/Theme.JobHub">
             <intent-filter>

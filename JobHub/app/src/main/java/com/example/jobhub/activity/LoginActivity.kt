@@ -1,8 +1,9 @@
-package com.example.jobhub
+package com.example.jobhub.activity
 
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import com.example.jobhub.R
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.LoginScreenBinding
 import com.example.jobhub.dto.auth.LoginRequest
