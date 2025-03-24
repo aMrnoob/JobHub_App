@@ -1,22 +1,21 @@
 package com.example.jobhub.dto.employer
 
-import com.example.jobhub.entity.Skill
+import com.example.jobhub.dto.jobseeker.SkillInfo
+import com.example.jobhub.entity.Application
 import com.example.jobhub.entity.enumm.JobType
-import java.time.LocalDateTime
 
 data class JobInfo(
-    val jobId: Int? = null,
+    var jobId: Int? = null,
     var title: String = "",
-    val companyInfo: CompanyInfo? = null,
-    val description: String = "",
-    val requirements: String = "",
-    val salary: String = "",
-    val location: String = "",
-    val jobType: JobType? = null,
-    val experienceRequired: String = "",
-    val postingDate: LocalDateTime? = null,
-    val expirationDate: LocalDateTime? = null,
-    val requiredSkills: Set<Skill> = emptySet(),
-    val createdAt: String = "",
-    val updatedAt: String = "",
+    var companyInfo: CompanyInfo? = null,
+    var description: String = "",
+    var requirements: String = "",
+    var salary: String = "",
+    var location: String = "",
+    var jobType: JobType? = null,
+    var experienceRequired: String = "",
+    var postingDate: String? = null,
+    var expirationDate: String? = null,
+    var requiredSkills: Set<SkillInfo> = emptySet(),
+    var applications: Set<Application> = emptySet()
 )

@@ -1,5 +1,6 @@
 package com.example.jobhub.adapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,8 +8,9 @@ import android.widget.EditText
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.jobhub.R
+import com.example.jobhub.dto.jobseeker.SkillInfo
 
-class SkillAdapter(private val skills: MutableList<String>) :
+class SkillAdapter(private var skills: MutableList<SkillInfo>) :
     RecyclerView.Adapter<SkillAdapter.SkillViewHolder>() {
 
     class SkillViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -22,18 +24,32 @@ class SkillAdapter(private val skills: MutableList<String>) :
     }
 
     override fun onBindViewHolder(holder: SkillViewHolder, position: Int) {
-        holder.edtSkill.setText(skills[position])
+        val skill = skills[position]
+        holder.edtSkill.setText(skill.skillName)
 
         holder.btnRemove.setOnClickListener {
             skills.removeAt(position)
             notifyDataSetChanged()
         }
+
+        holder.edtSkill.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {
+                skills[position].skillName = holder.edtSkill.text.toString().trim()
+            }
+        }
     }
 
     override fun getItemCount() = skills.size
 
-    fun addSkill() {
-        skills.add("")
+    @SuppressLint("NotifyDataSetChanged")
+    fun addSkill(skill: SkillInfo) {
+        skills.add(skill)
         notifyDataSetChanged()
     }
+
+    fun getSkills(): List<SkillInfo> = skills
+        .filter { it.skillName.isNotBlank() }
+        .mapIndexed { index, skill ->
+            SkillInfo(skillId = index + 1, skillName = skill.skillName)
+        }
 }

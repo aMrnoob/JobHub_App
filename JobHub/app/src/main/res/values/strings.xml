@@ -54,9 +54,9 @@
     </string-array>
 
     <string-array name="job_type">
-        <item>Full Time</item>
-        <item>Part Time</item>
-        <item>Internship</item>
-        <item>Contract</item>
+        <item>FULL TIME</item>
+        <item>PART TIME</item>
+        <item>INTERNSHIP</item>
+        <item>CONTRACT</item>
     </string-array>
 </resources>
