@@ -36,9 +36,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_marginHorizontal="10dp"
         app:layout_constraintHorizontal_bias="0.168"
         app:layout_constraintVertical_bias="0.5"
         app:layout_constraintWidth_percent="0.8"
@@ -47,121 +50,112 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_marginHorizontal="10dp">
+            android:layout_marginBottom="10dp"
+            android:layout_marginStart="5dp"
+            android:text="Posting Date*"
+            android:textColor="@color/gray_700"
+            android:textSize="20sp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="5dp"
-                android:text="Posting Date*"
-                android:textColor="@color/gray_700"
-                android:textSize="20sp" />
+        <EditText
+            android:id="@+id/edtPostingDate"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/edittext_background"
+            android:hint="Posting date"
+            android:textColorHint="@color/gray_500"
+            android:textColor="@color/black"
+            android:inputType="none"
+            android:focusable="false" />
 
-            <EditText
-                android:id="@+id/edtPostingDate"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginBottom="20dp"
-                android:background="@drawable/edittext_background"
-                android:hint="Posting date"
-                android:textColorHint="@color/gray_500"
-                android:textColor="@color/black"
-                android:inputType="none"
-                android:focusable="false" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginStart="5dp"
+            android:text="Expiration Date*"
+            android:textColor="@color/gray_700"
+            android:textSize="20sp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="5dp"
-                android:text="Expiration Date*"
-                android:textColor="@color/gray_700"
-                android:textSize="20sp" />
+        <EditText
+            android:id="@+id/edtExpirationDate"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/edittext_background"
+            android:hint="Expiration date"
+            android:textColorHint="@color/gray_500"
+            android:textColor="@color/black"
+            android:inputType="none"
+            android:focusable="false" />
 
-            <EditText
-                android:id="@+id/edtExpirationDate"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginBottom="20dp"
-                android:background="@drawable/edittext_background"
-                android:hint="Expiration date"
-                android:textColorHint="@color/gray_500"
-                android:textColor="@color/black"
-                android:inputType="none"
-                android:focusable="false" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginStart="5dp"
+            android:text="Experience Required*"
+            android:textColor="@color/gray_700"
+            android:textSize="20sp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="5dp"
-                android:text="Experience Required*"
-                android:textColor="@color/gray_700"
-                android:textSize="20sp" />
+        <Spinner
+            android:id="@+id/spinnerExperience"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="15dp"
+            android:theme="@style/SpinnerTextStyle"
+            android:popupBackground="@color/gray_100"
+            android:background="@drawable/edittext_background"
+            android:entries="@array/experience_options" />
 
-            <Spinner
-                android:id="@+id/spinnerExperience"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginBottom="15dp"
-                android:theme="@style/SpinnerTextStyle"
-                android:popupBackground="@color/gray_100"
-                android:background="@drawable/edittext_background"
-                android:entries="@array/experience_options" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginStart="5dp"
+            android:text="Select Company*"
+            android:textColor="@color/gray_700"
+            android:textSize="20sp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="5dp"
-                android:text="Select Company*"
-                android:textColor="@color/gray_700"
-                android:textSize="20sp" />
+        <Spinner
+            android:id="@+id/spinnerCompany"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="15dp"
+            android:theme="@style/SpinnerTextStyle"
+            android:popupBackground="@color/gray_100"
+            android:background="@drawable/edittext_background" />
 
-            <Spinner
-                android:id="@+id/spinnerCompany"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginBottom="20dp"
-                android:theme="@style/SpinnerTextStyle"
-                android:popupBackground="@color/gray_100"
-                android:background="@drawable/edittext_background"
-                android:entries="@array/experience_options" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginStart="5dp"
+            android:text="Job Type*"
+            android:textColor="@color/gray_700"
+            android:textSize="20sp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="5dp"
-                android:text="Job Type*"
-                android:textColor="@color/gray_700"
-                android:textSize="20sp" />
+        <Spinner
+            android:id="@+id/spinnerJobType"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="40dp"
+            android:theme="@style/SpinnerTextStyle"
+            android:popupBackground="@color/gray_100"
+            android:background="@drawable/edittext_background"
+            android:entries="@array/job_type" />
 
-            <Spinner
-                android:id="@+id/spinnerJobType"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginBottom="40dp"
-                android:theme="@style/SpinnerTextStyle"
-                android:popupBackground="@color/gray_100"
-                android:background="@drawable/edittext_background"
-                android:entries="@array/job_type" />
-
-            <Button
-                android:id="@+id/btnNext"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginHorizontal="50dp"
-                android:backgroundTint="@color/blue_700"
-                android:text="Next"
-                android:textColor="@color/white"
-                android:textSize="24sp" />
-        </LinearLayout>
-    </ScrollView>
+        <Button
+            android:id="@+id/btnNext"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginHorizontal="50dp"
+            android:backgroundTint="@color/blue_700"
+            android:text="Next"
+            android:textColor="@color/white"
+            android:textSize="24sp" />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

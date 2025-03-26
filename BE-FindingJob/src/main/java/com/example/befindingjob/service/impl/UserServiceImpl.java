@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
         User user = userOptional.get();
 
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            return new ApiResponse<>(false, "Password is incorrect");
+            return new ApiResponse<>(false, "Password or Email is incorrect");
         }
 
         String token = jwtService.generateToken(user.getUserId(), user.getFullname());
@@ -179,7 +179,7 @@ public class UserServiceImpl implements UserService {
         userInfo.setPhone(user.getPhone());
 
 
-        return new ApiResponse<>(true, "Get userInfo successfully.", userInfo);
+        return new ApiResponse<>(true, "", userInfo);
     }
 
     @Override

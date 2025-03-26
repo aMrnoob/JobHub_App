@@ -2,8 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="30dp"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:layout_marginBottom="15dp">
 
     <EditText
         android:id="@+id/edtSkill"
@@ -11,12 +11,12 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:hint="Enter skill"
-        android:textAlignment="center"
-        android:textSize="18sp"
+        android:textSize="15sp"
         android:textStyle="bold"
         android:textColor="@color/black"
+        android:textColorHint="@color/gray_600"
         android:padding="10dp"
-        android:paddingStart="50dp"
+        android:paddingStart="15dp"
         android:background="@drawable/edittext_background" />
 
     <ImageView

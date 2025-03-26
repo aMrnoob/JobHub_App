@@ -46,12 +46,22 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public ApiResponse<List<CompanyInfo>> getAllCompanies(String token) {
+    public ApiResponse<List<CompanyInfo>> getAllCompaniesByUserId(String token) {
+        if (token == null || !token.startsWith("Bearer ")) {
+            return new ApiResponse<>(false, "");
+        }
+
+        token = token.substring(7);
+
+        if (!jwtService.isTokenValid(token)) {
+            return new ApiResponse<>(false, "Invalid or expired token.");
+        }
+
         Integer userId = jwtService.extractUserId(token);
 
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
-            return new ApiResponse<>(false, "User not found", null);
+            return new ApiResponse<>(false, "", null);
         }
 
         List<Company> companies = companyRepository.findByUserId(userId);
@@ -68,6 +78,6 @@ public class CompanyServiceImpl implements CompanyService {
                 null
         )).toList();
 
-        return new ApiResponse<>(true, "Company list retrieved successfully", companyInfoList);
+        return new ApiResponse<>(true, "", companyInfoList);
     }
 }

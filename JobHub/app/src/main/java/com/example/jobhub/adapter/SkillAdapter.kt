@@ -1,6 +1,8 @@
 package com.example.jobhub.adapter
 
 import android.annotation.SuppressLint
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,12 +12,41 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.jobhub.R
 import com.example.jobhub.dto.jobseeker.SkillInfo
 
-class SkillAdapter(private var skills: MutableList<SkillInfo>) :
+class SkillAdapter(private var skills: MutableList<SkillInfo>, private var isEditable: Boolean = false) :
     RecyclerView.Adapter<SkillAdapter.SkillViewHolder>() {
 
-    class SkillViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val edtSkill: EditText = view.findViewById(R.id.edtSkill)
-        val btnRemove: ImageView = view.findViewById(R.id.btnRemoveSkill)
+    inner class SkillViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val edtSkill: EditText = itemView.findViewById(R.id.edtSkill)
+        private val btnRemoveSkill: ImageView = itemView.findViewById(R.id.btnRemoveSkill)
+
+        fun bind(skill: SkillInfo) {
+            edtSkill.setText(skill.skillName)
+            edtSkill.isEnabled = isEditable
+
+            btnRemoveSkill.isEnabled = isEditable
+            btnRemoveSkill.visibility = if (isEditable) View.VISIBLE else View.GONE
+
+            edtSkill.addTextChangedListener(object : TextWatcher {
+                override fun afterTextChanged(s: Editable?) {
+                    val pos = adapterPosition
+                    if (pos != RecyclerView.NO_POSITION) {
+                        skills[pos].skillName = s.toString()
+                    }
+                }
+
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            })
+
+            btnRemoveSkill.setOnClickListener {
+                val pos = adapterPosition
+                if (pos != RecyclerView.NO_POSITION) {
+                    skills.removeAt(pos)
+                    notifyItemRemoved(pos)
+                    notifyItemRangeChanged(pos, skills.size)
+                }
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SkillViewHolder {
@@ -24,32 +55,23 @@ class SkillAdapter(private var skills: MutableList<SkillInfo>) :
     }
 
     override fun onBindViewHolder(holder: SkillViewHolder, position: Int) {
-        val skill = skills[position]
-        holder.edtSkill.setText(skill.skillName)
-
-        holder.btnRemove.setOnClickListener {
-            skills.removeAt(position)
-            notifyDataSetChanged()
-        }
-
-        holder.edtSkill.setOnFocusChangeListener { _, hasFocus ->
-            if (!hasFocus) {
-                skills[position].skillName = holder.edtSkill.text.toString().trim()
-            }
-        }
+        holder.bind(skills[position])
     }
 
-    override fun getItemCount() = skills.size
+    override fun getItemCount(): Int = skills.size
 
-    @SuppressLint("NotifyDataSetChanged")
     fun addSkill(skill: SkillInfo) {
         skills.add(skill)
-        notifyDataSetChanged()
+        notifyItemInserted(skills.size - 1)
     }
 
-    fun getSkills(): List<SkillInfo> = skills
-        .filter { it.skillName.isNotBlank() }
-        .mapIndexed { index, skill ->
-            SkillInfo(skillId = index + 1, skillName = skill.skillName)
-        }
+    fun getSkills(): List<SkillInfo> {
+        return skills.filter { it.skillName.isNotBlank() }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun setEditable(editable: Boolean) {
+        isEditable = editable
+        notifyDataSetChanged()
+    }
 }

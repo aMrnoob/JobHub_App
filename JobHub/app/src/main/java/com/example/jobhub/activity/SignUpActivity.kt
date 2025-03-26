@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import com.example.jobhub.R
+import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.CreateAccountBinding
 import com.example.jobhub.dto.auth.Register_ResetPwdRequest
@@ -67,23 +68,11 @@ class SignUpActivity : BaseActivity() {
     }
 
     private fun signUp(email: String, password: String) {
-        val registerRequest = Register_ResetPwdRequest(email, password)
-        userService.register(registerRequest).enqueue(object : Callback<ApiResponse<Void>> {
-            override fun onResponse(
-                call: Call<ApiResponse<Void>>,
-                response: Response<ApiResponse<Void>>
-            ) {
-                if (response.isSuccessful && response.body()?.isSuccess == true) {
-                    Toast.makeText(this@SignUpActivity, response.body()?.message, Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this@SignUpActivity, response.body()?.message ?: "Sign up failed", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onFailure(call: Call<ApiResponse<Void>>, t: Throwable) {
-                Toast.makeText(this@SignUpActivity, "Error connection: ${t.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
+        ApiHelper().callApi(
+            context = this,
+            call = userService.register(Register_ResetPwdRequest(email, password)),
+            onSuccess = { }
+        )
     }
 
     private fun togglePasswordVisibility(isPasswordField: Boolean) {

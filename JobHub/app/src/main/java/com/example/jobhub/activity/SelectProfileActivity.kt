@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.TextView
+import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.ActivityProfileBinding
 import com.example.jobhub.databinding.ChooseJobBinding
@@ -13,6 +14,7 @@ import com.example.jobhub.databinding.ChooseProfileBinding
 import com.example.jobhub.dto.admin.UserInfo
 import com.example.jobhub.entity.enumm.Role
 import com.example.jobhub.model.ApiResponse
+import com.example.jobhub.service.JobService
 import com.example.jobhub.service.UserService
 import retrofit2.Call
 import retrofit2.Callback
@@ -20,13 +22,15 @@ import retrofit2.Response
 import java.util.Calendar
 import kotlin.properties.Delegates
 
-
 class SelectProfileActivity : BaseActivity() {
 
     private lateinit var bindingChooseProfile: ChooseProfileBinding
     private lateinit var bindingChooseJob: ChooseJobBinding
     private lateinit var bindingProfile: ActivityProfileBinding
     private lateinit var binding: ChooseProfileBinding
+    private val userService: UserService by lazy {
+        RetrofitClient.createRetrofit().create(UserService::class.java)
+    }
 
     private var userId by Delegates.notNull<Int>()
     private lateinit var role: Role
@@ -148,57 +152,27 @@ class SelectProfileActivity : BaseActivity() {
     }
 
     private fun updateUser(userInfo: UserInfo) {
-        val apiService = RetrofitClient.createRetrofit().create(UserService::class.java)
-        apiService.updateUser(userInfo).enqueue(object : Callback<ApiResponse<Void>> {
-            override fun onResponse(call: Call<ApiResponse<Void>>, response: Response<ApiResponse<Void>>) {
-                if (response.isSuccessful && response.body()?.isSuccess == true) {
-                    response.body()?.let {
-                        if (response.isSuccessful) {
-                            currentStep = 4
-                            showStep(currentStep)
-                        }
-                    }
-                }
+        ApiHelper().callApi(
+            context = this,
+            call = userService.updateUser(userInfo),
+            onSuccess = {
+                currentStep = 4
+                showStep(currentStep)
             }
-
-            override fun onFailure(call: Call<ApiResponse<Void>>, t: Throwable) {
-
-            }
-        })
+        )
     }
 
     private fun decryptedToken(token: String) {
-        val apiService = RetrofitClient.createRetrofit().create(UserService::class.java)
-        apiService.getUserInfo("Bearer $token").enqueue(object : Callback<ApiResponse<UserInfo>> {
-            override fun onResponse(call: Call<ApiResponse<UserInfo>>, response: Response<ApiResponse<UserInfo>>) {
-                if (response.isSuccessful) {
-                    Log.d("decryptedToken", "API call successful. Code: ${response.code()}")
-
-                    val apiResponse = response.body()
-                    if (apiResponse != null && apiResponse.isSuccess) {
-                        Log.d("decryptedToken", "User info: ${apiResponse.data}")
-
-                        apiResponse.data?.let {
-                            runOnUiThread {
-                                it.userId?.let { id -> userId = id } ?: Log.e("decryptedToken", "User ID is null")
-                                bindingProfile.edtEmail.setText(it.email)
-                            }
-                        } ?: run {
-                            Log.e("decryptedToken", "User data is null in the response.")
-                        }
-                    } else {
-                        Log.e("decryptedToken", "API response is not successful. Message: ${apiResponse?.message}")
-                    }
-                } else {
-                    Log.e("decryptedToken", "API call failed. Code: ${response.code()}, Message: ${response.message()}")
-                    Log.e("decryptedToken", "Error body: ${response.errorBody()?.string()}")
+        ApiHelper().callApi(
+            context = this,
+            call = userService.getUserInfo("Bearer $token"),
+            onSuccess = { userInfo ->
+                userInfo?.let {
+                    it.userId?.let { id -> userId = id }
+                    bindingProfile.edtEmail.setText(it.email)
                 }
             }
-
-            override fun onFailure(call: Call<ApiResponse<UserInfo>>, t: Throwable) {
-                Log.e("decryptedToken", "API call failed: ${t.message}", t)
-            }
-        })
+        )
     }
 
     private fun handleClick(view: View, selectedRole: Role) {
@@ -222,7 +196,7 @@ class SelectProfileActivity : BaseActivity() {
 
     private fun selectRole() {
         if (role == Role.EMPLOYER) {
-            currentStep = 2
+            currentStep = 3
             showStep(currentStep)
         } else {
             currentStep = 2

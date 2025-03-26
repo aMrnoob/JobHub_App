@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface CompanyService {
     ApiResponse<Void> addCompany(CompanyInfo companyInfo);
-    ApiResponse<List<CompanyInfo>> getAllCompanies(String token);
+    ApiResponse<List<CompanyInfo>> getAllCompaniesByUserId(String token);
 }

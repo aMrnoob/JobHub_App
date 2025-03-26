@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import com.example.jobhub.R
+import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.LoginScreenBinding
 import com.example.jobhub.dto.auth.LoginRequest
@@ -58,36 +59,25 @@ class LoginActivity : BaseActivity() {
     }
 
     private fun login(email: String, password: String) {
-        val loginRequest = LoginRequest(email, password)
-        userService.login(loginRequest).enqueue(object : Callback<ApiResponse<LoginResponse>> {
-            override fun onResponse(
-                call: Call<ApiResponse<LoginResponse>>,
-                response: Response<ApiResponse<LoginResponse>>
-            ) {
-                if (response.isSuccessful && response.body()?.isSuccess == true) {
-                    Toast.makeText(this@LoginActivity, response.body()?.message ?: "Login successfully", Toast.LENGTH_SHORT).show()
-
-                    val loginResponse = response.body()?.data
-
-                    loginResponse?.token?.let { token ->
-                        saveToken(token)
-                    }
-
-                    when (loginResponse?.role) {
-                        Role.UNDEFINED -> startActivity(Intent(this@LoginActivity, SelectProfileActivity::class.java))
-                        Role.EMPLOYER, Role.JOB_SEEKER, Role.ADMIN -> startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-                        else -> Toast.makeText(this@LoginActivity, response.body()?.message ?: "Login failed", Toast.LENGTH_SHORT).show()
-                    }
-                } else {
-                    Toast.makeText(this@LoginActivity, response.body()?.message ?: "Login failed", Toast.LENGTH_SHORT).show()
-                }
+        ApiHelper().callApi(
+            context = this,
+            call = userService.login(LoginRequest(email, password)),
+            onSuccess = { loginResponse ->
+                loginResponse?.token?.let { saveToken(it) }
+                navigateToNextScreen(loginResponse?.role)
             }
-
-            override fun onFailure(call: Call<ApiResponse<LoginResponse>>, t: Throwable) {
-                Toast.makeText(this@LoginActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
+        )
     }
+
+    private fun navigateToNextScreen(role: Role?) {
+        val nextActivity = when (role) {
+            Role.UNDEFINED -> SelectProfileActivity::class.java
+            Role.EMPLOYER, Role.JOB_SEEKER, Role.ADMIN -> MainActivity::class.java
+            else -> null
+        }
+        nextActivity?.let { startActivity(Intent(this, it)) }
+    }
+
 
     private fun saveToken(token: String) {
         val sharedPreferences = getSharedPreferences("JobHubPrefs", MODE_PRIVATE)

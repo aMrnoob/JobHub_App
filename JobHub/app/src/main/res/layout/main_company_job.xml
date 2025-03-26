@@ -1,47 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
+<androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
-
-    <ImageButton
-        android:id="@+id/btnComeBack"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
-        android:background="@color/blue_100"
-        android:scaleType="fitXY"
-        android:src="@drawable/comeback_icon"
-        app:layout_constraintHorizontal_bias="0.047"
-        app:layout_constraintVertical_bias="0.07"
-        app:layout_constraintWidth_percent="0.8"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/tvCompany"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="About Job"
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintHorizontal_bias="0.23"
-        app:layout_constraintVertical_bias="0.075"
-        app:layout_constraintWidth_percent="0.8"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    android:background="@color/white"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintHorizontal_bias="0.168"
-        app:layout_constraintVertical_bias="0.45"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -59,18 +26,60 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:layout_marginStart="5dp"
-                android:text="Title*"
+                android:text="Company Name*"
                 android:textColor="@color/gray_700"
                 android:textSize="20sp" />
 
             <EditText
-                android:id="@+id/edtTitle"
+                android:id="@+id/edtCompanyName"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="50dp"
                 android:layout_marginBottom="20dp"
                 android:background="@drawable/edittext_background"
-                android:hint="Job name"
+                android:hint="Company name"
+                android:textColorHint="@color/gray_500"
+                android:textColor="@color/black"
+                android:inputType="text"
+                app:layout_constraintVertical_bias="0.25"
+                app:layout_constraintWidth_percent="0.8"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="Address*"
+                android:textColor="@color/gray_700"
+                android:textSize="20sp" />
+
+            <EditText
+                android:id="@+id/edtAddress"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/edittext_background"
+                android:hint="Address"
+                android:textColorHint="@color/gray_500"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="Logo Url*"
+                android:textColor="@color/gray_700"
+                android:textSize="20sp" />
+
+            <EditText
+                android:id="@+id/edtLogoUrl"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/edittext_background"
+                android:hint="Logo url"
                 android:textColorHint="@color/gray_500"
                 android:textColor="@color/black"
                 android:inputType="text" />
@@ -79,7 +88,25 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:layout_marginStart="5dp"
+                android:text="Website Url*"
+                android:textColor="@color/gray_700"
+                android:textSize="20sp" />
+
+            <EditText
+                android:id="@+id/edtWebsite"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/edittext_background"
+                android:hint="Website url"
+                android:textColorHint="@color/gray_500"
+                android:textColor="@color/black"
+                android:inputType="text" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
                 android:text="Description*"
                 android:textColor="@color/gray_700"
                 android:textSize="20sp" />
@@ -87,91 +114,26 @@
             <EditText
                 android:id="@+id/edtDescription"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="70dp"
                 android:layout_marginBottom="20dp"
-                android:paddingTop="5dp"
                 android:background="@drawable/edittext_background"
                 android:hint="Description"
+                android:padding="10dp"
                 android:textColorHint="@color/gray_500"
                 android:textColor="@color/black"
-                android:minHeight="70dp"
-                android:gravity="top"
-                android:inputType="textMultiLine" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="10dp"
-                android:text="Requirements*"
-                android:textColor="@color/gray_700"
-                android:textSize="20sp" />
-
-            <EditText
-                android:id="@+id/edtRequirements"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:paddingTop="5dp"
-                android:background="@drawable/edittext_background"
-                android:hint="Requirements"
-                android:textColorHint="@color/gray_500"
-                android:textColor="@color/black"
-                android:minHeight="70dp"
-                android:gravity="top"
-                android:inputType="textMultiLine" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="5dp"
-                android:text="Salary*"
-                android:textColor="@color/gray_700"
-                android:textSize="20sp" />
-
-            <EditText
-                android:id="@+id/edtSalary"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginBottom="20dp"
-                android:background="@drawable/edittext_background"
-                android:drawableEnd="@drawable/icon_dollar"
-                android:hint="Salary"
-                android:textColorHint="@color/gray_500"
-                android:textColor="@color/black"
-                android:inputType="numberDecimal" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="5dp"
-                android:text="Address*"
-                android:textColor="@color/gray_700"
-                android:textSize="20sp" />
-
-            <EditText
-                android:id="@+id/edtLocation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="35dp"
-                android:paddingTop="5dp"
-                android:background="@drawable/edittext_background"
-                android:hint="Work's address"
-                android:textColorHint="@color/gray_500"
-                android:textColor="@color/black"
-                android:inputType="text"
-                android:minHeight="70dp"
-                android:gravity="top"/>
+                android:inputType="textMultiLine"
+                android:gravity="top|start"
+                android:minLines="3"
+                android:maxLines="3"
+                android:scrollbars="vertical" />
 
             <Button
-                android:id="@+id/btnNext"
+                android:id="@+id/btnAdd"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_marginHorizontal="50dp"
+                android:layout_marginHorizontal="40dp"
                 android:backgroundTint="@color/blue_700"
-                android:text="Next"
+                android:text="Add"
                 android:textColor="@color/white"
                 android:textSize="24sp" />
         </LinearLayout>

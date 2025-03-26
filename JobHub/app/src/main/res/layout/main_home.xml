@@ -199,6 +199,7 @@
         app:layout_constraintBottom_toBottomOf="parent"/>
 
     <HorizontalScrollView
+        android:id="@+id/hsvMenu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fillViewport="true"
@@ -222,12 +223,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
                 android:text="All Job"
-                android:textColor="@drawable/text_color_selected"
+                android:textColor="@drawable/text_select"
                 android:textStyle="bold"
                 android:textSize="18sp"
                 android:padding="13dp"
-                android:background="@drawable/selected_box"
-                android:gravity="center"/>
+                android:gravity="center"
+                android:background="@drawable/background_select"/>
 
             <TextView
                 android:id="@+id/tvWriter"
@@ -235,12 +236,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
                 android:text="Writer"
-                android:textColor="@drawable/text_color_selected"
+                android:textColor="@drawable/text_select"
                 android:textStyle="bold"
                 android:textSize="18sp"
                 android:padding="13dp"
-                android:background="@drawable/selected_box"
-                android:gravity="center"/>
+                android:gravity="center"
+                android:background="@drawable/background_select"/>
 
             <TextView
                 android:id="@+id/tvDesign"
@@ -248,12 +249,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
                 android:text="Design"
-                android:textColor="@drawable/text_color_selected"
+                android:textColor="@drawable/text_select"
                 android:textStyle="bold"
                 android:padding="13dp"
                 android:textSize="18sp"
-                android:background="@drawable/selected_box"
-                android:gravity="center"/>
+                android:gravity="center"
+                android:background="@drawable/background_select"/>
 
             <TextView
                 android:id="@+id/tvHR"
@@ -261,12 +262,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
                 android:text="HR"
-                android:textColor="@drawable/text_color_selected"
+                android:textColor="@drawable/text_select"
                 android:textStyle="bold"
                 android:textSize="18sp"
                 android:padding="13dp"
-                android:background="@drawable/selected_box"
-                android:gravity="center"/>
+                android:gravity="center"
+                android:background="@drawable/background_select"/>
 
             <TextView
                 android:id="@+id/tvProgramer"
@@ -274,11 +275,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
                 android:text="Programer"
-                android:textColor="@drawable/text_color_selected"
+                android:textColor="@drawable/text_select"
                 android:textStyle="bold"
                 android:textSize="18sp"
                 android:padding="13dp"
-                android:background="@drawable/selected_box" />
+                android:background="@drawable/background_select"/>
 
             <TextView
                 android:id="@+id/tvFinance"
@@ -286,11 +287,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
                 android:text="Finance"
-                android:textColor="@drawable/text_color_selected"
+                android:textColor="@drawable/text_select"
                 android:textStyle="bold"
                 android:padding="13dp"
                 android:textSize="18sp"
-                android:background="@drawable/selected_box"/>
+                android:background="@drawable/background_select"/>
 
             <TextView
                 android:id="@+id/tvCustomerService"
@@ -298,11 +299,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
                 android:text="Customer Service"
-                android:textColor="@drawable/text_color_selected"
+                android:textColor="@drawable/text_select"
                 android:textStyle="bold"
                 android:textSize="18sp"
                 android:padding="13dp"
-                android:background="@drawable/selected_box"/>
+                android:background="@drawable/background_select"/>
 
             <TextView
                 android:id="@+id/tvFoodRestaurant"
@@ -310,11 +311,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
                 android:text="Cooking"
-                android:textColor="@drawable/text_color_selected"
+                android:textColor="@drawable/text_select"
                 android:textStyle="bold"
                 android:textSize="18sp"
                 android:padding="13dp"
-                android:background="@drawable/selected_box"/>
+                android:background="@drawable/background_select"/>
 
             <TextView
                 android:id="@+id/tvMusicProducer"
@@ -322,23 +323,21 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
                 android:text="Music Producer"
-                android:textColor="@drawable/text_color_selected"
+                android:textColor="@drawable/text_select"
                 android:textStyle="bold"
                 android:textSize="18sp"
                 android:padding="13dp"
-                android:background="@drawable/selected_box"/>
+                android:background="@drawable/background_select"/>
         </LinearLayout>
     </HorizontalScrollView>
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvJob"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginHorizontal="20dp"
-        app:layout_constraintHeight_percent="0.29"
-        app:layout_constraintVertical_bias="0.88"
+        android:layout_height="270dp"
+        android:layout_marginTop="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@+id/hsvMenu" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
