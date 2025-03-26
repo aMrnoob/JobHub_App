@@ -3,6 +3,8 @@ package com.example.jobhub.fragment
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.jobhub.R
+import com.example.jobhub.activity.VacancyActivity
 import com.example.jobhub.adapter.JobAdapter
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
@@ -19,6 +22,7 @@ import com.example.jobhub.databinding.ActivityMainBinding
 import com.example.jobhub.databinding.MainHomeBinding
 import com.example.jobhub.dto.employer.JobInfo
 import com.example.jobhub.service.JobService
+import com.google.gson.Gson
 
 class HomeFragment : Fragment() {
 
@@ -48,8 +52,13 @@ class HomeFragment : Fragment() {
 
     private fun setupRecyclerView() {
         jobAdapter = JobAdapter(jobList) { selectedJob ->
-
+            val intent = Intent(requireContext(), VacancyActivity::class.java)
+            val jobJson = Gson().toJson(selectedJob)
+            val sharedPreferences = requireContext().getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
+            sharedPreferences.edit().putString("job_info", jobJson).apply()
+            startActivity(intent)
         }
+
         binding.rvJob.apply {
             adapter = jobAdapter
             layoutManager = LinearLayoutManager(requireContext())

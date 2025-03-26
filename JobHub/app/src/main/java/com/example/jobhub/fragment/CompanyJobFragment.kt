@@ -1,32 +1,31 @@
 package com.example.jobhub.fragment
 
+import android.app.AlertDialog
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import com.example.jobhub.R
+import com.example.jobhub.databinding.MainCompanyJobBinding
+import com.example.jobhub.databinding.MainRequirementsBinding
+import com.example.jobhub.dto.employer.JobInfo
+import com.example.jobhub.fragment.fragmentinterface.FragmentInterface
+import com.google.gson.Gson
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [CompanyJobFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class CompanyJobFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+    private var _binding: MainCompanyJobBinding? = null
+    private val binding get() = _binding!!
+    private var jobInfo: JobInfo? = null
+    private var jobRequirementsInterface: FragmentInterface? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is FragmentInterface) {
+            jobRequirementsInterface = context
         }
     }
 
@@ -34,27 +33,66 @@ class CompanyJobFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.main_company_job, container, false)
+        _binding = MainCompanyJobBinding.inflate(inflater, container, false)
+
+        loadJobInfoFromPrefs()
+        displayJobInfo()
+        setEditTextEnabled(false)
+
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment CompanyJobFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            CompanyJobFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    fun enableEditing() {
+        setEditTextEnabled(true)
+    }
+
+    private fun displayJobInfo() {
+        jobInfo?.companyInfo?.let { company ->
+            binding.edtCompanyName.setText(company.companyName)
+            binding.edtAddress.setText(company.address)
+            binding.edtLogoUrl.setText(company.logoUrl)
+            binding.edtWebsite.setText(company.website)
+            binding.edtDescription.setText(company.description)
+        }
+    }
+
+    private fun setEditTextEnabled(enabled: Boolean) {
+        setEditTextState(binding.edtCompanyName, enabled)
+        setEditTextState(binding.edtAddress, enabled)
+        setEditTextState(binding.edtLogoUrl, enabled)
+        setEditTextState(binding.edtWebsite, enabled)
+        setEditTextState(binding.edtDescription, enabled)
+        if (!enabled) {
+            binding.edtDescription.setOnClickListener {
+                showDescriptionDialog(binding.edtDescription.text.toString())
             }
+        } else {
+            binding.edtDescription.setOnClickListener(null)
+        }
+
+        binding.btnAdd.isEnabled = enabled
+    }
+
+    private fun setEditTextState(editText: EditText, enabled: Boolean) {
+        editText.isFocusable = enabled
+        editText.isFocusableInTouchMode = enabled
+        editText.isCursorVisible = enabled
+    }
+
+    private fun showDescriptionDialog(description: String) {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Description")
+        builder.setMessage(description)
+        builder.setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+        builder.show()
+    }
+
+    private fun loadJobInfoFromPrefs() {
+        val sharedPreferences = requireContext().getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
+        val jobInfoJson = sharedPreferences.getString("job_info", null)
+
+        if (!jobInfoJson.isNullOrEmpty()) {
+            jobInfo = Gson().fromJson(jobInfoJson, JobInfo::class.java)
+        }
     }
 }

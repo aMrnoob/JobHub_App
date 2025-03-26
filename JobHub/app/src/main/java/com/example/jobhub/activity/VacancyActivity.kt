@@ -27,6 +27,8 @@ class VacancyActivity : BaseActivity(), FragmentInterface {
     private var userInfo: UserInfo? = null
     private var jobDetailFragment: JobDetailFragment? = null
     private var requirementsFragment: RequirementsFragment? = null
+    private var companyJobFragment: CompanyJobFragment? = null
+    private var currentFragment: Fragment? = null
     private val userService: UserService by lazy {
         RetrofitClient.createRetrofit().create(UserService::class.java)
     }
@@ -39,13 +41,6 @@ class VacancyActivity : BaseActivity(), FragmentInterface {
 
         binding.btnComeBack.setOnClickListener {
             finish()
-        }
-
-        binding.btnEdit.setOnClickListener {
-            when {
-                jobDetailFragment?.isVisible == true -> jobDetailFragment?.enableEditing()
-                requirementsFragment?.isVisible == true -> requirementsFragment?.enableEditing()
-            }
         }
 
         getAuthToken()?.let { decryptedToken(it) } ?: Log.e("VacancyActivity", "Invalid or empty token")
@@ -83,8 +78,12 @@ class VacancyActivity : BaseActivity(), FragmentInterface {
     }
 
     private fun loadFragment(fragment: Fragment) {
-        if (fragment is JobDetailFragment) {
-            jobDetailFragment = fragment
+        currentFragment = fragment
+
+        when (fragment) {
+            is RequirementsFragment -> requirementsFragment = fragment
+            is JobDetailFragment -> jobDetailFragment = fragment
+            is CompanyJobFragment -> companyJobFragment = fragment
         }
 
         supportFragmentManager.beginTransaction()
@@ -98,7 +97,13 @@ class VacancyActivity : BaseActivity(), FragmentInterface {
         }
 
         binding.btnEdit.setOnClickListener {
-            animateView(it) { jobDetailFragment?.enableEditing() }
+            animateView(it) {
+                when {
+                    jobDetailFragment?.isVisible == true -> jobDetailFragment?.enableEditing()
+                    requirementsFragment?.isVisible == true -> requirementsFragment?.enableEditing()
+                    companyJobFragment?.isVisible == true -> companyJobFragment?.enableEditing()
+                }
+            }
         }
     }
 
@@ -131,14 +136,23 @@ class VacancyActivity : BaseActivity(), FragmentInterface {
 
                 val fragment = when (textView) {
                     binding.tvJobDetail -> {
-                        jobDetailFragment = JobDetailFragment()
+                        if (jobDetailFragment == null) {
+                            jobDetailFragment = JobDetailFragment()
+                        }
                         jobDetailFragment!!
                     }
                     binding.tvRequirementJob -> {
-                        requirementsFragment = RequirementsFragment()
+                        if (requirementsFragment == null) {
+                            requirementsFragment = RequirementsFragment()
+                        }
                         requirementsFragment!!
                     }
-                    binding.tvCompany -> CompanyJobFragment()
+                    binding.tvCompany -> {
+                        if (companyJobFragment == null) {
+                            companyJobFragment = CompanyJobFragment()
+                        }
+                        companyJobFragment!!
+                    }
                     else -> return@setOnClickListener
                 }
 
@@ -152,6 +166,10 @@ class VacancyActivity : BaseActivity(), FragmentInterface {
     }
 
     override fun onEditClicked() {
-        jobDetailFragment?.enableEditing()
+        when {
+            jobDetailFragment?.isVisible == true -> jobDetailFragment?.enableEditing()
+            requirementsFragment?.isVisible == true -> requirementsFragment?.enableEditing()
+            companyJobFragment?.isVisible == true -> companyJobFragment?.enableEditing()
+        }
     }
 }

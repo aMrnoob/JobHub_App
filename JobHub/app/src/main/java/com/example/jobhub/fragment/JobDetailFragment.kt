@@ -85,6 +85,7 @@ class JobDetailFragment : Fragment() {
         binding.edtRequirements.isEnabled = enabled
         binding.edtSalary.isEnabled = enabled
         binding.edtLocation.isEnabled = enabled
+        binding.btnUpdate.isEnabled = enabled
     }
 
     private fun update() {

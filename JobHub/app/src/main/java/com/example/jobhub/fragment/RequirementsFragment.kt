@@ -1,5 +1,6 @@
 package com.example.jobhub.fragment
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.jobhub.adapter.SkillAdapter
 import com.example.jobhub.databinding.MainRequirementsBinding
 import com.example.jobhub.dto.employer.JobInfo
+import com.example.jobhub.dto.jobseeker.SkillInfo
 import com.example.jobhub.fragment.fragmentinterface.FragmentInterface
 import com.google.gson.Gson
 
@@ -34,13 +36,6 @@ class RequirementsFragment : Fragment() {
     ): View {
         _binding = MainRequirementsBinding.inflate(inflater, container, false)
 
-        val sharedPreferences = requireContext().getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
-        val jobInfoJson = sharedPreferences.getString("job_info", null)
-
-        if (!jobInfoJson.isNullOrEmpty()) {
-            jobInfo = Gson().fromJson(jobInfoJson, JobInfo::class.java)
-        }
-
         loadJobInfoFromPrefs()
         setupRecyclerView()
         setEditTextEnabled(false)
@@ -48,8 +43,10 @@ class RequirementsFragment : Fragment() {
         return binding.root
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun enableEditing() {
         setEditTextEnabled(true)
+        skillAdapter.notifyDataSetChanged()
     }
 
     private fun setupRecyclerView() {
@@ -58,6 +55,16 @@ class RequirementsFragment : Fragment() {
         skillAdapter = SkillAdapter(skillsList, false)
         binding.rvSkillJob.layoutManager = LinearLayoutManager(requireContext())
         binding.rvSkillJob.adapter = skillAdapter
+
+        binding.tvAddSkill.setOnClickListener {
+            val newSkill = SkillInfo(
+                skillName = "",
+                skillId = skillAdapter.itemCount + 1,
+                users = null,
+            )
+
+            skillAdapter.addSkill(newSkill)
+        }
     }
 
     private fun setEditTextEnabled(enabled: Boolean) {
