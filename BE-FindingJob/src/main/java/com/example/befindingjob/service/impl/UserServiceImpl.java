@@ -204,4 +204,26 @@ public class UserServiceImpl implements UserService {
             return new ApiResponse<Void>(true, "User updated successfully", null);
         }).orElseGet(() -> new ApiResponse<>(false, "User not found", null));
     }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    @Override
+    public User createUser(User user) {
+        user.setRole(Role.UNDEFINED);
+        return userRepository.save(user);
+    }
+
+    @Override
+    public String generateToken(User user) {
+        return "sample-jwt-token-" + user.getEmail();
+    }
+
+    @Override
+    public boolean verifyPassword(User user, String password) {
+        return user.getPassword() != null && user.getPassword().equals(password);
+    }
+
 }

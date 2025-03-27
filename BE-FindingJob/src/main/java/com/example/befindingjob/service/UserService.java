@@ -5,6 +5,8 @@ import com.example.befindingjob.dto.auth.*;
 import com.example.befindingjob.entity.User;
 import com.example.befindingjob.model.ApiResponse;
 
+import java.util.Optional;
+
 public interface UserService {
     ApiResponse<Void> register(Register_ResetPwdRequest registerRequest);
     ApiResponse<LoginResponse> login(LoginRequest loginRequest);
@@ -13,4 +15,12 @@ public interface UserService {
     ApiResponse<Void> passwordReset(Register_ResetPwdRequest resetPwdRequest);
     ApiResponse<UserInfo> getUserInfo(String token);
     ApiResponse<Void> updateUser(UserInfo userInfo);
+
+    Optional<User> findByEmail(String email);
+
+    User createUser(User user);
+
+    String generateToken(User user);
+
+    boolean verifyPassword(User user, String password);
 }
