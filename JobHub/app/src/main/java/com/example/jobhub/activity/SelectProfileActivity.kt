@@ -2,10 +2,14 @@ package com.example.jobhub.activity
 
 import android.app.DatePickerDialog
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.ActivityProfileBinding
 import com.example.jobhub.databinding.ChooseJobBinding
@@ -20,7 +24,6 @@ import retrofit2.Response
 import java.util.Calendar
 import kotlin.properties.Delegates
 
-
 class SelectProfileActivity : BaseActivity() {
 
     private lateinit var bindingChooseProfile: ChooseProfileBinding
@@ -33,6 +36,7 @@ class SelectProfileActivity : BaseActivity() {
 
     private var currentStep = 1
     private var lastClickTime: Long = 0
+    private var selectedImageUri: Uri? = null
 
     private val jobTitleMap: Map<String, TextView> by lazy {
         mapOf(
@@ -45,6 +49,27 @@ class SelectProfileActivity : BaseActivity() {
             "Food Restaurant" to bindingChooseJob.tvFoodRestaurant,
             "Music Producer" to bindingChooseJob.tvMusicProducer
         )
+    }
+
+    private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        if (uri != null) {
+            selectedImageUri = uri
+
+            if (::bindingProfile.isInitialized) {
+                bindingProfile.uploadedImageView.setImageURI(uri)
+                bindingProfile.uploadedImageView.invalidate()
+
+                bindingProfile.iconUploadImage.visibility = View.GONE
+
+                bindingProfile.uploadedImageView.visibility = View.VISIBLE
+            } else {
+                Log.e("ImagePicker", "bindingProfile chưa được khởi tạo")
+            }
+
+            validateFields()
+        } else {
+            Log.e("ImagePicker", "Không chọn được ảnh")
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -102,41 +127,40 @@ class SelectProfileActivity : BaseActivity() {
                 val token = sharedPreferences.getString("authToken", null)
 
                 if (token != null && token.isNotBlank()) {
-                    val cleanedToken = token.trim()
-                    Log.d("Token", "'$token'")
-                    decryptedToken(cleanedToken)
+                    decryptedToken(token.trim())
                 } else {
                     Log.e("SelectProfileActivity", "Invalid or empty token")
                 }
 
                 bindingProfile.edtDateOfBirth.setOnClickListener {
-                    val calendar = Calendar.getInstance()
-                    val year = calendar.get(Calendar.YEAR)
-                    val month = calendar.get(Calendar.MONTH)
-                    val day = calendar.get(Calendar.DAY_OF_MONTH)
+                    showDatePicker()
+                }
 
-                    val datePicker = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
-                        val date = "$selectedDay/${selectedMonth + 1}/$selectedYear"
-                        bindingProfile.edtDateOfBirth.setText(date)
-                    }, year, month, day)
+                bindingProfile.uploadImage.setOnClickListener {
+                    openImagePicker()
+                }
 
-                    datePicker.show()
+                bindingProfile.uploadedImageView.setOnClickListener {
+                    openImagePicker()
                 }
 
                 bindingProfile.btnNext.setOnClickListener {
-                    val fullName = bindingProfile.edtFullName.text.toString()
-                    val email = bindingProfile.edtEmail.text.toString()
-                    val dateString = bindingProfile.edtDateOfBirth.text.toString()
-                    val phone = bindingProfile.edtPhone.text.toString()
-                    val address = bindingProfile.edtAddress.text.toString()
-                    val userInfo = UserInfo(userId = userId, fullName = fullName, role = role,
-                        email = email, phone = phone, address = address, dateOfBirth = dateString
-                    )
+                    if (validateFields()) {
+                        val userInfo = UserInfo(
+                            userId = userId,
+                            fullName = bindingProfile.edtFullName.text.toString(),
+                            role = role,
+                            email = bindingProfile.edtEmail.text.toString(),
+                            phone = bindingProfile.edtPhone.text.toString(),
+                            address = bindingProfile.edtAddress.text.toString(),
+                            dateOfBirth = bindingProfile.edtDateOfBirth.text.toString()
+                        )
 
-                    updateUser(userInfo)
+                        updateUser(userInfo)
 
-                    currentStep = 4
-                    showStep(currentStep)
+                        currentStep = 4
+                        showStep(currentStep)
+                    }
                 }
             }
             4 -> {
@@ -152,17 +176,12 @@ class SelectProfileActivity : BaseActivity() {
         apiService.updateUser(userInfo).enqueue(object : Callback<ApiResponse<Void>> {
             override fun onResponse(call: Call<ApiResponse<Void>>, response: Response<ApiResponse<Void>>) {
                 if (response.isSuccessful && response.body()?.isSuccess == true) {
-                    response.body()?.let {
-                        if (response.isSuccessful) {
-                            currentStep = 4
-                            showStep(currentStep)
-                        }
-                    }
+                    showStep(4)
                 }
             }
 
             override fun onFailure(call: Call<ApiResponse<Void>>, t: Throwable) {
-
+                Log.e("UpdateUser", "API call failed: ${t.message}")
             }
         })
     }
@@ -241,5 +260,33 @@ class SelectProfileActivity : BaseActivity() {
     private fun highlightSelectedJob(selectedTextView: TextView) {
         jobTitleMap.values.forEach { it.isSelected = false }
         selectedTextView.isSelected = true
+    }
+
+    private fun openImagePicker() {
+        imagePickerLauncher.launch("image/*")
+    }
+
+    private fun showDatePicker() {
+        val calendar = Calendar.getInstance()
+        val datePicker = DatePickerDialog(this, { _, year, month, day ->
+            bindingProfile.edtDateOfBirth.setText("$day/${month + 1}/$year")
+            validateFields()
+        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
+
+        datePicker.show()
+    }
+
+    private fun validateFields(): Boolean {
+        val fields = listOf(
+            bindingProfile.edtFullName.text,
+            bindingProfile.edtEmail.text,
+            bindingProfile.edtPhone.text,
+            bindingProfile.edtAddress.text,
+            bindingProfile.edtDateOfBirth.text
+        )
+
+        val isValid = fields.all { it.isNotBlank() } && selectedImageUri != null
+        bindingProfile.btnNext.isEnabled = isValid
+        return isValid
     }
 }
