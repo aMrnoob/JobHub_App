@@ -7,7 +7,7 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface ApiService {
-    @POST("/oauth/google")
+    @POST("/auth/google")
     fun sendGoogleToken(@Body request: TokenRequest): Call<ApiResponse<LoginResponse>>
 }
 

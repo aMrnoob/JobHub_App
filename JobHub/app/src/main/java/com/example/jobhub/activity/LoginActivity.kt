@@ -45,7 +45,7 @@ class LoginActivity : BaseActivity() {
         }
 
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken("874208356309-lekou6atac3r23lghn1voe0e7deb5a85.apps.googleusercontent.com") // Thay bằng Web Client ID
+            .requestIdToken("856354548077-e00ibmh0ojbv416s43qldd8ec0j4o43m.apps.googleusercontent.com") // Thay bằng Web Client ID
             .requestEmail()
             .build()
 
