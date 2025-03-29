@@ -100,41 +100,41 @@
 
         <TextView
             android:id="@+id/tvAllVacancies"
-            android:layout_width="110dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
-            android:text="All Vacancies"
-            android:textColor="@drawable/text_color_selected"
+            android:text=" All Vacancies "
+            android:textColor="@drawable/text_select"
             android:textStyle="bold"
             android:textSize="15sp"
             android:padding="8dp"
-            android:background="@drawable/selected_box"
+            android:background="@drawable/background_select"
             android:gravity="center" />
 
         <TextView
             android:id="@+id/tvActive"
-            android:layout_width="60dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
-            android:text="Active"
-            android:textColor="@drawable/text_color_selected"
+            android:text=" Active "
+            android:textColor="@drawable/text_select"
             android:textStyle="bold"
             android:textSize="15sp"
             android:padding="8dp"
-            android:background="@drawable/selected_box"
+            android:background="@drawable/background_select"
             android:gravity="center" />
 
         <TextView
             android:id="@+id/tvInactive"
-            android:layout_width="70dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
-            android:text="Inactive"
-            android:textColor="@drawable/text_color_selected"
+            android:text=" Expired "
+            android:textColor="@drawable/text_select"
             android:textStyle="bold"
             android:textSize="15sp"
             android:padding="8dp"
-            android:background="@drawable/selected_box"
+            android:background="@drawable/background_select"
             android:gravity="center" />
     </LinearLayout>
 
@@ -142,20 +142,10 @@
         android:id="@+id/rvApplications"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="25dp"
         app:layout_constraintHorizontal_bias="0.9"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/statusVacancies"/>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvApplicants"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        app:layout_constraintHorizontal_bias="0.9"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rvApplications" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

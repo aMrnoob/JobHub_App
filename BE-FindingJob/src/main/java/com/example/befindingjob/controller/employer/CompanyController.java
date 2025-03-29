@@ -20,8 +20,8 @@ public class CompanyController {
         return companyService.addCompany(companyInfo);
     }
 
-    @PostMapping("/get-all-companies")
-    public ApiResponse<List<CompanyInfo>> getAllCompanies(@RequestHeader("token") String token) {
-        return companyService.getAllCompanies(token);
+    @PostMapping("/get-all-companies-by-userId")
+    public ApiResponse<List<CompanyInfo>> getAllCompaniesByUserId(@RequestHeader("token") String token) {
+        return companyService.getAllCompaniesByUserId(token);
     }
 }

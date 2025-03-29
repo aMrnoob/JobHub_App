@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import com.example.jobhub.R
+import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.ActivityMainBinding
 import com.example.jobhub.dto.admin.UserInfo
@@ -49,29 +50,13 @@ class MainActivity : BaseActivity() {
     }
 
     private fun decryptedToken(token: String) {
-        RetrofitClient.createRetrofit()
-            .create(UserService::class.java)
-            .getUserInfo("Bearer $token")
-            .enqueue(object : Callback<ApiResponse<UserInfo>> {
-                override fun onResponse(call: Call<ApiResponse<UserInfo>>, response: Response<ApiResponse<UserInfo>>) {
-                    if (!response.isSuccessful) {
-                        Log.e("decryptedToken", "API failed. Code: ${response.code()}, Message: ${response.message()}")
-                        return
-                    }
-
-                    response.body()?.let { apiResponse ->
-                        if (apiResponse.isSuccess) {
-                            userInfo = apiResponse.data
-                        } else {
-                            Log.e("decryptedToken", "API unsuccessful: ${apiResponse.message}")
-                        }
-                    } ?: Log.e("decryptedToken", "Response body is null")
-                }
-
-                override fun onFailure(call: Call<ApiResponse<UserInfo>>, t: Throwable) {
-                    Log.e("decryptedToken", "API call failed: ${t.message}", t)
-                }
-            })
+        ApiHelper().callApi(
+            context = this,
+            call = RetrofitClient.createRetrofit()
+                .create(UserService::class.java)
+                .getUserInfo("Bearer $token"),
+            onSuccess = { userInfo = it }
+        )
     }
 
     private fun setupBottomNavigation() {

@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity.MODE_PRIVATE
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.jobhub.activity.CompanyActivity
 import com.example.jobhub.adapter.CompanyAdapter
+import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.MainCompanyBinding
 import com.example.jobhub.dto.employer.CompanyInfo
@@ -63,32 +64,21 @@ class CompanyFragment : Fragment() {
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun fetchAllCompanies() {
-        val token = getAuthToken()
-        if (token == null) {
-            Toast.makeText(requireContext(), "You are not logged in yet!", Toast.LENGTH_SHORT).show()
-            return
-        }
+        val token = getAuthToken() ?: return
 
-        companyService.getAllCompanies(token).enqueue(object :
-            Callback<ApiResponse<List<CompanyInfo>>> {
-            @SuppressLint("NotifyDataSetChanged")
-            override fun onResponse(
-                call: Call<ApiResponse<List<CompanyInfo>>>,
-                response: Response<ApiResponse<List<CompanyInfo>>>
-            ) {
-                if (response.isSuccessful && response.body()?.isSuccess == true) {
-                    companyList.clear()
-                    response.body()?.data?.let { companyList.addAll(it) }
-                    companyAdapter.notifyDataSetChanged()
+        ApiHelper().callApi(
+            context = requireContext(),
+            call = companyService.getAllCompaniesByUserId("Bearer $token"),
+            onSuccess = { response ->
+                companyList.apply {
+                    clear()
+                    response?.let { addAll(it) }
                 }
+                companyAdapter.notifyDataSetChanged()
             }
-
-            override fun onFailure(call: Call<ApiResponse<List<CompanyInfo>>>, t: Throwable) {
-                Toast.makeText(requireContext(), "Error connection: ${t.message}", Toast.LENGTH_SHORT).show()
-                Log.e("API_ERROR", "Failed to get all companies", t)
-            }
-        })
+        )
     }
 
     private fun getAuthToken(): String? {

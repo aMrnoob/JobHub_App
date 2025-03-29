@@ -1,16 +1,31 @@
 package com.example.jobhub.activity
 
+import android.R
+import android.app.DatePickerDialog
 import android.os.Bundle
+import android.util.TypedValue
+import android.view.View
+import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.jobhub.adapter.SkillAdapter
+import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.ActivityAboutJobBinding
 import com.example.jobhub.databinding.ActivityDetailJobBinding
 import com.example.jobhub.databinding.ActivityRequirementJobBinding
+import com.example.jobhub.dto.employer.CompanyInfo
 import com.example.jobhub.dto.employer.JobInfo
 import com.example.jobhub.dto.jobseeker.SkillInfo
 import com.example.jobhub.entity.enumm.JobType
+import com.example.jobhub.service.CompanyService
 import com.example.jobhub.service.JobService
+import java.util.Calendar
 
 class JobActivity : BaseActivity() {
 
@@ -20,9 +35,13 @@ class JobActivity : BaseActivity() {
     private val jobService: JobService by lazy {
         RetrofitClient.createRetrofit().create(JobService::class.java)
     }
+    private val companyService: CompanyService by lazy {
+        RetrofitClient.createRetrofit().create(CompanyService::class.java)
+    }
 
-    private lateinit var jobInfo: JobInfo
+    private var jobInfo: JobInfo = JobInfo()
     private lateinit var skillAdapter: SkillAdapter
+    private var companyList: MutableList<CompanyInfo> = mutableListOf()
     private var currentStep = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,34 +63,41 @@ class JobActivity : BaseActivity() {
                     finish()
                 }
 
-                val title = bindingAboutJob.edtTitle.text.toString().trim()
-                val description = bindingAboutJob.edtDescription.text.toString().trim()
-                val requirements = bindingAboutJob.edtRequirements.text.toString().trim()
-                val salary = bindingAboutJob.edtSalary.text.toString().trim()
-                val location = bindingAboutJob.edtLocation.text.toString().trim()
+                bindingAboutJob.btnNext.setOnClickListener {
+                    val title = bindingAboutJob.edtTitle.text.toString().trim()
+                    val description = bindingAboutJob.edtDescription.text.toString().trim()
+                    val requirements = bindingAboutJob.edtRequirements.text.toString().trim()
+                    val salary = bindingAboutJob.edtSalary.text.toString().trim()
+                    val location = bindingAboutJob.edtLocation.text.toString().trim()
 
-                jobInfo.apply {
-                    this.title = title
-                    this.description = description
-                    this.requirements = requirements
-                    this.salary = "$salary$"
-                    this.location = location
+                    if (!isValidInput(title, description, requirements, salary, location)) {
+                        Toast.makeText(this, "Please fill in the information completely!", Toast.LENGTH_SHORT).show()
+                    } else {
+                        jobInfo = jobInfo.copy(
+                            title = title,
+                            description = description,
+                            requirements = requirements,
+                            salary = "$salary$",
+                            location = location
+                        )
+
+                        currentStep = 2
+                        showStep(currentStep)
+                    }
                 }
-
-                if (!isValidInput(title, description, requirements, salary, location)) {
-                    Toast.makeText(this, "Please fill in the information completely!", Toast.LENGTH_SHORT).show()
-                }
-
-                currentStep = 2
-                showStep(currentStep)
             }
             2 -> {
+                bindingDetailJob = ActivityDetailJobBinding.inflate(layoutInflater)
                 setContentView(bindingDetailJob.root)
+
+                getAllCompaniesByUserId()
 
                 bindingDetailJob.btnComeBack.setOnClickListener {
                     currentStep = 1
                     showStep(currentStep)
                 }
+
+                setupDatePickers()
 
                 bindingDetailJob.btnNext.setOnClickListener {
                     val postingDate = bindingDetailJob.edtPostingDate.text.toString().trim()
@@ -89,12 +115,8 @@ class JobActivity : BaseActivity() {
                         this.postingDate = postingDate
                         this.expirationDate = expirationDate
                         this.experienceRequired = experience
-                        //this.companyInfo = company
-                        this.jobType = try {
-                            JobType.valueOf(jobType)
-                        } catch (e: IllegalArgumentException) {
-                            null
-                        }
+                        val formattedJobType = jobType.replace(" ", "_").uppercase()
+                        this.jobType = JobType.entries.find { it.name == formattedJobType }
                     }
 
                     currentStep = 3
@@ -102,6 +124,7 @@ class JobActivity : BaseActivity() {
                 }
             }
             3 -> {
+                bindingRequirementJob = ActivityRequirementJobBinding.inflate(layoutInflater)
                 setContentView(bindingRequirementJob.root)
 
                 setupRecyclerView()
@@ -120,45 +143,124 @@ class JobActivity : BaseActivity() {
                         return@setOnClickListener
                     }
 
-                    Toast.makeText(this, "Job Info Saved!", Toast.LENGTH_SHORT).show()
-                    finish()
+                    createJob(jobInfo)
                 }
-
             }
         }
     }
 
     private fun setupRecyclerView() {
+
         skillAdapter = SkillAdapter(jobInfo.requiredSkills.toMutableList())
+        bindingRequirementJob.rvSkillJob.layoutManager = LinearLayoutManager(this)
         bindingRequirementJob.rvSkillJob.adapter = skillAdapter
 
         bindingRequirementJob.tvAddSkill.setOnClickListener {
-            skillAdapter.addSkill(SkillInfo(
+            Toast.makeText(this, "Add Skill Clicked", Toast.LENGTH_SHORT).show()
+            val newSkill = SkillInfo(
                 skillName = "",
-                skillId = 0,
+                skillId = skillAdapter.itemCount + 1,
                 users = null,
-                jobs = setOf(jobInfo)
-            ))
+            )
+
+            skillAdapter.addSkill(newSkill)
         }
     }
 
-    /*private fun saveJobToDatabase(jobInfo: JobInfo) {
-        jobService.createJob(jobInfo).enqueue(object : Callback<JobInfo> {
-            override fun onResponse(call: Call<Void>, response: ApiResponse<Void>) {
-                if (response.isSuccessful && response.body()?.isSuccess == true) {
-                    Toast.makeText(this@JobActivity, "Job saved successfully!", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this@JobActivity, "Failed to save job", Toast.LENGTH_SHORT).show()
+    private fun setupCompanySpinner() {
+        val companyNames = companyList.map { it.companyName }
+
+        val adapter = object : ArrayAdapter<String>(this, R.layout.simple_spinner_item, companyNames) {
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = super.getView(position, convertView, parent) as TextView
+                view.setTextColor(ContextCompat.getColor(context, R.color.black))
+                view.textSize = 17f
+
+                return view
+            }
+
+            override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = super.getDropDownView(position, convertView, parent) as TextView
+
+                val padding = TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP, 10f, context.resources.displayMetrics
+                ).toInt()
+
+                view.setPadding(view.paddingLeft, padding, view.paddingRight, padding)
+
+                return view
+            }
+        }
+
+        bindingDetailJob.spinnerCompany.adapter = adapter
+
+        bindingDetailJob.spinnerCompany.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val selectedCompanyName = companyNames[position]
+                val selectedCompany = companyList.find { it.companyName == selectedCompanyName }
+
+                if (selectedCompany != null) {
+                    jobInfo.companyInfo = selectedCompany
                 }
             }
 
-            override fun onFailure(call: Call<JobInfo>, t: Throwable) {
-                Toast.makeText(this@JobActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+
             }
-        })
-    }*/
+        }
+    }
+
+    private fun setupDatePickers() {
+        val calendar = Calendar.getInstance()
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+        val dateListener = { editText: EditText ->
+            DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
+                val date = "$selectedDay/${selectedMonth + 1}/$selectedYear"
+                editText.setText(date)
+            }, year, month, day).show()
+        }
+
+        bindingDetailJob.edtPostingDate.setOnClickListener { dateListener(bindingDetailJob.edtPostingDate) }
+        bindingDetailJob.edtExpirationDate.setOnClickListener { dateListener(bindingDetailJob.edtExpirationDate) }
+    }
+
+
+    private fun getAllCompaniesByUserId() {
+        val token = getAuthToken() ?: return
+
+        ApiHelper().callApi(
+            context = this,
+            call = companyService.getAllCompaniesByUserId("Bearer $token"),
+            onSuccess = {
+                if (it != null) {
+                    companyList = it as MutableList<CompanyInfo>
+                    setupCompanySpinner()
+                }
+            }
+        )
+    }
+
+    private fun getAuthToken(): String? {
+        return getSharedPreferences("JobHubPrefs", MODE_PRIVATE)
+            .getString("authToken", null)
+            ?.trim()
+            ?.takeIf { it.isNotBlank() }
+    }
 
     private fun isValidInput(vararg fields: String): Boolean {
         return fields.all { it.isNotBlank() }
+    }
+
+    private fun createJob(jobInfo: JobInfo) {
+        ApiHelper().callApi(
+            context = this,
+            call = jobService.createJob(jobInfo),
+            onSuccess = {
+                finish()
+            }
+        )
     }
 }

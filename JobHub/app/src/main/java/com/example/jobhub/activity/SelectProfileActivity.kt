@@ -63,12 +63,12 @@ class SelectProfileActivity : BaseActivity() {
 
                 bindingProfile.uploadedImageView.visibility = View.VISIBLE
             } else {
-                Log.e("ImagePicker", "bindingProfile chưa được khởi tạo")
+                Log.e("ImagePicker", "bindingProfile chua du?c kh?i t?o")
             }
 
             validateFields()
         } else {
-            Log.e("ImagePicker", "Không chọn được ảnh")
+            Log.e("ImagePicker", "Kh�ng ch?n du?c ?nh")
         }
     }
 

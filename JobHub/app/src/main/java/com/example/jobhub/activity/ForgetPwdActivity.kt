@@ -7,6 +7,7 @@ import android.os.CountDownTimer
 import android.widget.EditText
 import android.widget.Toast
 import com.example.jobhub.R
+import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.ForgetPwdBinding
 import com.example.jobhub.databinding.ResetPasswordBinding
@@ -138,56 +139,35 @@ class ForgetPwdActivity : BaseActivity() {
     }
 
     private fun requestOtp(forgetPwdRequest: ForgetPwdRequest) {
-        userService.resetPasswordRequest(forgetPwdRequest).enqueue(object : Callback<ApiResponse<Void>> {
-            override fun onResponse(call: Call<ApiResponse<Void>>, response: Response<ApiResponse<Void>>) {
-                if (response.isSuccessful && response.body()?.isSuccess == true) {
-                    Toast.makeText(this@ForgetPwdActivity, response.body()?.message ?:"OTP has sent. Please check your email.", Toast.LENGTH_SHORT).show()
-                    currentStep = 2
-                    showStep(currentStep)
-                } else {
-                    Toast.makeText(this@ForgetPwdActivity, response.body()?.message ?:"Failed to send OTP", Toast.LENGTH_SHORT).show()
-                }
+        ApiHelper().callApi(
+            context = this,
+            call = userService.resetPasswordRequest(forgetPwdRequest),
+            onSuccess = {
+                currentStep = 2
+                showStep(currentStep)
             }
-
-            override fun onFailure(call: Call<ApiResponse<Void>>, t: Throwable) {
-                Toast.makeText(this@ForgetPwdActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
+        )
     }
 
     private fun verifyOtpAndResetPassword(otpVerifyRequest: OtpVerifyRequest) {
-        userService.verifyOtp(otpVerifyRequest).enqueue(object : Callback<ApiResponse<Void>> {
-            override fun onResponse(call: Call<ApiResponse<Void>>, response: Response<ApiResponse<Void>>) {
-                if (response.isSuccessful && response.body()?.isSuccess == true) {
-                    Toast.makeText(this@ForgetPwdActivity, response.body()?.message ?:"OTP is valid. You can change your password.", Toast.LENGTH_SHORT).show()
-                    currentStep = 3
-                    showStep(currentStep)
-                } else {
-                    Toast.makeText(this@ForgetPwdActivity, response.body()?.message ?:"OTP verification failed", Toast.LENGTH_SHORT).show()
-                }
+        ApiHelper().callApi(
+            context = this,
+            call = userService.verifyOtp(otpVerifyRequest),
+            onSuccess = {
+                currentStep = 3
+                showStep(currentStep)
             }
-
-            override fun onFailure(call: Call<ApiResponse<Void>>, t: Throwable) {
-                Toast.makeText(this@ForgetPwdActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
+        )
     }
 
     private fun passwordReset(resetPwdRequest: Register_ResetPwdRequest) {
-        userService.passwordReset(resetPwdRequest).enqueue(object : Callback<ApiResponse<Void>> {
-            override fun onResponse(call: Call<ApiResponse<Void>>, response: Response<ApiResponse<Void>>) {
-                if (response.isSuccessful && response.body()?.isSuccess == true) {
-                    Toast.makeText(this@ForgetPwdActivity, response.body()?.message ?:"Password reset successful", Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this@ForgetPwdActivity, LoginActivity::class.java))
-                } else {
-                    Toast.makeText(this@ForgetPwdActivity, response.body()?.message ?:"Password reset failed", Toast.LENGTH_SHORT).show()
-                }
+        ApiHelper().callApi(
+            context = this,
+            call = userService.passwordReset(resetPwdRequest),
+            onSuccess = {
+                startActivity(Intent(this, LoginActivity::class.java))
             }
-
-            override fun onFailure(call: Call<ApiResponse<Void>>, t: Throwable) {
-                Toast.makeText(this@ForgetPwdActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
+        )
     }
 
     private fun togglePasswordVisibility(isPasswordField: Boolean) {

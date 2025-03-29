@@ -11,6 +11,6 @@ interface CompanyService {
     @POST("api/company/add-company")
     fun addCompany(@Body companyInfo: CompanyInfo): Call<ApiResponse<Void>>
 
-    @POST("api/company/get-all-companies")
-    fun getAllCompanies(@Header("token") token: String): Call<ApiResponse<List<CompanyInfo>>>
+    @POST("api/company/get-all-companies-by-userId")
+    fun getAllCompaniesByUserId(@Header("token") token: String): Call<ApiResponse<List<CompanyInfo>>>
 }
