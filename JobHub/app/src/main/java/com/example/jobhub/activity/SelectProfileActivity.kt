@@ -2,9 +2,12 @@ package com.example.jobhub.activity
 
 import android.app.DatePickerDialog
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.widget.TextView
@@ -21,6 +24,7 @@ import com.example.jobhub.service.UserService
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.ByteArrayOutputStream
 import java.util.Calendar
 import kotlin.properties.Delegates
 
@@ -63,12 +67,12 @@ class SelectProfileActivity : BaseActivity() {
 
                 bindingProfile.uploadedImageView.visibility = View.VISIBLE
             } else {
-                Log.e("ImagePicker", "bindingProfile chua du?c kh?i t?o")
+                Log.e("ImagePicker", "bindingProfile not working when created")
             }
 
             validateFields()
         } else {
-            Log.e("ImagePicker", "Kh�ng ch?n du?c ?nh")
+            Log.e("ImagePicker", "Can't select photo")
         }
     }
 
@@ -152,6 +156,7 @@ class SelectProfileActivity : BaseActivity() {
                             role = role,
                             email = bindingProfile.edtEmail.text.toString(),
                             phone = bindingProfile.edtPhone.text.toString(),
+                            imageUrl = encodeImageToBase64(),
                             address = bindingProfile.edtAddress.text.toString(),
                             dateOfBirth = bindingProfile.edtDateOfBirth.text.toString()
                         )
@@ -177,14 +182,17 @@ class SelectProfileActivity : BaseActivity() {
             override fun onResponse(call: Call<ApiResponse<Void>>, response: Response<ApiResponse<Void>>) {
                 if (response.isSuccessful && response.body()?.isSuccess == true) {
                     showStep(4)
+                } else {
+                    Log.e("UpdateUser", "Lỗi: ${response.errorBody()?.string()}")
                 }
             }
 
             override fun onFailure(call: Call<ApiResponse<Void>>, t: Throwable) {
-                Log.e("UpdateUser", "API call failed: ${t.message}")
+                Log.e("UpdateUser", "API thất bại: ${t.message}")
             }
         })
     }
+
 
     private fun decryptedToken(token: String) {
         val apiService = RetrofitClient.createRetrofit().create(UserService::class.java)
@@ -288,5 +296,18 @@ class SelectProfileActivity : BaseActivity() {
         val isValid = fields.all { it.isNotBlank() } && selectedImageUri != null
         bindingProfile.btnNext.isEnabled = isValid
         return isValid
+    }
+
+    private fun encodeImageToBase64(): String? {
+        selectedImageUri?.let { uri ->
+            val bitmap = (bindingProfile.uploadedImageView.drawable as? BitmapDrawable)?.bitmap
+            if (bitmap != null) {
+                val outputStream = ByteArrayOutputStream()
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                val byteArray = outputStream.toByteArray()
+                return Base64.encodeToString(byteArray, Base64.DEFAULT)
+            }
+        }
+        return null
     }
 }

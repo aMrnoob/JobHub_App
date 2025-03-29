@@ -11,6 +11,7 @@ data class UserInfo (
     var address: String? = null,
     var dateOfBirth: String = "",
     var phone: String? = null,
+    var imageUrl: String? = null,
     val createdAt: String = "",
     val updatedAt: String = ""
 )

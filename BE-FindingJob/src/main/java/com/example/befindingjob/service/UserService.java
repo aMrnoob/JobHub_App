@@ -16,11 +16,8 @@ public interface UserService {
     ApiResponse<UserInfo> getUserInfo(String token);
     ApiResponse<Void> updateUser(UserInfo userInfo);
 
-    Optional<User> findByEmail(String email);
-
-    User createUser(User user);
-
-    String generateToken(User user);
-
-    boolean verifyPassword(User user, String password);
+    ApiResponse<Optional<User>> findByEmail(String email);
+    ApiResponse<User> createUser(User user);
+    ApiResponse<String> generateToken(User user);
+    ApiResponse<Boolean> verifyPassword(User user, String password);
 }

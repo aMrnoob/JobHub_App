@@ -17,6 +17,7 @@ public class UserInfo {
     private String address;
     private String dateOfBirth;
     private String phone;
+    private String imageUrl;
     private String created_at;
     private String updated_at;
 }

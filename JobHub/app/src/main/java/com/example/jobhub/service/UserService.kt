@@ -32,6 +32,6 @@ interface UserService {
     @POST("api/admin/get-user-info")
     fun getUserInfo(@Header("token") token: String): Call<ApiResponse<UserInfo>>
 
-    @POST("api/admin/update-user")
+    @POST("api/users    /update-user")
     fun updateUser(@Body userInfo: UserInfo): Call<ApiResponse<Void>>
 }
