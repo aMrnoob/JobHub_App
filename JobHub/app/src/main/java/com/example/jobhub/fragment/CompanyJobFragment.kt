@@ -3,24 +3,33 @@ package com.example.jobhub.fragment
 import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
 import com.example.jobhub.R
+import com.example.jobhub.config.ApiHelper
+import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.MainCompanyJobBinding
-import com.example.jobhub.databinding.MainRequirementsBinding
-import com.example.jobhub.dto.employer.JobInfo
+import com.example.jobhub.dto.ItemJobDTO
+import com.example.jobhub.dto.toCompany
+import com.example.jobhub.entity.Job
 import com.example.jobhub.fragment.fragmentinterface.FragmentInterface
+import com.example.jobhub.service.CompanyService
 import com.google.gson.Gson
 
 class CompanyJobFragment : Fragment() {
 
     private var _binding: MainCompanyJobBinding? = null
     private val binding get() = _binding!!
-    private var jobInfo: JobInfo? = null
+    private var jobDTO: ItemJobDTO? = null
     private var jobRequirementsInterface: FragmentInterface? = null
+    private val companyService: CompanyService by lazy {
+        RetrofitClient.createRetrofit().create(CompanyService::class.java)
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -32,12 +41,17 @@ class CompanyJobFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = MainCompanyJobBinding.inflate(inflater, container, false)
 
-        loadJobInfoFromPrefs()
-        displayJobInfo()
+        loadJobFromPrefs()
+        displayJob()
         setEditTextEnabled(false)
+
+        binding.btnUpdate.setOnClickListener {
+            update()
+            setEditTextEnabled(false)
+        }
 
         return binding.root
     }
@@ -46,21 +60,20 @@ class CompanyJobFragment : Fragment() {
         setEditTextEnabled(true)
     }
 
-    private fun displayJobInfo() {
-        jobInfo?.companyInfo?.let { company ->
+    private fun displayJob() {
+        jobDTO?.company?.let { company ->
+            Glide.with(binding.ivImgJob)
+                .load(jobDTO!!.company.logoUrl)
+                .placeholder(R.drawable.error_image)
+                .error(R.drawable.error_image)
+                .into(binding.ivImgJob)
             binding.edtCompanyName.setText(company.companyName)
-            binding.edtAddress.setText(company.address)
-            binding.edtLogoUrl.setText(company.logoUrl)
-            binding.edtWebsite.setText(company.website)
             binding.edtDescription.setText(company.description)
         }
     }
 
     private fun setEditTextEnabled(enabled: Boolean) {
         setEditTextState(binding.edtCompanyName, enabled)
-        setEditTextState(binding.edtAddress, enabled)
-        setEditTextState(binding.edtLogoUrl, enabled)
-        setEditTextState(binding.edtWebsite, enabled)
         setEditTextState(binding.edtDescription, enabled)
         if (!enabled) {
             binding.edtDescription.setOnClickListener {
@@ -70,7 +83,7 @@ class CompanyJobFragment : Fragment() {
             binding.edtDescription.setOnClickListener(null)
         }
 
-        binding.btnAdd.isEnabled = enabled
+        binding.btnUpdate.isEnabled = enabled
     }
 
     private fun setEditTextState(editText: EditText, enabled: Boolean) {
@@ -87,12 +100,41 @@ class CompanyJobFragment : Fragment() {
         builder.show()
     }
 
-    private fun loadJobInfoFromPrefs() {
+    private fun loadJobFromPrefs() {
         val sharedPreferences = requireContext().getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
-        val jobInfoJson = sharedPreferences.getString("job_info", null)
+        val jobJson = sharedPreferences.getString("job", null)
 
-        if (!jobInfoJson.isNullOrEmpty()) {
-            jobInfo = Gson().fromJson(jobInfoJson, JobInfo::class.java)
+        if (!jobJson.isNullOrEmpty()) {
+            jobDTO = Gson().fromJson(jobJson, ItemJobDTO::class.java)
         }
+    }
+
+    private fun update() {
+        if (jobDTO == null) {
+            return
+        }
+
+        val updatedCompany = jobDTO!!.company.toCompany().copy(
+            companyName = binding.edtCompanyName.text.toString(),
+            description = binding.edtDescription.text.toString()
+        )
+
+        ApiHelper().callApi(
+            context = requireContext(),
+            call = companyService.updateCompany(updatedCompany),
+            onSuccess = {
+                jobDTO!!.company = jobDTO!!.company.copy(
+                    companyName = updatedCompany.companyName.toString(),
+                    description = updatedCompany.description.toString()
+                )
+                saveJobToPrefs()
+            }
+        )
+    }
+
+    private fun saveJobToPrefs() {
+        val sharedPreferences = requireContext().getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
+        val jobJson = Gson().toJson(jobDTO)
+        sharedPreferences.edit().putString("job", jobJson).apply()
     }
 }

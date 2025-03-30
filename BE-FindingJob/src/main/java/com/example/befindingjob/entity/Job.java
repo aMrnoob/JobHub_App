@@ -1,6 +1,7 @@
 package com.example.befindingjob.entity;
 
 import com.example.befindingjob.entity.enumm.JobType;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,14 +17,11 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "jobId")
 public class Job {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer jobId;
-
-    @ManyToOne
-    @JoinColumn(name = "company_id", nullable = false)
-    private Company company;
 
     @Column(nullable = false)
     private String title;
@@ -41,9 +39,14 @@ public class Job {
     private JobType jobType;
 
     private String experienceRequired;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private java.time.LocalDateTime postingDate;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private java.time.LocalDateTime expirationDate;
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "job_skills",
@@ -52,6 +55,12 @@ public class Job {
     )
     private Set<Skill> requiredSkills = new HashSet<>();
 
+    @ManyToOne
+    @JsonBackReference
+    @JoinColumn(name = "company_id", nullable = false)
+    private Company company;
+
+    @JsonIgnore
     @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Application> applications = new HashSet<>();
 }

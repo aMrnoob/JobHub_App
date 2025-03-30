@@ -8,9 +8,9 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.jobhub.R
-import com.example.jobhub.dto.employer.CompanyInfo
+import com.example.jobhub.entity.Company
 
-class CompanyAdapter(private val companyList: List<CompanyInfo>) :
+class CompanyAdapter(private val companyList: List<Company>) :
 
     RecyclerView.Adapter<CompanyAdapter.CompanyViewHolder>() {
 

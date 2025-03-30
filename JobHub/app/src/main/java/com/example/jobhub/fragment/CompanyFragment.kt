@@ -5,27 +5,19 @@ import android.animation.PropertyValuesHolder
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatActivity.MODE_PRIVATE
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.jobhub.activity.CompanyActivity
 import com.example.jobhub.adapter.CompanyAdapter
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.MainCompanyBinding
-import com.example.jobhub.dto.employer.CompanyInfo
-import com.example.jobhub.model.ApiResponse
+import com.example.jobhub.entity.Company
 import com.example.jobhub.service.CompanyService
-import com.example.jobhub.service.UserService
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class CompanyFragment : Fragment() {
 
@@ -36,12 +28,12 @@ class CompanyFragment : Fragment() {
         RetrofitClient.createRetrofit().create(CompanyService::class.java)
     }
     private lateinit var companyAdapter: CompanyAdapter
-    private var companyList: MutableList<CompanyInfo> = mutableListOf()
+    private var companyList: MutableList<Company> = mutableListOf()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = MainCompanyBinding.inflate(inflater, container, false)
 
         binding.ivAddCompany.setOnClickListener {

@@ -1,6 +1,7 @@
 package com.example.jobhub.config
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import com.example.jobhub.model.ApiResponse
 import retrofit2.Call
@@ -23,15 +24,20 @@ class ApiHelper {
                         }
                         onSuccess(apiResponse.data)
                     } else {
-                        showToast(context, apiResponse?.message ?: "Unknown error")
+                        showToast(context, "Empty response from server")
+                        Log.e("ApiHelper", "Empty response from server")
                     }
                 } else {
-                    showToast(context, "API Error: ${response.errorBody()?.string() ?: "Unknown error"}")
+                    val errorMessage = response.errorBody()?.string() ?: "Unknown API error"
+                    showToast(context, "API Error: $errorMessage")
+                    Log.e("ApiHelper", "API Error: HTTP ${response.code()} - $errorMessage")
                 }
             }
 
             override fun onFailure(call: Call<ApiResponse<T>>, t: Throwable) {
-                showToast(context, "Request failed: ${t.message}")
+                val errorMessage = t.localizedMessage ?: "Unknown error"
+                showToast(context, "Request failed: $errorMessage")
+                Log.e("ApiHelper", "API Request failed: $errorMessage", t)
             }
         })
     }

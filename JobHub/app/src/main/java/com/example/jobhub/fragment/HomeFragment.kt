@@ -13,14 +13,12 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.jobhub.R
 import com.example.jobhub.activity.VacancyActivity
 import com.example.jobhub.adapter.JobAdapter
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
-import com.example.jobhub.databinding.ActivityMainBinding
 import com.example.jobhub.databinding.MainHomeBinding
-import com.example.jobhub.dto.employer.JobInfo
+import com.example.jobhub.dto.ItemJobDTO
 import com.example.jobhub.service.JobService
 import com.google.gson.Gson
 
@@ -33,7 +31,7 @@ class HomeFragment : Fragment() {
     private val jobService: JobService by lazy {
         RetrofitClient.createRetrofit().create(JobService::class.java)
     }
-    private var jobList: MutableList<JobInfo> = mutableListOf()
+    private var jobList: MutableList<ItemJobDTO> = mutableListOf()
     private lateinit var jobAdapter: JobAdapter
 
     override fun onCreateView(
@@ -55,7 +53,7 @@ class HomeFragment : Fragment() {
             val intent = Intent(requireContext(), VacancyActivity::class.java)
             val jobJson = Gson().toJson(selectedJob)
             val sharedPreferences = requireContext().getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
-            sharedPreferences.edit().putString("job_info", jobJson).apply()
+            sharedPreferences.edit().putString("job", jobJson).apply()
             startActivity(intent)
         }
 

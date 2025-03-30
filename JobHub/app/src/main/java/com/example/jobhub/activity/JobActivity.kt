@@ -1,6 +1,8 @@
 package com.example.jobhub.activity
 
+//noinspection SuspiciousImport
 import android.R
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.util.TypedValue
@@ -19,12 +21,14 @@ import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.ActivityAboutJobBinding
 import com.example.jobhub.databinding.ActivityDetailJobBinding
 import com.example.jobhub.databinding.ActivityRequirementJobBinding
-import com.example.jobhub.dto.employer.CompanyInfo
-import com.example.jobhub.dto.employer.JobInfo
-import com.example.jobhub.dto.jobseeker.SkillInfo
+import com.example.jobhub.dto.JobDTO
+import com.example.jobhub.dto.SkillDTO
+import com.example.jobhub.entity.Company
+import com.example.jobhub.entity.Job
 import com.example.jobhub.entity.enumm.JobType
 import com.example.jobhub.service.CompanyService
 import com.example.jobhub.service.JobService
+import com.example.jobhub.service.SkillService
 import java.util.Calendar
 
 class JobActivity : BaseActivity() {
@@ -35,13 +39,16 @@ class JobActivity : BaseActivity() {
     private val jobService: JobService by lazy {
         RetrofitClient.createRetrofit().create(JobService::class.java)
     }
+    private val skillService: SkillService by lazy {
+        RetrofitClient.createRetrofit().create(SkillService::class.java)
+    }
     private val companyService: CompanyService by lazy {
         RetrofitClient.createRetrofit().create(CompanyService::class.java)
     }
 
-    private var jobInfo: JobInfo = JobInfo()
+    private var jobDTO: JobDTO = JobDTO()
     private lateinit var skillAdapter: SkillAdapter
-    private var companyList: MutableList<CompanyInfo> = mutableListOf()
+    private var companyList: MutableList<Company> = mutableListOf()
     private var currentStep = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,9 +78,9 @@ class JobActivity : BaseActivity() {
                     val location = bindingAboutJob.edtLocation.text.toString().trim()
 
                     if (!isValidInput(title, description, requirements, salary, location)) {
-                        Toast.makeText(this, "Please fill in the information completely!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "Please fill in the rmation completely!", Toast.LENGTH_SHORT).show()
                     } else {
-                        jobInfo = jobInfo.copy(
+                        jobDTO = jobDTO.copy(
                             title = title,
                             description = description,
                             requirements = requirements,
@@ -91,36 +98,36 @@ class JobActivity : BaseActivity() {
                 setContentView(bindingDetailJob.root)
 
                 getAllCompaniesByUserId()
+                setupDatePickers()
 
                 bindingDetailJob.btnComeBack.setOnClickListener {
                     currentStep = 1
                     showStep(currentStep)
                 }
 
-                setupDatePickers()
-
                 bindingDetailJob.btnNext.setOnClickListener {
-                    val postingDate = bindingDetailJob.edtPostingDate.text.toString().trim()
-                    val expirationDate = bindingDetailJob.edtExpirationDate.text.toString().trim()
+                    val postingDateStr = bindingDetailJob.edtPostingDate.text.toString().trim() + "T00:00:00"
+                    val expirationDateStr = bindingDetailJob.edtExpirationDate.text.toString().trim() + "T23:59:59"
                     val experience = bindingDetailJob.spinnerExperience.selectedItem.toString()
                     val company = bindingDetailJob.spinnerCompany.selectedItem.toString()
                     val jobType = bindingDetailJob.spinnerJobType.selectedItem.toString()
 
-                    if (!isValidInput(postingDate, expirationDate, experience, company, jobType)) {
+                    if (!isValidInput(postingDateStr, expirationDateStr, experience, company, jobType)) {
                         Toast.makeText(this, "Please fill in the information completely!", Toast.LENGTH_SHORT).show()
                         return@setOnClickListener
                     }
 
-                    jobInfo.apply {
-                        this.postingDate = postingDate
-                        this.expirationDate = expirationDate
-                        this.experienceRequired = experience
-                        val formattedJobType = jobType.replace(" ", "_").uppercase()
-                        this.jobType = JobType.entries.find { it.name == formattedJobType }
-                    }
+                    jobDTO = jobDTO.copy(
+                        companyName = company,
+                        postingDate = postingDateStr,
+                        expirationDate = expirationDateStr,
+                        experienceRequired = experience,
+                        jobType = JobType.entries.find { it.name == jobType.replace(" ", "_").uppercase() }
+                    )
 
                     currentStep = 3
                     showStep(currentStep)
+
                 }
             }
             3 -> {
@@ -135,32 +142,29 @@ class JobActivity : BaseActivity() {
                 }
 
                 bindingRequirementJob.btnComplete.setOnClickListener {
-                    jobInfo.requiredSkills = skillAdapter.getSkills().toSet()
-                    jobInfo.applications = emptySet()
+                    jobDTO.requiredSkills = skillAdapter.getSkillsDTO().toSet()
 
-                    if (jobInfo.requiredSkills.isEmpty()) {
+                    if (jobDTO.requiredSkills.isEmpty()) {
                         Toast.makeText(this, "Please add at least one skill!", Toast.LENGTH_SHORT).show()
                         return@setOnClickListener
                     }
 
-                    createJob(jobInfo)
+                    createJob()
+                    updateSkill()
                 }
             }
         }
     }
 
     private fun setupRecyclerView() {
-
-        skillAdapter = SkillAdapter(jobInfo.requiredSkills.toMutableList())
+        skillAdapter = SkillAdapter(jobDTO.requiredSkills.toMutableList(), true)
         bindingRequirementJob.rvSkillJob.layoutManager = LinearLayoutManager(this)
         bindingRequirementJob.rvSkillJob.adapter = skillAdapter
 
         bindingRequirementJob.tvAddSkill.setOnClickListener {
-            Toast.makeText(this, "Add Skill Clicked", Toast.LENGTH_SHORT).show()
-            val newSkill = SkillInfo(
+            val newSkill = SkillDTO(
                 skillName = "",
-                skillId = skillAdapter.itemCount + 1,
-                users = null,
+                skillId = skillAdapter.itemCount + 1
             )
 
             skillAdapter.addSkill(newSkill)
@@ -200,16 +204,16 @@ class JobActivity : BaseActivity() {
                 val selectedCompany = companyList.find { it.companyName == selectedCompanyName }
 
                 if (selectedCompany != null) {
-                    jobInfo.companyInfo = selectedCompany
+                    jobDTO.companyName = selectedCompany.companyName
                 }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
-
             }
         }
     }
 
+    @SuppressLint("DefaultLocale")
     private fun setupDatePickers() {
         val calendar = Calendar.getInstance()
         val year = calendar.get(Calendar.YEAR)
@@ -218,15 +222,14 @@ class JobActivity : BaseActivity() {
 
         val dateListener = { editText: EditText ->
             DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
-                val date = "$selectedDay/${selectedMonth + 1}/$selectedYear"
-                editText.setText(date)
+                val formattedDate = String.format("%04d-%02d-%02d", selectedYear, selectedMonth + 1, selectedDay)
+                editText.setText(formattedDate)
             }, year, month, day).show()
         }
 
         bindingDetailJob.edtPostingDate.setOnClickListener { dateListener(bindingDetailJob.edtPostingDate) }
         bindingDetailJob.edtExpirationDate.setOnClickListener { dateListener(bindingDetailJob.edtExpirationDate) }
     }
-
 
     private fun getAllCompaniesByUserId() {
         val token = getAuthToken() ?: return
@@ -236,7 +239,7 @@ class JobActivity : BaseActivity() {
             call = companyService.getAllCompaniesByUserId("Bearer $token"),
             onSuccess = {
                 if (it != null) {
-                    companyList = it as MutableList<CompanyInfo>
+                    companyList = it as MutableList<Company>
                     setupCompanySpinner()
                 }
             }
@@ -254,13 +257,27 @@ class JobActivity : BaseActivity() {
         return fields.all { it.isNotBlank() }
     }
 
-    private fun createJob(jobInfo: JobInfo) {
+    private fun createJob() {
         ApiHelper().callApi(
             context = this,
-            call = jobService.createJob(jobInfo),
+            call = jobService.createJob(jobDTO),
             onSuccess = {
                 finish()
             }
+        )
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun updateSkill() {
+        val job = Job()
+
+        job.jobId = jobDTO.jobId!!
+        job.requiredSkills = skillAdapter.getSkills().toSet()
+
+        ApiHelper().callApi(
+            context = this,
+            call = skillService.updateSkills(job.jobId, job.requiredSkills!!),
+            onSuccess = {}
         )
     }
 }

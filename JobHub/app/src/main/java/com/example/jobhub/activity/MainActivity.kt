@@ -10,7 +10,7 @@ import com.example.jobhub.R
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.ActivityMainBinding
-import com.example.jobhub.dto.admin.UserInfo
+import com.example.jobhub.entity.User
 import com.example.jobhub.entity.enumm.Role
 import com.example.jobhub.fragment.ApplicationEmployerFragment
 import com.example.jobhub.fragment.ApplicationJobSeekerFragment
@@ -18,17 +18,13 @@ import com.example.jobhub.fragment.ApplyFragment
 import com.example.jobhub.fragment.CompanyFragment
 import com.example.jobhub.fragment.HomeFragment
 import com.example.jobhub.fragment.ProfileFragment
-import com.example.jobhub.model.ApiResponse
 import com.example.jobhub.service.UserService
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class MainActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private var userInfo: UserInfo? = null
+    private var user: User? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +32,7 @@ class MainActivity : BaseActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        getAuthToken()?.let { decryptedToken(it) } ?: Log.e("MainActivity", "Invalid or empty token")
+        getAuthToken()?.let { decrypteken(it) } ?: Log.e("MainActivity", "Invalid or empty token")
         setupBottomNavigation()
 
         setupAnimation()
@@ -49,18 +45,18 @@ class MainActivity : BaseActivity() {
             ?.takeIf { it.isNotBlank() }
     }
 
-    private fun decryptedToken(token: String) {
+    private fun decrypteken(token: String) {
         ApiHelper().callApi(
             context = this,
             call = RetrofitClient.createRetrofit()
                 .create(UserService::class.java)
                 .getUserInfo("Bearer $token"),
-            onSuccess = { userInfo = it }
+            onSuccess = { user = it }
         )
     }
 
     private fun setupBottomNavigation() {
-        if (userInfo?.role == Role.EMPLOYER) {
+        if (user?.role == Role.EMPLOYER) {
             binding.tvApply.visibility = View.VISIBLE
             binding.tvCompany.visibility = View.GONE
         } else {
@@ -87,7 +83,7 @@ class MainActivity : BaseActivity() {
                     val fragment = when (it) {
                         binding.tvHome -> HomeFragment()
                         binding.tvApplication -> {
-                            if (userInfo?.role == Role.EMPLOYER) {
+                            if (user?.role == Role.EMPLOYER) {
                                 ApplicationEmployerFragment()
                             } else {
                                 ApplicationJobSeekerFragment()

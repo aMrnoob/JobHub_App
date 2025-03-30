@@ -3,14 +3,15 @@ package com.example.jobhub.entity
 import java.time.LocalDateTime
 
 data class Company(
-    val companyId: Int,
-    val user: User,
-    val companyName: String,
-    val description: String?,
-    val address: String?,
-    val logoUrl: String?,
-    val website: String?,
-    val createdAt: LocalDateTime?,
-    val updatedAt: LocalDateTime?,
-    val jobs: Set<Job> = emptySet(),
+    var companyId: Int? = null,
+    var companyName: String? = null,
+    var description: String? = null,
+    var address: String? = null,
+    var logoUrl: String? = null,
+    var website: String? = null,
+    var createdAt: LocalDateTime? = null,
+    var updatedAt: LocalDateTime? = null,
+    var user: User? = null,
+    var jobs: Set<Job>? = emptySet()
 )
+

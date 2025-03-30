@@ -9,45 +9,39 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.jobhub.R
 import com.example.jobhub.databinding.ItemJobBinding
-import com.example.jobhub.dto.employer.JobInfo
+import com.example.jobhub.dto.ItemJobDTO
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
 
-class JobAdapter(private val jobList: List<JobInfo>, private val onItemClick: (JobInfo) -> Unit) :
+class JobAdapter(private val jobList: List<ItemJobDTO>, private val onItemClick: (ItemJobDTO) -> Unit) :
     RecyclerView.Adapter<JobAdapter.JobViewHolder>() {
 
     inner class JobViewHolder(private val binding: ItemJobBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         @SuppressLint("SetTextI18n")
-        fun bind(job: JobInfo) {
+        fun bind(itemJobDTO: ItemJobDTO) {
 
             Glide.with(binding.root.context)
-                .load(job.companyInfo?.logoUrl)
+                .load(itemJobDTO.company.logoUrl)
                 .placeholder(R.drawable.error_image)
                 .error(R.drawable.error_image)
                 .into(binding.ivImgJob)
 
-            binding.tvTitle.text = job.title
-            binding.tvLocationJobType.text = "${job.location} - ${job.jobType}"
-            binding.tvSalary.text = job.salary
+            binding.tvTitle.text = itemJobDTO.title
+            binding.tvLocationJobType.text = "${itemJobDTO.location} - ${itemJobDTO.jobType}"
+            binding.tvSalary.text = itemJobDTO.salary
 
-            val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
             val outputFormatter = DateTimeFormatter.ofPattern("d/M/yyyy")
 
-            val expirationDateFormatted = formatDateString(job.expirationDate, inputFormatter, outputFormatter)
+            val expirationDateFormatted = itemJobDTO.expirationDate.format(outputFormatter) ?: "N/A"
 
             binding.tvPostExpirationDate.text = "Exp: $expirationDateFormatted"
 
             val currentDate = LocalDateTime.now()
-            val expirationDate = try {
-                job.expirationDate?.let { LocalDateTime.parse(it, inputFormatter) }
-            } catch (e: DateTimeParseException) {
-                null
-            }
+            val expirationDate = itemJobDTO.expirationDate
 
-            if (expirationDate != null && expirationDate.isBefore(currentDate)) {
+            if (expirationDate.isBefore(currentDate)) {
                 binding.tvStatus.text = "Expired"
                 binding.tvStatus.setTextColor(ContextCompat.getColor(binding.tvStatus.context, R.color.red_700))
                 binding.tvStatus.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(binding.tvStatus.context, R.color.red_300))
@@ -58,17 +52,7 @@ class JobAdapter(private val jobList: List<JobInfo>, private val onItemClick: (J
             }
 
             binding.root.setOnClickListener {
-                onItemClick(job)
-            }
-        }
-
-        private fun formatDateString(dateString: String?, inputFormatter: DateTimeFormatter, outputFormatter: DateTimeFormatter): String {
-            return try {
-                dateString?.let {
-                    LocalDateTime.parse(it, inputFormatter).toLocalDate().format(outputFormatter)
-                } ?: "N/A"
-            } catch (e: DateTimeParseException) {
-                "N/A"
+                onItemClick(itemJobDTO)
             }
         }
     }

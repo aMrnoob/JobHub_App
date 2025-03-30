@@ -1,6 +1,8 @@
 package com.example.befindingjob.controller.employer;
 
-import com.example.befindingjob.dto.employer.JobInfo;
+import com.example.befindingjob.dto.ItemJobDTO;
+import com.example.befindingjob.dto.JobDTO;
+import com.example.befindingjob.entity.Job;
 import com.example.befindingjob.model.ApiResponse;
 import com.example.befindingjob.service.JobService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,17 +18,17 @@ public class JobController {
     private JobService jobService;
 
     @PostMapping("/create-job")
-    public ApiResponse<Void> createJob(@RequestBody JobInfo jobInfo) {
-        return jobService.createJob(jobInfo);
+    public ApiResponse<Void> createJob(@RequestBody JobDTO jobDTO) {
+        return jobService.createJob(jobDTO);
     }
 
     @PostMapping("/update-job")
-    public ApiResponse<Void> updateJob(@RequestBody JobInfo jobInfo) {
-        return jobService.updateJob(jobInfo);
+    public ApiResponse<Void> updateJob(@RequestBody Job job) {
+        return jobService.updateJob(job);
     }
 
     @PostMapping("/get-all-jobs-by-user")
-    public ApiResponse<List<JobInfo>> getAllJobsByUser(@RequestHeader("token") String token) {
+    public ApiResponse<List<ItemJobDTO>> getAllJobsByUser(@RequestHeader("token") String token) {
         return jobService.getAllJobsByUser(token);
     }
 }

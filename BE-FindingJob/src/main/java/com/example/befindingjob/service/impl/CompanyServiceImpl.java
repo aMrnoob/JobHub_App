@@ -1,8 +1,9 @@
 package com.example.befindingjob.service.impl;
 
-import com.example.befindingjob.dto.employer.CompanyInfo;
+import com.example.befindingjob.dto.CompanyDTO;
 import com.example.befindingjob.entity.Company;
 import com.example.befindingjob.entity.User;
+import com.example.befindingjob.mapper.CompanyMapper;
 import com.example.befindingjob.model.ApiResponse;
 import com.example.befindingjob.repository.CompanyRepository;
 import com.example.befindingjob.repository.UserRepository;
@@ -26,58 +27,61 @@ public class CompanyServiceImpl implements CompanyService {
     @Autowired
     private JwtService jwtService;
 
-    @Override
-    public ApiResponse<Void> addCompany(CompanyInfo companyInfo) {
-
-        Optional<User> userOptional = userRepository.findById(companyInfo.getUserInfo().getUserId());
-        User user = userOptional.get();
-
-        Company company = new Company();
-        company.setCompanyName(companyInfo.getCompanyName());
-        company.setUser(user);
-        company.setAddress(companyInfo.getAddress());
-        company.setLogoUrl(companyInfo.getLogoUrl());
-        company.setWebsite(companyInfo.getWebsite());
-        company.setDescription(companyInfo.getDescription());
-        company.setCreatedAt(java.time.LocalDateTime.now());
-
-        companyRepository.save(company);
-        return new ApiResponse<>(true, "Add your company successfully", null);
-    }
+    @Autowired
+    private CompanyMapper companyMapper;
 
     @Override
-    public ApiResponse<List<CompanyInfo>> getAllCompaniesByUserId(String token) {
-        if (token == null || !token.startsWith("Bearer ")) {
-            return new ApiResponse<>(false, "");
-        }
-
-        token = token.substring(7);
-
-        if (!jwtService.isTokenValid(token)) {
-            return new ApiResponse<>(false, "Invalid or expired token.");
-        }
-
-        Integer userId = jwtService.extractUserId(token);
-
-        Optional<User> userOptional = userRepository.findById(userId);
-        if (userOptional.isEmpty()) {
+    public ApiResponse<Void> addCompany(CompanyDTO companyDTO) {
+        Optional<User> userOpt = userRepository.findById(companyDTO.getUserId());
+        if (userOpt.isEmpty()) {
             return new ApiResponse<>(false, "", null);
         }
 
-        List<Company> companies = companyRepository.findByUserId(userId);
+        try {
+            Company company = companyMapper.CompanyDTOtoCompany(companyDTO);
+            company.setUser(userOpt.get());
+            company.setCompanyId(null);
+            companyRepository.save(company);
+            return new ApiResponse<>(true, "Company added successfully!");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ApiResponse<>(false, "", null);
+        }
+    }
 
-        List<CompanyInfo> companyInfoList = companies.stream().map(company -> new CompanyInfo(
-                company.getCompanyId(),
-                company.getCompanyName(),
-                null,
-                company.getAddress(),
-                company.getLogoUrl(),
-                company.getWebsite(),
-                company.getDescription(),
-                null,
-                null
-        )).toList();
+    @Override
+    public ApiResponse<Void> updateCompany(Company company) {
+        Optional<Company> existingCompanyOpt = companyRepository.findById(company.getCompanyId());
 
-        return new ApiResponse<>(true, "", companyInfoList);
+        if (existingCompanyOpt.isEmpty()) {
+            return new ApiResponse<>(false, "Company not found.");
+        }
+
+        Company existingCompany = existingCompanyOpt.get();
+
+        if (company.getCompanyName() != null) existingCompany.setCompanyName(company.getCompanyName());
+        if (company.getDescription() != null) existingCompany.setDescription(company.getDescription());
+        if (company.getAddress() != null) existingCompany.setAddress(company.getAddress());
+        if (company.getLogoUrl() != null) existingCompany.setLogoUrl(company.getLogoUrl());
+        if (company.getWebsite() != null) existingCompany.setWebsite(company.getWebsite());
+
+        companyRepository.save(existingCompany);
+        return new ApiResponse<>(true, "Company updated successfully.");
+    }
+
+    @Override
+    public ApiResponse<List<Company>> getAllCompaniesByUserId(String token) {
+        if (!jwtService.isValidToken(token)) {
+            return new ApiResponse<>(false, "Invalid or expired token.", null);
+        }
+
+        Integer userId = jwtService.extractUserId(token);
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            return new ApiResponse<>(false, "User not found.", null);
+        }
+
+        List<Company> company = companyRepository.findByUserId(userId);
+        return new ApiResponse<>(true, "", company);
     }
 }

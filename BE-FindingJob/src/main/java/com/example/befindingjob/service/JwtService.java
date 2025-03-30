@@ -1,11 +1,9 @@
 package com.example.befindingjob.service;
 
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,9 +13,8 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    private final String SECRET_KEY = "G6H1D9K8B5F4M0L3N2P7A8B5F4M0L1C7Q9E8B5F4M0L2R6X3Y4VZT";
-
     private Key getSigningKey() {
+        String SECRET_KEY = "G6H1D9K8B5F4M0L3N2P7A8B5F4M0L1C7Q9E8B5F4M0L2R6X3Y4VZT";
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     }
 
@@ -36,10 +33,12 @@ public class JwtService {
     }
 
     public String extractFullname(String token) {
+        token = token.substring(7);
         return extractClaim(token, claims -> claims.get("fullname", String.class));
     }
 
     public Integer extractUserId(String token) {
+        token = token.substring(7);
         return extractClaim(token, claims -> claims.get("userId", Integer.class));
     }
 
@@ -52,14 +51,20 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
-    public boolean isTokenValid(String token) {
+    public boolean isValidToken(String token) {
+        if (token == null || !token.startsWith("Bearer ")) {
+            return false;
+        }
+
+        String pureToken = token.substring(7);
+
         try {
             final Claims claims = Jwts.parserBuilder()
                     .setSigningKey(getSigningKey())
                     .build()
-                    .parseClaimsJws(token)
+                    .parseClaimsJws(pureToken)
                     .getBody();
-            return !isTokenExpired(token);
+            return !isTokenExpired(pureToken);
         } catch (Exception e) {
             return false;
         }

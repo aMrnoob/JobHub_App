@@ -2,14 +2,15 @@ package com.example.jobhub.fragment
 
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.MainJobDetailBinding
-import com.example.jobhub.dto.employer.JobInfo
+import com.example.jobhub.dto.ItemJobDTO
+import com.example.jobhub.entity.Job
 import com.example.jobhub.fragment.fragmentinterface.FragmentInterface
 import com.example.jobhub.service.JobService
 import com.google.gson.Gson
@@ -18,9 +19,8 @@ class JobDetailFragment : Fragment() {
 
     private var _binding: MainJobDetailBinding? = null
     private val binding get() = _binding!!
-    private var jobInfo: JobInfo? = null
+    private var jobDTO: ItemJobDTO? = null
     private var jobDetailInterface: FragmentInterface? = null
-    private val handler = android.os.Handler(android.os.Looper.getMainLooper())
     private val jobService: JobService by lazy {
         RetrofitClient.createRetrofit().create(JobService::class.java)
     }
@@ -39,13 +39,13 @@ class JobDetailFragment : Fragment() {
         _binding = MainJobDetailBinding.inflate(inflater, container, false)
 
         val sharedPreferences = requireContext().getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
-        val jobInfoJson = sharedPreferences.getString("job_info", null)
+        val jobJson = sharedPreferences.getString("job", null)
 
-        if (!jobInfoJson.isNullOrEmpty()) {
-            jobInfo = Gson().fromJson(jobInfoJson, JobInfo::class.java)
+        if (!jobJson.isNullOrEmpty()) {
+            jobDTO = Gson().fromJson(jobJson, ItemJobDTO::class.java)
         }
 
-        displayJobInfo()
+        displayJob()
         setEditTextEnabled(false)
         binding.btnUpdate.setOnClickListener {
             setEditTextEnabled(false)
@@ -55,18 +55,8 @@ class JobDetailFragment : Fragment() {
         return binding.root
     }
 
-    override fun onResume() {
-        super.onResume()
-        handler.postDelayed(refreshRunnable, 10000)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        handler.removeCallbacks(refreshRunnable)
-    }
-
-    private fun displayJobInfo() {
-        jobInfo?.let {
+    private fun displayJob() {
+        jobDTO?.let {
             binding.edtTitle.setText(it.title)
             binding.edtDescription.setText(it.description)
             binding.edtRequirements.setText(it.requirements)
@@ -89,8 +79,14 @@ class JobDetailFragment : Fragment() {
     }
 
     private fun update() {
-        if (jobInfo == null) return
-        jobInfo?.apply {
+        val job = Job()
+        if (jobDTO == null) {
+            return
+        }
+
+        job.jobId = jobDTO!!.jobId
+
+        job.apply {
             title = binding.edtTitle.text.toString().trim()
             description = binding.edtDescription.text.toString().trim()
             requirements = binding.edtRequirements.text.toString().trim()
@@ -100,34 +96,33 @@ class JobDetailFragment : Fragment() {
 
         ApiHelper().callApi(
             context = requireContext(),
-            call = jobService.updateJob(jobInfo!!),
+            call = jobService.updateJob(job),
             onSuccess = {
-                saveJobInfoToPrefs()
-                displayJobInfo()
+                jobDTO?.apply {
+                    title = job.title.toString()
+                    description = job.description.toString()
+                    requirements = job.requirements.toString()
+                    salary = job.salary.toString()
+                    location = job.location.toString()
+                }
+                saveJobToPrefs()
+                refreshJob()
             }
         )
     }
 
-    private val refreshRunnable = object : Runnable {
-        override fun run() {
-            refreshJobInfo()
-            handler.postDelayed(this, 10000)
+    private fun refreshJob() {
+        val sharedPreferences = requireContext().getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
+        val jobJson = sharedPreferences.getString("job", null)
+        if (!jobJson.isNullOrEmpty()) {
+            jobDTO = Gson().fromJson(jobJson, ItemJobDTO::class.java)
+            displayJob()
         }
     }
 
-    private fun refreshJobInfo() {
+    private fun saveJobToPrefs() {
         val sharedPreferences = requireContext().getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
-        val jobInfoJson = sharedPreferences.getString("job_info", null)
-
-        if (!jobInfoJson.isNullOrEmpty()) {
-            jobInfo = Gson().fromJson(jobInfoJson, JobInfo::class.java)
-            displayJobInfo()
-        }
-    }
-
-    private fun saveJobInfoToPrefs() {
-        val sharedPreferences = requireContext().getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
-        val jobJson = Gson().toJson(jobInfo)
-        sharedPreferences.edit().putString("job_info", jobJson).apply()
+        val jobJson = Gson().toJson(jobDTO)
+        sharedPreferences.edit().putString("job", jobJson).apply()
     }
 }

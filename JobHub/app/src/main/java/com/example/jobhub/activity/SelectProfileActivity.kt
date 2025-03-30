@@ -6,19 +6,18 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.ActivityProfileBinding
 import com.example.jobhub.databinding.ChooseJobBinding
 import com.example.jobhub.databinding.ChooseProfileBinding
-import com.example.jobhub.dto.admin.UserInfo
+import com.example.jobhub.entity.User
 import com.example.jobhub.entity.enumm.Role
-import com.example.jobhub.model.ApiResponse
-import com.example.jobhub.service.JobService
 import com.example.jobhub.service.UserService
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import kotlin.properties.Delegates
 
@@ -105,10 +104,10 @@ class SelectProfileActivity : BaseActivity() {
                 val sharedPreferences = getSharedPreferences("JobHubPrefs", MODE_PRIVATE)
                 val token = sharedPreferences.getString("authToken", null)
 
-                if (token != null && token.isNotBlank()) {
-                    val cleanedToken = token.trim()
+                if (!token.isNullOrBlank()) {
+                    val cleaneken = token.trim()
                     Log.d("Token", "'$token'")
-                    decryptedToken(cleanedToken)
+                    decrypteken(cleaneken)
                 } else {
                     Log.e("SelectProfileActivity", "Invalid or empty token")
                 }
@@ -120,8 +119,10 @@ class SelectProfileActivity : BaseActivity() {
                     val day = calendar.get(Calendar.DAY_OF_MONTH)
 
                     val datePicker = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
-                        val date = "$selectedDay/${selectedMonth + 1}/$selectedYear"
-                        bindingProfile.edtDateOfBirth.setText(date)
+                        val selectedDate = LocalDate.of(selectedYear, selectedMonth + 1, selectedDay)
+                        val formattedDate = selectedDate.atStartOfDay().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+
+                        bindingProfile.edtDateOfBirth.setText(formattedDate)
                     }, year, month, day)
 
                     datePicker.show()
@@ -133,15 +134,30 @@ class SelectProfileActivity : BaseActivity() {
                     val dateString = bindingProfile.edtDateOfBirth.text.toString()
                     val phone = bindingProfile.edtPhone.text.toString()
                     val address = bindingProfile.edtAddress.text.toString()
-                    val userInfo = UserInfo(userId = userId, fullName = fullName, role = role,
-                        email = email, phone = phone, address = address, dateOfBirth = dateString
-                    )
 
-                    updateUser(userInfo)
+                    try {
+                        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                        val dateOfBirth = LocalDateTime.parse(dateString, formatter)
 
-                    currentStep = 4
-                    showStep(currentStep)
+                        val user = User(
+                            userId = userId,
+                            fullName = fullName,
+                            role = role,
+                            email = email,
+                            phone = phone,
+                            address = address,
+                            dateOfBirth = dateOfBirth
+                        )
+
+                        updateUser(user)
+
+                        currentStep = 4
+                        showStep(currentStep)
+                    } catch (e: Exception) {
+                        Toast.makeText(this, "Invalid date format! Please use yyyy-MM-dd HH:mm:ss", Toast.LENGTH_SHORT).show()
+                    }
                 }
+
             }
             4 -> {
                 val intent = Intent(this, MainActivity::class.java)
@@ -151,10 +167,10 @@ class SelectProfileActivity : BaseActivity() {
         }
     }
 
-    private fun updateUser(userInfo: UserInfo) {
+    private fun updateUser(user: User) {
         ApiHelper().callApi(
             context = this,
-            call = userService.updateUser(userInfo),
+            call = userService.updateUser(user),
             onSuccess = {
                 currentStep = 4
                 showStep(currentStep)
@@ -162,13 +178,17 @@ class SelectProfileActivity : BaseActivity() {
         )
     }
 
-    private fun decryptedToken(token: String) {
+    private fun decrypteken(token: String) {
         ApiHelper().callApi(
             context = this,
             call = userService.getUserInfo("Bearer $token"),
-            onSuccess = { userInfo ->
-                userInfo?.let {
-                    it.userId?.let { id -> userId = id }
+            onSuccess = { user ->
+                user?.let {
+                    it.userId.let { id ->
+                        if (id != null) {
+                            userId = id
+                        }
+                    }
                     bindingProfile.edtEmail.setText(it.email)
                 }
             }

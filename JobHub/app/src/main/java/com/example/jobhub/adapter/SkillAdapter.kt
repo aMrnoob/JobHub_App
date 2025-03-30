@@ -10,17 +10,18 @@ import android.widget.EditText
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.jobhub.R
-import com.example.jobhub.dto.jobseeker.SkillInfo
+import com.example.jobhub.dto.SkillDTO
+import com.example.jobhub.entity.Skill
 
-class SkillAdapter(private var skills: MutableList<SkillInfo>, private var isEditable: Boolean = false) :
+class SkillAdapter(private var skills: MutableList<SkillDTO>, private var isEditable: Boolean) :
     RecyclerView.Adapter<SkillAdapter.SkillViewHolder>() {
 
     inner class SkillViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val edtSkill: EditText = itemView.findViewById(R.id.edtSkill)
         private val btnRemoveSkill: ImageView = itemView.findViewById(R.id.btnRemoveSkill)
 
-        fun bind(skill: SkillInfo) {
-            edtSkill.setText(skill.skillName)
+        fun bind(skillDTO: SkillDTO) {
+            edtSkill.setText(skillDTO.skillName)
             edtSkill.isEnabled = isEditable
 
             btnRemoveSkill.isEnabled = isEditable
@@ -60,13 +61,22 @@ class SkillAdapter(private var skills: MutableList<SkillInfo>, private var isEdi
 
     override fun getItemCount(): Int = skills.size
 
-    fun addSkill(skill: SkillInfo) {
-        skills.add(skill)
+    fun addSkill(skillDTO: SkillDTO) {
+        skills.add(skillDTO)
         notifyItemInserted(skills.size - 1)
     }
 
-    fun getSkills(): List<SkillInfo> {
+    fun getSkillsDTO(): List<SkillDTO> {
         return skills.filter { it.skillName.isNotBlank() }
+    }
+
+    fun getSkills(): List<Skill> {
+        return skills.map { skillDTO ->
+            Skill(
+                skillId = skillDTO.skillId.takeIf { it > 0 },
+                skillName = skillDTO.skillName
+            )
+        }
     }
 
     @SuppressLint("NotifyDataSetChanged")

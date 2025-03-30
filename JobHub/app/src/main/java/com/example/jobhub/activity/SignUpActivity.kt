@@ -8,11 +8,7 @@ import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.CreateAccountBinding
 import com.example.jobhub.dto.auth.Register_ResetPwdRequest
-import com.example.jobhub.model.ApiResponse
 import com.example.jobhub.service.UserService
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class SignUpActivity : BaseActivity() {
 

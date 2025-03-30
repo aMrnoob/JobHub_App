@@ -1,11 +1,11 @@
-package com.example.jobhub.entity
+package com.example.jobhub.dto
 
-import com.example.jobhub.dto.SkillDTO
 import com.example.jobhub.entity.enumm.JobType
 
-data class Job(
-    var jobId: Int = 0,
+data class JobDTO(
+    var jobId: Int? = null,
     var title: String? = null,
+    var companyName: String? = null,
     var description: String? = null,
     var requirements: String? = null,
     var salary: String? = null,
@@ -14,7 +14,5 @@ data class Job(
     var experienceRequired: String? = null,
     var postingDate: String? = null,
     var expirationDate: String? = null,
-    var requiredSkills: Set<Skill>? = null,
-    var company: Company? = null,
-    var applications: Set<Application>? = null
+    var requiredSkills: Set<SkillDTO> = emptySet(),
 )

@@ -8,13 +8,8 @@ import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.LoginScreenBinding
 import com.example.jobhub.dto.auth.LoginRequest
-import com.example.jobhub.dto.auth.LoginResponse
 import com.example.jobhub.entity.enumm.Role
-import com.example.jobhub.model.ApiResponse
 import com.example.jobhub.service.UserService
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class LoginActivity : BaseActivity() {
 
@@ -44,9 +39,9 @@ class LoginActivity : BaseActivity() {
             val password = binding.edtPassword.text.toString()
 
             if(email.isBlank()) {
-                Toast.makeText(this@LoginActivity, "Please enter your email.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Please enter your email.", Toast.LENGTH_SHORT).show()
             } else if (password.isBlank()){
-                Toast.makeText(this@LoginActivity, "Please enter your password", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Please enter your password", Toast.LENGTH_SHORT).show()
             } else {
                 login(email, password)
             }

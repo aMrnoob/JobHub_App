@@ -1,21 +1,20 @@
-package com.example.befindingjob.dto.employer;
+package com.example.befindingjob.dto;
 
-import com.example.befindingjob.dto.jobseeker.SkillInfo;
 import com.example.befindingjob.entity.enumm.JobType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.HashSet;
 import java.util.Set;
 
 @Data
-@NoArgsConstructor
+@Getter
+@Setter
 @AllArgsConstructor
-public class JobInfo {
-    private int jobId;
+public class JobDTO {
+    private String jobId;
     private String title;
-    private CompanyInfo companyInfo;
     private String description;
     private String requirements;
     private String salary;
@@ -24,5 +23,6 @@ public class JobInfo {
     private String experienceRequired;
     private String postingDate;
     private String expirationDate;
-    private Set<SkillInfo> requiredSkills;
+    private String companyName;
+    private Set<SkillDTO> requiredSkills;
 }

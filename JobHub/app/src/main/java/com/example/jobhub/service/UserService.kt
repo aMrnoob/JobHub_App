@@ -1,6 +1,6 @@
 package com.example.jobhub.service
 
-import com.example.jobhub.dto.admin.UserInfo
+import com.example.jobhub.dto.UserDTO
 import com.example.jobhub.dto.auth.ForgetPwdRequest
 import com.example.jobhub.dto.auth.LoginRequest
 import com.example.jobhub.dto.auth.LoginResponse
@@ -30,8 +30,8 @@ interface UserService {
     fun passwordReset(@Body resetPwdRequest: Register_ResetPwdRequest): Call<ApiResponse<Void>>
 
     @POST("api/admin/get-user-info")
-    fun getUserInfo(@Header("token") token: String): Call<ApiResponse<UserInfo>>
+    fun getUserInfo(@Header("token") token: String): Call<ApiResponse<User>>
 
     @POST("api/admin/update-user")
-    fun updateUser(@Body userInfo: UserInfo): Call<ApiResponse<Void>>
+    fun updateUser(@Body user: User): Call<ApiResponse<Void>>
 }

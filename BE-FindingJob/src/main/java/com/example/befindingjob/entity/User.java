@@ -1,6 +1,7 @@
 package com.example.befindingjob.entity;
 
 import com.example.befindingjob.entity.enumm.Role;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,6 +15,8 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties("user")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "userId")
 public class User {
 
     @Id
@@ -43,15 +46,19 @@ public class User {
     @Column(name = "phone")
     private String phone;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Company> companies = new HashSet<>();
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "user_skills",
@@ -60,6 +67,7 @@ public class User {
     )
     private Set<Skill> skills = new HashSet<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Application> applications = new HashSet<>();
 }

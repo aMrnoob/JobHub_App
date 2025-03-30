@@ -1,6 +1,6 @@
 package com.example.befindingjob.controller.admin;
 
-import com.example.befindingjob.dto.admin.UserInfo;
+import com.example.befindingjob.entity.User;
 import com.example.befindingjob.model.ApiResponse;
 import com.example.befindingjob.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +14,12 @@ public class AdminController {
     private UserService userService;
 
     @PostMapping("/get-user-info")
-    public ApiResponse<UserInfo> getUserInfo(@RequestHeader("token") String token) {
+    public ApiResponse<User> getUserInfo(@RequestHeader("token") String token) {
         return userService.getUserInfo(token);
     }
 
     @PostMapping("/update-user")
-    public ApiResponse<Void> passwordReset(@RequestBody UserInfo userInfo) {
-        return userService.updateUser(userInfo);
+    public ApiResponse<Void> passwordReset(@RequestBody User user) {
+        return userService.updateUser(user);
     }
 }

@@ -12,7 +12,7 @@ import com.example.jobhub.R
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.ActivityVacancyBinding
-import com.example.jobhub.dto.admin.UserInfo
+import com.example.jobhub.entity.User
 import com.example.jobhub.entity.enumm.Role
 import com.example.jobhub.fragment.CompanyJobFragment
 import com.example.jobhub.fragment.JobDetailFragment
@@ -24,7 +24,7 @@ class VacancyActivity : BaseActivity(), FragmentInterface {
 
     private lateinit var binding: ActivityVacancyBinding
 
-    private var userInfo: UserInfo? = null
+    private var user: User? = null
     private var jobDetailFragment: JobDetailFragment? = null
     private var requirementsFragment: RequirementsFragment? = null
     private var companyJobFragment: CompanyJobFragment? = null
@@ -43,7 +43,7 @@ class VacancyActivity : BaseActivity(), FragmentInterface {
             finish()
         }
 
-        getAuthToken()?.let { decryptedToken(it) } ?: Log.e("VacancyActivity", "Invalid or empty token")
+        getAuthToken()?.let { decrypteken(it) } ?: Log.e("VacancyActivity", "Invalid or empty token")
         setupCategorySelection()
         setupAnimation()
     }
@@ -55,19 +55,19 @@ class VacancyActivity : BaseActivity(), FragmentInterface {
             ?.takeIf { it.isNotBlank() }
     }
 
-    private fun decryptedToken(token: String) {
+    private fun decrypteken(token: String) {
         ApiHelper().callApi(
             context = this,
             call = userService.getUserInfo("Bearer $token"),
             onSuccess = {
-                userInfo = it
+                user = it
                 runOnUiThread { setupBottomNavigation() }
             }
         )
     }
 
     private fun setupBottomNavigation() {
-        if (userInfo?.role == Role.EMPLOYER) {
+        if (user?.role == Role.EMPLOYER) {
             binding.btnEdit.visibility = View.VISIBLE
         } else {
             binding.btnEdit.visibility = View.GONE
@@ -132,7 +132,7 @@ class VacancyActivity : BaseActivity(), FragmentInterface {
             textView.setOnClickListener {
                 updateSelectedCategory(textView, categoryTextViews)
 
-                binding.btnEdit.visibility = if (userInfo?.role == Role.EMPLOYER) View.VISIBLE else View.GONE
+                binding.btnEdit.visibility = if (user?.role == Role.EMPLOYER) View.VISIBLE else View.GONE
 
                 val fragment = when (textView) {
                     binding.tvJobDetail -> {

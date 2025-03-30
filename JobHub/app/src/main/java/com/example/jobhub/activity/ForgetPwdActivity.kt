@@ -15,11 +15,7 @@ import com.example.jobhub.databinding.VerifyOtpBinding
 import com.example.jobhub.dto.auth.ForgetPwdRequest
 import com.example.jobhub.dto.auth.OtpVerifyRequest
 import com.example.jobhub.dto.auth.Register_ResetPwdRequest
-import com.example.jobhub.model.ApiResponse
 import com.example.jobhub.service.UserService
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class ForgetPwdActivity : BaseActivity() {
 
@@ -40,7 +36,6 @@ class ForgetPwdActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.navigationBarColor = resources.getColor(android.R.color.black)
         showStep(1)
     }
 
