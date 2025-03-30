@@ -16,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
@@ -44,7 +45,7 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setEmail(registerRequest.getEmail());
         user.setRole(Role.UNDEFINED);
-        user.setCreatedAt(java.time.LocalDateTime.now());
+        user.setCreatedAt(LocalDateTime.now());
 
         userRepository.save(user);
 
@@ -203,20 +204,36 @@ public class UserServiceImpl implements UserService {
                 existingUser.setImageUrl(userInfo.getImageUrl());
             }
 
-            existingUser.setUpdatedAt(java.time.LocalDateTime.now());
-
+            existingUser.setUpdatedAt(LocalDateTime.now());
             userRepository.save(existingUser);
             return new ApiResponse<Void>(true, "User updated successfully", null);
         }).orElseGet(() -> new ApiResponse<>(false, "User not found", null));
     }
 
     @Override
-    public ApiResponse<Optional<User>> findByEmail(String email) {
+    public ApiResponse<UserInfo> getUserProfile(String token) {
+        if (token == null || !token.startsWith("Bearer "))
+            return new ApiResponse<>(false, "Invalid token format");
+
+        token = token.substring(7);
+        if (!jwtService.isTokenValid(token))
+            return new ApiResponse<>(false, "Invalid or expired token");
+
+        int userId = jwtService.extractUserId(token);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        UserInfo userInfo = new UserInfo(user);
+        return new ApiResponse<>(true, "Success", userInfo);
+    }
+
+    @Override
+    public ApiResponse<UserInfo> findByEmail(String email) {
         Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isEmpty()) {
-            return new ApiResponse<>(false, "User not found", Optional.empty());
+            return new ApiResponse<>(false, "User not found");
         }
-        return new ApiResponse<>(true, "User found", userOpt);
+        return new ApiResponse<>(true, "User found");
     }
 
     @Override

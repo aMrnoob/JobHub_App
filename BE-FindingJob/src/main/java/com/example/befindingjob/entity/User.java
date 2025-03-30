@@ -1,9 +1,11 @@
 package com.example.befindingjob.entity;
 
 import com.example.befindingjob.entity.enumm.Role;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;

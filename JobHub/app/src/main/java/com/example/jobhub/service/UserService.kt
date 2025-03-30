@@ -10,6 +10,7 @@ import com.example.jobhub.entity.User
 import com.example.jobhub.model.ApiResponse
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
 
@@ -32,6 +33,9 @@ interface UserService {
     @POST("api/admin/get-user-info")
     fun getUserInfo(@Header("token") token: String): Call<ApiResponse<UserInfo>>
 
-    @POST("api/users    /update-user")
+    @POST("api/users/update-user")
     fun updateUser(@Body userInfo: UserInfo): Call<ApiResponse<Void>>
+
+    @GET("/api/users/me")
+    fun getUserProfile(@Header("token") token: String): Call<ApiResponse<UserInfo>>
 }

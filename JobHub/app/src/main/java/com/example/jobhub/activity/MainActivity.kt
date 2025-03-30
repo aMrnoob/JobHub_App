@@ -2,6 +2,7 @@ package com.example.jobhub.activity
 
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -55,7 +56,11 @@ class MainActivity : BaseActivity() {
             call = RetrofitClient.createRetrofit()
                 .create(UserService::class.java)
                 .getUserInfo("Bearer $token"),
-            onSuccess = { userInfo = it }
+            onSuccess = {
+                userInfo = it
+                setupBottomNavigation()
+            },
+
         )
     }
 
@@ -71,6 +76,18 @@ class MainActivity : BaseActivity() {
         if (supportFragmentManager.findFragmentById(R.id.fragmentContainer) == null) {
             loadFragment(HomeFragment())
         }
+
+        binding.tvProfile.setOnClickListener {
+            animateView(it)
+            if (userInfo != null) {
+                val intent = Intent(this, ProfileActivity::class.java)
+                intent.putExtra("userId", userInfo?.userId ?: -1)
+                startActivity(intent)
+            } else {
+                Log.e("MainActivity", "UserInfo chưa được tải")
+            }
+        }
+
     }
 
     private fun loadFragment(fragment: Fragment) {
