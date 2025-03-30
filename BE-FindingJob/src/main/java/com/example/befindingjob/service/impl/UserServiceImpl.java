@@ -1,5 +1,6 @@
 package com.example.befindingjob.service.impl;
 
+import com.example.befindingjob.dto.admin.UserInfo;
 import com.example.befindingjob.dto.auth.*;
 import com.example.befindingjob.entity.User;
 import com.example.befindingjob.entity.enumm.Role;
@@ -147,5 +148,61 @@ public class UserServiceImpl implements UserService {
             userRepository.save(user);
             return new ApiResponse<Void>(true, "User updated successfully");
         }).orElseGet(() -> new ApiResponse<>(false, "User not found"));
+    }
+
+    @Override
+    public ApiResponse<UserInfo> getUserProfile(String token) {
+        if (token == null || !token.startsWith("Bearer "))
+            return new ApiResponse<>(false, "Invalid token format");
+
+        token = token.substring(7);
+        if (!jwtService.isTokenValid(token))
+            return new ApiResponse<>(false, "Invalid or expired token");
+
+        int userId = jwtService.extractUserId(token);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        UserInfo userInfo = new UserInfo(user);
+        return new ApiResponse<>(true, "Success", userInfo);
+    }
+
+    @Override
+    public ApiResponse<UserInfo> findByEmail(String email) {
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isEmpty()) {
+            return new ApiResponse<>(false, "User not found");
+        }
+        return new ApiResponse<>(true, "User found");
+    }
+
+    @Override
+    public ApiResponse<User> createUser(User user) {
+        try {
+            User savedUser = userRepository.save(user);
+            return new ApiResponse<>(true, "User created successfully", savedUser);
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "Error creating user: " + e.getMessage(), null);
+        }
+    }
+
+    @Override
+    public ApiResponse<String> generateToken(User user) {
+        try {
+            String token = jwtService.generateToken(user.getUserId(), user.getFullname());
+            return new ApiResponse<>(true, "Token generated successfully", token);
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "Error generating token", null);
+        }
+    }
+
+    @Override
+    public ApiResponse<Boolean> verifyPassword(User user, String password) {
+        boolean isMatch = passwordEncoder.matches(password, user.getPassword());
+        if (isMatch) {
+            return new ApiResponse<>(true, "Password verified", true);
+        } else {
+            return new ApiResponse<>(false, "Invalid password", false);
+        }
     }
 }

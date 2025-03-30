@@ -49,18 +49,28 @@
         android:orientation="vertical">
 
         <ImageView
-            android:layout_width="70dp"
-            android:layout_height="70dp"
+            android:id="@+id/uploadedImageView"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:scaleType="centerCrop"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/iconUploadImage"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_marginBottom="10dp"
             android:src="@drawable/icon_upload_image" />
-        
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Upload Photo Profile"
             android:textSize="20sp"
             android:textColor="@color/gray_600" />
+
     </LinearLayout>
+
 
     <TextView
         android:layout_width="wrap_content"
@@ -69,7 +79,7 @@
         android:textColor="@color/gray_700"
         android:textSize="20sp"
         app:layout_constraintHorizontal_bias="0.15"
-        app:layout_constraintVertical_bias="0.32"
+        app:layout_constraintVertical_bias="0.35"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -79,13 +89,13 @@
     <EditText
         android:id="@+id/edtFullName"
         android:layout_width="0dp"
-        android:layout_height="40dp"
+        android:layout_height="50dp"
         android:background="@drawable/edittext_background"
         android:hint="Full name"
         android:textColorHint="@color/gray_500"
         android:textColor="@color/black"
         android:inputType="text"
-        app:layout_constraintVertical_bias="0.37"
+        app:layout_constraintVertical_bias="0.4"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -99,7 +109,7 @@
         android:textColor="@color/gray_700"
         android:textSize="20sp"
         app:layout_constraintHorizontal_bias="0.14"
-        app:layout_constraintVertical_bias="0.43"
+        app:layout_constraintVertical_bias="0.47"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -109,12 +119,12 @@
     <EditText
         android:id="@+id/edtEmail"
         android:layout_width="0dp"
-        android:layout_height="40dp"
+        android:layout_height="50dp"
         android:background="@drawable/edittext_background"
         android:hint="Email"
         android:textColorHint="@color/gray_500"
         android:textColor="@color/black"
-        app:layout_constraintVertical_bias="0.48"
+        app:layout_constraintVertical_bias="0.52"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -128,7 +138,7 @@
         android:textColor="@color/gray_700"
         android:textSize="20sp"
         app:layout_constraintHorizontal_bias="0.15"
-        app:layout_constraintVertical_bias="0.538"
+        app:layout_constraintVertical_bias="0.588"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -138,14 +148,14 @@
     <EditText
         android:id="@+id/edtDateOfBirth"
         android:layout_width="0dp"
-        android:layout_height="40dp"
+        android:layout_height="50dp"
         android:background="@drawable/edittext_background"
         android:hint="Date of birth"
         android:textColorHint="@color/gray_500"
         android:textColor="@color/black"
-        android:inputType="date"
+        android:inputType="none"
         android:focusable="false"
-        app:layout_constraintVertical_bias="0.59"
+        app:layout_constraintVertical_bias="0.64"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -159,7 +169,7 @@
         android:textColor="@color/gray_700"
         android:textSize="20sp"
         app:layout_constraintHorizontal_bias="0.14"
-        app:layout_constraintVertical_bias="0.648"
+        app:layout_constraintVertical_bias="0.708"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -169,13 +179,13 @@
     <EditText
         android:id="@+id/edtPhone"
         android:layout_width="0dp"
-        android:layout_height="40dp"
+        android:layout_height="50dp"
         android:background="@drawable/edittext_background"
         android:hint="Phone number"
         android:textColorHint="@color/gray_500"
         android:textColor="@color/black"
         android:inputType="phone"
-        app:layout_constraintVertical_bias="0.703"
+        app:layout_constraintVertical_bias="0.763"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -189,7 +199,7 @@
         android:textColor="@color/gray_700"
         android:textSize="20sp"
         app:layout_constraintHorizontal_bias="0.14"
-        app:layout_constraintVertical_bias="0.755"
+        app:layout_constraintVertical_bias="0.825"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -199,13 +209,13 @@
     <EditText
         android:id="@+id/edtAddress"
         android:layout_width="0dp"
-        android:layout_height="40dp"
+        android:layout_height="50dp"
         android:background="@drawable/edittext_background"
         android:hint="Address"
         android:textColorHint="@color/gray_500"
         android:textColor="@color/black"
         android:inputType="text"
-        app:layout_constraintVertical_bias="0.813"
+        app:layout_constraintVertical_bias="0.883"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -221,10 +231,10 @@
         android:textColor="@color/white"
         android:textSize="24sp"
         app:layout_constraintWidth_percent="0.8"
-        app:layout_constraintVertical_bias="0.3"
+        app:layout_constraintVertical_bias="0.9"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtAddress"
+        app:layout_constraintTop_toTopOf="@+id/edtAddress"
         app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

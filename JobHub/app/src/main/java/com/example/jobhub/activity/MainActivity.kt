@@ -18,7 +18,11 @@ import com.example.jobhub.fragment.ApplyFragment
 import com.example.jobhub.fragment.CompanyFragment
 import com.example.jobhub.fragment.HomeFragment
 import com.example.jobhub.fragment.ProfileFragment
+import com.example.jobhub.model.ApiResponse
 import com.example.jobhub.service.UserService
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MainActivity : BaseActivity() {
 

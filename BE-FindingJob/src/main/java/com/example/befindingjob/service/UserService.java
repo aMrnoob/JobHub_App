@@ -12,4 +12,11 @@ public interface UserService {
     ApiResponse<Void> passwordReset(Register_ResetPwdRequest resetPwdRequest);
     ApiResponse<User> getUserInfo(String token);
     ApiResponse<Void> updateUser(User userDTO);
+
+    ApiResponse<UserInfo> getUserProfile(String token);
+    ApiResponse<UserInfo> findByEmail(String email);
+    ApiResponse<User> createUser(User user);
+    ApiResponse<String> generateToken(User user);
+    ApiResponse<Boolean> verifyPassword(User user, String password);
+
 }

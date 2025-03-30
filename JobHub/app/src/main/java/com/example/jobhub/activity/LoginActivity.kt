@@ -39,9 +39,9 @@ class LoginActivity : BaseActivity() {
             val password = binding.edtPassword.text.toString()
 
             if(email.isBlank()) {
-                Toast.makeText(this, "Please enter your email.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@LoginActivity, "Please enter your email.", Toast.LENGTH_SHORT).show()
             } else if (password.isBlank()){
-                Toast.makeText(this, "Please enter your password", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@LoginActivity, "Please enter your password", Toast.LENGTH_SHORT).show()
             } else {
                 login(email, password)
             }
