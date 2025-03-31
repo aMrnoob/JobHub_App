@@ -1,6 +1,6 @@
 package com.example.befindingjob.service.impl;
 
-import com.example.befindingjob.dto.admin.UserInfo;
+import com.example.befindingjob.dto.UserDTO;
 import com.example.befindingjob.dto.auth.*;
 import com.example.befindingjob.entity.User;
 import com.example.befindingjob.entity.enumm.Role;
@@ -128,40 +128,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ApiResponse<User> getUserInfo(String token) {
-        if (!jwtService.isValidToken(token)) {
-            return new ApiResponse<>(false, "", null);
-        }
-
-        Integer userId = jwtService.extractUserId(token);
-        if (userId == null) {
-            return new ApiResponse<>(false, "", null);
-        }
-
-        return userRepository.findById(userId)
-                .map(user -> new ApiResponse<>(true, "", user))
-                .orElseGet(() -> new ApiResponse<>(false, "", null));
-    }
-
-    @Override
-    public ApiResponse<Void> updateUser(UserInfo userInfo) {
-        return userRepository.findById(userInfo.getUserId()).map(existingUser -> {
-            existingUser.setEmail(userInfo.getEmail());
-            if (userInfo.getPassword() != null && !userInfo.getPassword().isBlank()) {
-                existingUser.setPassword(passwordEncoder.encode(userInfo.getPassword()));
+    public ApiResponse<Void> updateUser(UserDTO userDTO) {
+        return userRepository.findById(userDTO.getUserId()).map(existingUser -> {
+            existingUser.setEmail(userDTO.getEmail());
+            if (userDTO.getPassword() != null && !userDTO.getPassword().isBlank()) {
+                existingUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
             }
-            existingUser.setRole(userInfo.getRole());
-            existingUser.setFullname(userInfo.getFullName());
-            existingUser.setAddress(userInfo.getAddress());
+            existingUser.setRole(userDTO.getRole());
+            existingUser.setFullname(userDTO.getFullName());
+            existingUser.setAddress(userDTO.getAddress());
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy");
-            LocalDate dateOfBirth = LocalDate.parse(userInfo.getDateOfBirth(), formatter);
+            LocalDate dateOfBirth = LocalDate.parse(userDTO.getDateOfBirth(), formatter);
             existingUser.setDateOfBirth(dateOfBirth.atStartOfDay());
-            System.out.println(userInfo.getRole());
-            existingUser.setPhone(userInfo.getPhone());
+            System.out.println(userDTO.getRole());
+            existingUser.setPhone(userDTO.getPhone());
 
-            if (userInfo.getImageUrl() != null && !userInfo.getImageUrl().isBlank()) {
-                existingUser.setImageUrl(userInfo.getImageUrl());
+            if (userDTO.getImageUrl() != null && !userDTO.getImageUrl().isBlank()) {
+                existingUser.setImageUrl(userDTO.getImageUrl());
             }
 
             existingUser.setUpdatedAt(LocalDateTime.now());
@@ -170,7 +154,7 @@ public class UserServiceImpl implements UserService {
         }).orElseGet(() -> new ApiResponse<>(false, "User not found", null));
     }
     @Override
-    public ApiResponse<UserInfo> getUserProfile(String token) {
+    public ApiResponse<UserDTO> getUser(String token) {
         if (token == null || !token.startsWith("Bearer "))
             return new ApiResponse<>(false, "Invalid token format");
 
@@ -182,12 +166,12 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        UserInfo userInfo = new UserInfo(user);
-        return new ApiResponse<>(true, "Success", userInfo);
+        UserDTO userDTO = new UserDTO(user);
+        return new ApiResponse<>(true, "Success", userDTO);
     }
 
     @Override
-    public ApiResponse<UserInfo> findByEmail(String email) {
+    public ApiResponse<UserDTO> findByEmail(String email) {
         Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isEmpty()) {
             return new ApiResponse<>(false, "User not found");

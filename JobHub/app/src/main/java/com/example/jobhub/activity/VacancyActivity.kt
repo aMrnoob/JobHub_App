@@ -12,7 +12,7 @@ import com.example.jobhub.R
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.ActivityVacancyBinding
-import com.example.jobhub.entity.User
+import com.example.jobhub.dto.UserDTO
 import com.example.jobhub.entity.enumm.Role
 import com.example.jobhub.fragment.CompanyJobFragment
 import com.example.jobhub.fragment.JobDetailFragment
@@ -24,7 +24,7 @@ class VacancyActivity : BaseActivity(), FragmentInterface {
 
     private lateinit var binding: ActivityVacancyBinding
 
-    private var user: User? = null
+    private var userDTO: UserDTO? = null
     private var jobDetailFragment: JobDetailFragment? = null
     private var requirementsFragment: RequirementsFragment? = null
     private var companyJobFragment: CompanyJobFragment? = null
@@ -58,16 +58,16 @@ class VacancyActivity : BaseActivity(), FragmentInterface {
     private fun decrypteken(token: String) {
         ApiHelper().callApi(
             context = this,
-            call = userService.getUserInfo("Bearer $token"),
+            call = userService.getUser("Bearer $token"),
             onSuccess = {
-                user = it
+                userDTO = it
                 runOnUiThread { setupBottomNavigation() }
             }
         )
     }
 
     private fun setupBottomNavigation() {
-        if (user?.role == Role.EMPLOYER) {
+        if (userDTO?.role == Role.EMPLOYER) {
             binding.btnEdit.visibility = View.VISIBLE
         } else {
             binding.btnEdit.visibility = View.GONE
@@ -132,7 +132,7 @@ class VacancyActivity : BaseActivity(), FragmentInterface {
             textView.setOnClickListener {
                 updateSelectedCategory(textView, categoryTextViews)
 
-                binding.btnEdit.visibility = if (user?.role == Role.EMPLOYER) View.VISIBLE else View.GONE
+                binding.btnEdit.visibility = if (userDTO?.role == Role.EMPLOYER) View.VISIBLE else View.GONE
 
                 val fragment = when (textView) {
                     binding.tvJobDetail -> {

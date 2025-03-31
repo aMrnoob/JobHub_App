@@ -1,36 +1,38 @@
 package com.example.jobhub.activity
 
-import android.app.Activity
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.MainProfileBinding
-import com.example.jobhub.dto.admin.UserInfo
-import com.example.jobhub.model.ApiResponse
+import com.example.jobhub.dto.UserDTO
 import com.example.jobhub.service.UserService
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 class ProfileActivity : AppCompatActivity() {
+
     private lateinit var binding: MainProfileBinding
     private var userId: Int = -1
     private var selectedImageUri: Uri? = null
+
+    private val userService: UserService by lazy {
+        RetrofitClient.createRetrofit().create(UserService::class.java)
+    }
 
     private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         if (uri != null) {
@@ -74,32 +76,25 @@ class ProfileActivity : AppCompatActivity() {
             return
         }
 
-        val apiService = RetrofitClient.createRetrofit().create(UserService::class.java)
-        apiService.getUserProfile("Bearer $token").enqueue(object : Callback<ApiResponse<UserInfo>> {
-            override fun onResponse(call: Call<ApiResponse<UserInfo>>, response: Response<ApiResponse<UserInfo>>) {
-                if (response.isSuccessful) {
-                    response.body()?.data?.let { userInfo ->
-                        userId = userInfo.userId ?: -1
-                        updateUI(userInfo)
-                    }
-                } else {
-                    Log.e("ProfileActivity", "Lỗi khi lấy thông tin user: ${response.errorBody()?.string()}")
+        ApiHelper().callApi(
+            context = this,
+            call = userService.getUser("Bearer $token"),
+            onSuccess = { response ->
+                response?.let { userDTO ->
+                    userId = userDTO.userId ?: -1
+                    updateUI(userDTO)
                 }
             }
-
-            override fun onFailure(call: Call<ApiResponse<UserInfo>>, t: Throwable) {
-                Log.e("ProfileActivity", "API call thất bại: ${t.message}")
-            }
-        })
+        )
     }
 
-    private fun updateUI(userInfo: UserInfo) {
-        binding.edtFullName.setText(userInfo.fullName ?: "")
-        binding.edtEmail.setText(userInfo.email ?: "")
+    private fun updateUI(userInfo: UserDTO) {
+        binding.edtFullName.setText(userInfo.fullName)
+        binding.edtEmail.setText(userInfo.email)
         binding.edtPhone.setText(userInfo.phone ?: "")
         binding.edtAddress.setText(userInfo.address ?: "")
 
-        binding.edtDateOfBirth.setText(formatDateForDisplay(userInfo.dateOfBirth ?: ""))
+        binding.edtDateOfBirth.setText(formatDateForDisplay(userInfo.dateOfBirth))
 
         if (!userInfo.imageUrl.isNullOrEmpty()) {
             val bitmap = decodeBase64ToBitmap(userInfo.imageUrl.toString())
@@ -122,7 +117,7 @@ class ProfileActivity : AppCompatActivity() {
 
         val formattedDate = formatDateForBackend(binding.edtDateOfBirth.text.toString())
 
-        val userInfo = UserInfo(
+        val userInfo = UserDTO(
             userId = userId,
             fullName = binding.edtFullName.text.toString(),
             email = binding.edtEmail.text.toString(),
@@ -132,20 +127,13 @@ class ProfileActivity : AppCompatActivity() {
             dateOfBirth = formattedDate
         )
 
-        val apiService = RetrofitClient.createRetrofit().create(UserService::class.java)
-        apiService.updateUser(userInfo).enqueue(object : Callback<ApiResponse<Void>> {
-            override fun onResponse(call: Call<ApiResponse<Void>>, response: Response<ApiResponse<Void>>) {
-                if (response.isSuccessful && response.body()?.isSuccess == true) {
-                    Toast.makeText(this@ProfileActivity, "Cập nhật thành công!", Toast.LENGTH_SHORT).show()
-                } else {
-                    Log.e("ProfileActivity", "Lỗi khi cập nhật: ${response.errorBody()?.string()}")
-                }
+        ApiHelper().callApi(
+            context = this,
+            call = userService.updateUser(userInfo),
+            onSuccess = {
+                Toast.makeText(this, "Cập nhật thành công!", Toast.LENGTH_SHORT).show()
             }
-
-            override fun onFailure(call: Call<ApiResponse<Void>>, t: Throwable) {
-                Log.e("ProfileActivity", "API thất bại: ${t.message}")
-            }
-        })
+        )
     }
 
     private fun validateFields(): Boolean {
@@ -188,7 +176,6 @@ class ProfileActivity : AppCompatActivity() {
         return inputDate
     }
 
-
     private fun formatDateForDisplay(apiDate: String): String {
         return try {
             val inputFormats = listOf(
@@ -213,8 +200,7 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
 
-
-
+    @SuppressLint("DefaultLocale")
     private fun showDatePicker() {
         val calendar = Calendar.getInstance()
 
@@ -237,6 +223,4 @@ class ProfileActivity : AppCompatActivity() {
         datePicker.datePicker.maxDate = System.currentTimeMillis()
         datePicker.show()
     }
-
-
 }

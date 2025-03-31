@@ -1,29 +1,25 @@
 package com.example.jobhub.activity
 
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.ActivityProfileBinding
 import com.example.jobhub.databinding.ChooseJobBinding
 import com.example.jobhub.databinding.ChooseProfileBinding
-import com.example.jobhub.dto.admin.UserInfo
+import com.example.jobhub.dto.UserDTO
 import com.example.jobhub.entity.enumm.Role
-import com.example.jobhub.model.ApiResponse
 import com.example.jobhub.service.UserService
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.io.ByteArrayOutputStream
 import java.util.Calendar
 import kotlin.properties.Delegates
@@ -161,11 +157,11 @@ class SelectProfileActivity : BaseActivity() {
                     val dateString = bindingProfile.edtDateOfBirth.text.toString()
                     val phone = bindingProfile.edtPhone.text.toString()
                     val address = bindingProfile.edtAddress.text.toString()
-                    val userInfo = UserInfo(userId = userId, fullName = fullName, role = role,
+                    val userDTO = UserDTO(userId = userId, fullName = fullName, role = role,
                         email = email, phone = phone, address = address, dateOfBirth = dateString
                     )
 
-                    updateUser(userInfo)
+                    updateUser(userDTO)
 
                     currentStep = 4
                     showStep(currentStep)
@@ -179,54 +175,32 @@ class SelectProfileActivity : BaseActivity() {
         }
     }
 
-    private fun updateUser(userInfo: UserInfo) {
+    private fun updateUser(userDTO: UserDTO) {
         ApiHelper().callApi(
             context = this,
-            call = userService.updateUser(userInfo),
+            call = userService.updateUser(userDTO),
             onSuccess = {
                 currentStep = 4
                 showStep(currentStep)
             }
-
-            override fun onFailure(call: Call<ApiResponse<Void>>, t: Throwable) {
-                Log.e("UpdateUser", "API thất bại: ${t.message}")
-            })
-        })
+        )
     }
 
-
     private fun decryptedToken(token: String) {
-        val apiService = RetrofitClient.createRetrofit().create(UserService::class.java)
-        apiService.getUserInfo("Bearer $token").enqueue(object : Callback<ApiResponse<UserInfo>> {
-            override fun onResponse(call: Call<ApiResponse<UserInfo>>, response: Response<ApiResponse<UserInfo>>) {
-                if (response.isSuccessful) {
-                    Log.d("decryptedToken", "API call successful. Code: ${response.code()}")
+        if (token.isBlank()) return
 
-                    val apiResponse = response.body()
-                    if (apiResponse != null && apiResponse.isSuccess) {
-                        Log.d("decryptedToken", "User info: ${apiResponse.data}")
-
-                        apiResponse.data?.let {
-                            runOnUiThread {
-                                it.userId?.let { id -> userId = id } ?: Log.e("decryptedToken", "User ID is null")
-                                bindingProfile.edtEmail.setText(it.email)
-                            }
-                        } ?: run {
-                            Log.e("decryptedToken", "User data is null in the response.")
-                        }
-                    } else {
-                        Log.e("decryptedToken", "API response is not successful. Message: ${apiResponse?.message}")
+        ApiHelper().callApi(
+            context = this,
+            call = userService.getUser("Bearer $token"),
+            onSuccess = { userDTO ->
+                userDTO?.let {
+                    runOnUiThread {
+                        it.userId?.let { id -> userId = id }
+                        bindingProfile.edtEmail.setText(it.email)
                     }
-                } else {
-                    Log.e("decryptedToken", "API call failed. Code: ${response.code()}, Message: ${response.message()}")
-                    Log.e("decryptedToken", "Error body: ${response.errorBody()?.string()}")
                 }
             }
-
-            override fun onFailure(call: Call<ApiResponse<UserInfo>>, t: Throwable) {
-                Log.e("decryptedToken", "API call failed: ${t.message}", t)
-            }
-        })
+        )
     }
 
     private fun handleClick(view: View, selectedRole: Role) {
@@ -275,6 +249,7 @@ class SelectProfileActivity : BaseActivity() {
         imagePickerLauncher.launch("image/*")
     }
 
+    @SuppressLint("SetTextI18n")
     private fun showDatePicker() {
         val calendar = Calendar.getInstance()
         val datePicker = DatePickerDialog(this, { _, year, month, day ->

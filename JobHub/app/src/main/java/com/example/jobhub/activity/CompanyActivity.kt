@@ -2,12 +2,11 @@ package com.example.jobhub.activity
 
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.ActivityCompanyBinding
 import com.example.jobhub.dto.CompanyDTO
-import com.example.jobhub.entity.User
+import com.example.jobhub.dto.UserDTO
 import com.example.jobhub.service.CompanyService
 import com.example.jobhub.service.UserService
 
@@ -21,7 +20,7 @@ class CompanyActivity : BaseActivity() {
         RetrofitClient.createRetrofit().create(UserService::class.java)
     }
 
-    private var user: User? = null
+    private var userDTO: UserDTO? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,7 +37,7 @@ class CompanyActivity : BaseActivity() {
             val website = binding.edtWebsite.text.toString()
             val description = binding.edtDescription.text.toString()
 
-            val companyDTO = CompanyDTO(null, companyName, description, address, logoUrl, website, user?.userId)
+            val companyDTO = CompanyDTO(null, companyName, description, address, logoUrl, website, userDTO?.userId)
 
             addCompany(companyDTO)
         }
@@ -66,17 +65,9 @@ class CompanyActivity : BaseActivity() {
     private fun decryptoken(token: String) {
         ApiHelper().callApi(
             context = this,
-            call = userService.getUserInfo("Bearer $token"),
+            call = userService.getUser("Bearer $token"),
             onSuccess = {
-                user = it
-                if (it != null) {
-                    Log.d("UserCheck", "User loaded: ${it.userId}, ${it.email}")
-                }
-                if (it != null) {
-                    if (it.userId == null) {
-                        Toast.makeText(this, "Invalid user data", Toast.LENGTH_SHORT).show()
-                    }
-                }
+                userDTO = it
             }
         )
     }
