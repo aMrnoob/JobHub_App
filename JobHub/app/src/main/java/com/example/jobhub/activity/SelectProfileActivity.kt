@@ -190,7 +190,7 @@ class SelectProfileActivity : BaseActivity() {
 
             override fun onFailure(call: Call<ApiResponse<Void>>, t: Throwable) {
                 Log.e("UpdateUser", "API thất bại: ${t.message}")
-            }
+            })
         })
     }
 

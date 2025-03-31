@@ -15,6 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 @Service
@@ -141,22 +144,38 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ApiResponse<Void> updateUser(User user) {
-        return userRepository.findById(user.getUserId()).map(existingUser -> {
-            user.setPassword(existingUser.getPassword());
+    public ApiResponse<Void> updateUser(UserInfo userInfo) {
+        return userRepository.findById(userInfo.getUserId()).map(existingUser -> {
+            existingUser.setEmail(userInfo.getEmail());
+            if (userInfo.getPassword() != null && !userInfo.getPassword().isBlank()) {
+                existingUser.setPassword(passwordEncoder.encode(userInfo.getPassword()));
+            }
+            existingUser.setRole(userInfo.getRole());
+            existingUser.setFullname(userInfo.getFullName());
+            existingUser.setAddress(userInfo.getAddress());
 
-            userRepository.save(user);
-            return new ApiResponse<Void>(true, "User updated successfully");
-        }).orElseGet(() -> new ApiResponse<>(false, "User not found"));
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy");
+            LocalDate dateOfBirth = LocalDate.parse(userInfo.getDateOfBirth(), formatter);
+            existingUser.setDateOfBirth(dateOfBirth.atStartOfDay());
+            System.out.println(userInfo.getRole());
+            existingUser.setPhone(userInfo.getPhone());
+
+            if (userInfo.getImageUrl() != null && !userInfo.getImageUrl().isBlank()) {
+                existingUser.setImageUrl(userInfo.getImageUrl());
+            }
+
+            existingUser.setUpdatedAt(LocalDateTime.now());
+            userRepository.save(existingUser);
+            return new ApiResponse<Void>(true, "User updated successfully", null);
+        }).orElseGet(() -> new ApiResponse<>(false, "User not found", null));
     }
-
     @Override
     public ApiResponse<UserInfo> getUserProfile(String token) {
         if (token == null || !token.startsWith("Bearer "))
             return new ApiResponse<>(false, "Invalid token format");
 
         token = token.substring(7);
-        if (!jwtService.isTokenValid(token))
+        if (!jwtService.isValidToken(token))
             return new ApiResponse<>(false, "Invalid or expired token");
 
         int userId = jwtService.extractUserId(token);
