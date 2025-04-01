@@ -48,14 +48,12 @@ public class UserServiceImpl implements UserService {
         user.setCreatedAt(java.time.LocalDateTime.now());
 
         userRepository.save(user);
-
         return new ApiResponse<>(true, "Register successfully");
     }
 
     @Override
     public ApiResponse<LoginResponse> login(LoginRequest loginRequest) {
         var userOptional = userRepository.findByEmail(loginRequest.getEmail());
-
         if (userOptional.isEmpty()) {
             return new ApiResponse<>(false, "Email does not exist");
         }
@@ -155,10 +153,6 @@ public class UserServiceImpl implements UserService {
     }
     @Override
     public ApiResponse<UserDTO> getUser(String token) {
-        if (token == null || !token.startsWith("Bearer "))
-            return new ApiResponse<>(false, "Invalid token format");
-
-        token = token.substring(7);
         if (!jwtService.isValidToken(token))
             return new ApiResponse<>(false, "Invalid or expired token");
 
@@ -167,7 +161,8 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         UserDTO userDTO = new UserDTO(user);
-        return new ApiResponse<>(true, "Success", userDTO);
+        System.out.println(userDTO.getRole());
+        return new ApiResponse<>(true, "", userDTO);
     }
 
     @Override

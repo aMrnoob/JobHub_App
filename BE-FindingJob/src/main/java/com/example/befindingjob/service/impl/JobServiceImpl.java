@@ -49,7 +49,6 @@ public class JobServiceImpl implements JobService {
             jobRepository.save(job);
             return new ApiResponse<>(true, "Job created successfully!");
         } catch (Exception e) {
-            e.printStackTrace();
             return new ApiResponse<>(false, "", null);
         }
     }

@@ -84,10 +84,8 @@ class ApplicationEmployerFragment : Fragment() {
     }
 
     private fun getAuthToken(): String? {
-        return requireContext().getSharedPreferences("JobHubPrefs", AppCompatActivity.MODE_PRIVATE)
-            .getString("authToken", null)
-            ?.trim()
-            ?.takeIf { it.isNotBlank() }
+        val sharedPreferences = activity?.getSharedPreferences("JobHubPrefs", AppCompatActivity.MODE_PRIVATE)
+        return sharedPreferences?.getString("authToken", null)?.trim()?.takeIf { it.isNotBlank() }
     }
 
     private fun animateView(view: View) {

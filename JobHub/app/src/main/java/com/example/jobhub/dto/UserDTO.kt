@@ -8,7 +8,7 @@ data class UserDTO(
     var fullName: String = "",
     val email: String = "",
     val password: String = "",
-    var role: Role = Role.UNDEFINED,
+    var role: Role? = null,
     var address: String? = null,
     var dateOfBirth: String = "",
     var phone: String? = null,

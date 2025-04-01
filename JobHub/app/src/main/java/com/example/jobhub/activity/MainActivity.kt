@@ -25,6 +25,9 @@ class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
 
     private var userDTO: UserDTO? = null
+    private val userService: UserService by lazy {
+        RetrofitClient.createRetrofit().create(UserService::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,20 +51,21 @@ class MainActivity : BaseActivity() {
     private fun decrypteken(token: String) {
         ApiHelper().callApi(
             context = this,
-            call = RetrofitClient.createRetrofit()
-                .create(UserService::class.java)
-                .getUser("Bearer $token"),
-            onSuccess = { userDTO = it }
+            call = userService.getUser("Bearer $token"),
+            onSuccess = {
+                userDTO = it
+                runOnUiThread { setupBottomNavigation() }
+            }
         )
     }
 
     private fun setupBottomNavigation() {
         if (userDTO?.role == Role.EMPLOYER) {
-            binding.tvApply.visibility = View.VISIBLE
-            binding.tvCompany.visibility = View.GONE
-        } else {
             binding.tvApply.visibility = View.GONE
             binding.tvCompany.visibility = View.VISIBLE
+        } else {
+            binding.tvApply.visibility = View.VISIBLE
+            binding.tvCompany.visibility = View.GONE
         }
 
         if (supportFragmentManager.findFragmentById(R.id.fragmentContainer) == null) {

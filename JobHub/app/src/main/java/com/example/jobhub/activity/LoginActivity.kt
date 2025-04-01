@@ -50,7 +50,6 @@ class LoginActivity : BaseActivity() {
 
         googleSignInClient = GoogleSignIn.getClient(this, gso)
 
-        // Xử lý nút đăng nhập với binding
         binding.btnGoogle.setOnClickListener {
             val signInIntent = googleSignInClient.signInIntent
             signInLauncher.launch(signInIntent)
@@ -89,7 +88,7 @@ class LoginActivity : BaseActivity() {
                 Log.d("GoogleSignIn", "ID Token: $idToken")
                 sendTokenToBackend(idToken)
             } catch (e: ApiException) {
-                Log.w("GoogleSignIn", "Đăng nhập thất bại: ${e.statusCode}")
+                Log.w("GoogleSignIn", "Login failed: ${e.statusCode}")
             }
         }
     }
@@ -111,7 +110,6 @@ class LoginActivity : BaseActivity() {
             }
         )
     }
-
 
     private fun login(email: String, password: String) {
         ApiHelper().callApi(

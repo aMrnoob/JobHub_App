@@ -130,9 +130,7 @@ class ProfileActivity : AppCompatActivity() {
         ApiHelper().callApi(
             context = this,
             call = userService.updateUser(userInfo),
-            onSuccess = {
-                Toast.makeText(this, "Cập nhật thành công!", Toast.LENGTH_SHORT).show()
-            }
+            onSuccess = { }
         )
     }
 
