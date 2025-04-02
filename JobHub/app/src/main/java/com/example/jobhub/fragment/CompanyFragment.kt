@@ -1,5 +1,6 @@
 package com.example.jobhub.fragment
 
+import com.example.jobhub.R
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.annotation.SuppressLint
@@ -8,6 +9,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,6 +22,7 @@ import com.example.jobhub.databinding.MainCompanyBinding
 import com.example.jobhub.entity.Company
 import com.example.jobhub.service.CompanyService
 
+
 class CompanyFragment : Fragment() {
 
     private var _binding: MainCompanyBinding? = null
@@ -28,6 +32,7 @@ class CompanyFragment : Fragment() {
         RetrofitClient.createRetrofit().create(CompanyService::class.java)
     }
     private lateinit var companyAdapter: CompanyAdapter
+    private var allCompanies: MutableList<Company> = mutableListOf()
     private var companyList: MutableList<Company> = mutableListOf()
 
     override fun onCreateView(
@@ -43,6 +48,7 @@ class CompanyFragment : Fragment() {
         }
 
         setupRecyclerView()
+        setupSearchView()
         fetchAllCompanies()
 
         return binding.root
@@ -66,7 +72,11 @@ class CompanyFragment : Fragment() {
             onSuccess = { response ->
                 companyList.apply {
                     clear()
-                    response?.let { addAll(it) }
+                    response?.let {
+                        addAll(it)
+                        allCompanies.clear()
+                        allCompanies.addAll(it)
+                    }
                 }
                 companyAdapter.notifyDataSetChanged()
             }
@@ -89,5 +99,47 @@ class CompanyFragment : Fragment() {
             duration = 300
             start()
         }
+    }
+
+    private fun setupSearchView() {
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                filterCompanies(newText.orEmpty())
+                return true
+            }
+        })
+
+        val searchEditText = binding.searchView.findViewById<EditText>(androidx.appcompat.R.)
+        searchEditText.setOnEditorActionListener { _, _, _ ->
+            filterCompanies(searchEditText.text.toString())
+            true
+        }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun filterCompanies(query: String) {
+        if (query.isEmpty()) {
+            companyList.clear()
+            companyList.addAll(allCompanies)
+            companyAdapter.notifyDataSetChanged()
+            binding.tvNoResults.visibility = View.GONE
+            return
+        }
+
+        val filteredList = allCompanies.filter { company ->
+            company.companyName?.contains(query, ignoreCase = true) == true ||
+                    company.address?.contains(query, ignoreCase = true) == true ||
+                    company.description?.contains(query, ignoreCase = true) == true
+        }.toMutableList()
+
+        companyList.clear()
+        companyList.addAll(filteredList)
+        companyAdapter.notifyDataSetChanged()
+
+        binding.tvNoResults.visibility = if (filteredList.isEmpty()) View.VISIBLE else View.GONE
     }
 }

@@ -1,5 +1,6 @@
 package com.example.jobhub.adapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,7 +11,7 @@ import com.bumptech.glide.Glide
 import com.example.jobhub.R
 import com.example.jobhub.entity.Company
 
-class CompanyAdapter(private val companyList: List<Company>) :
+class CompanyAdapter(private var companyList: List<Company>) :
 
     RecyclerView.Adapter<CompanyAdapter.CompanyViewHolder>() {
 
@@ -52,5 +53,11 @@ class CompanyAdapter(private val companyList: List<Company>) :
         val tvCompanyName: TextView = itemView.findViewById(R.id.tvCompanyName)
         val tvAddress: TextView = itemView.findViewById(R.id.tvAddress)
         val tvDescription: TextView = itemView.findViewById(R.id.tvDescription)
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateList(newList: List<Company>) {
+        companyList = newList
+        notifyDataSetChanged()
     }
 }

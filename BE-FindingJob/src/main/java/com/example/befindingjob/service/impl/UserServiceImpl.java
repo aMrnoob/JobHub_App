@@ -161,7 +161,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         UserDTO userDTO = new UserDTO(user);
-        System.out.println(userDTO.getRole());
+
         return new ApiResponse<>(true, "", userDTO);
     }
 

@@ -50,11 +50,10 @@
         android:id="@+id/searchView"
         android:layout_width="0dp"
         android:layout_height="45dp"
-        android:iconifiedByDefault="true"
-        android:queryHint="Search your company"
+        android:iconifiedByDefault="false"
+        android:queryHint="Search company"
         android:background="@drawable/edittext_background"
-        android:textColorHint="@color/gray_600"
-        android:textColor="@color/black"
+        android:theme="@style/CustomSearchView"
         app:layout_constraintWidth_percent="0.7"
         app:layout_constraintVertical_bias="0.12"
         app:layout_constraintHorizontal_bias="0.2"
@@ -89,6 +88,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <TextView
+        android:id="@+id/tvNoResults"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="No companies found"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:visibility="gone"
+        android:layout_marginTop="20dp"
+        app:layout_constraintHorizontal_bias="0.9"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvCompany" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvCompany"

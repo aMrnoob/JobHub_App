@@ -129,7 +129,7 @@ class SelectProfileActivity : BaseActivity() {
                 val sharedPreferences = getSharedPreferences("JobHubPrefs", MODE_PRIVATE)
                 val token = sharedPreferences.getString("authToken", null)
 
-                if (token != null && token.isNotBlank()) {
+                if (!token.isNullOrBlank()) {
                     val cleanedToken = token.trim()
                     Log.d("Token", "'$token'")
                     decryptedToken(cleanedToken)
