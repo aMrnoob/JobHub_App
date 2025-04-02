@@ -48,6 +48,9 @@
             android:name=".activity.ProfileActivity"
             android:exported="true" />
         <activity
+            android:name=".activity.MainProfile"
+            android:exported="true" />
+        <activity
             android:name=".activity.Welcome"
             android:exported="true"
             android:theme="@style/Theme.JobHub">

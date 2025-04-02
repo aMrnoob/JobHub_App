@@ -9,6 +9,10 @@ android {
     namespace = "com.example.jobhub"
     compileSdk = 35
 
+    buildFeatures {
+        viewBinding = true
+    }
+
     defaultConfig {
         applicationId = "com.example.jobhub"
         minSdk = 26
