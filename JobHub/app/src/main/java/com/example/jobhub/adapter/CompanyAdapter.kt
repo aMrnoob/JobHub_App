@@ -54,10 +54,4 @@ class CompanyAdapter(private var companyList: List<Company>) :
         val tvAddress: TextView = itemView.findViewById(R.id.tvAddress)
         val tvDescription: TextView = itemView.findViewById(R.id.tvDescription)
     }
-
-    @SuppressLint("NotifyDataSetChanged")
-    fun updateList(newList: List<Company>) {
-        companyList = newList
-        notifyDataSetChanged()
-    }
 }

@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SearchView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -31,6 +32,7 @@ class HomeFragment : Fragment() {
     private val jobService: JobService by lazy {
         RetrofitClient.createRetrofit().create(JobService::class.java)
     }
+    private var allJobs: MutableList<ItemJobDTO> = mutableListOf()
     private var jobList: MutableList<ItemJobDTO> = mutableListOf()
     private lateinit var jobAdapter: JobAdapter
 
@@ -43,6 +45,7 @@ class HomeFragment : Fragment() {
         setupCategorySelection()
         setupAnimation()
         setupRecyclerView()
+        setupSearchView()
         getAllJobs()
 
         return binding.root
@@ -73,7 +76,11 @@ class HomeFragment : Fragment() {
             onSuccess = { response ->
                 jobList.apply {
                     clear()
-                    response?.let { addAll(it) }
+                    response?.let {
+                        addAll(it)
+                        allJobs.clear()
+                        allJobs.addAll(it)
+                    }
                 }
                 jobAdapter.notifyDataSetChanged()
             }
@@ -100,7 +107,7 @@ class HomeFragment : Fragment() {
 
     private fun setupAnimation() {
         listOf(
-            binding.ivNotification, binding.ivSearch, binding.ivMenu,
+            binding.ivNotification, binding.ivMenu,
             binding.tvTips, binding.tvViewMore1, binding.tvViewMore
         ).forEach { it.setOnClickListener { animateView(it) } }
     }
@@ -130,5 +137,39 @@ class HomeFragment : Fragment() {
         }
 
         selectedTextView = selected
+    }
+
+    private fun setupSearchView() {
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                filterCompanies(newText.orEmpty())
+                return true
+            }
+        })
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun filterCompanies(query: String) {
+        if (query.isEmpty()) {
+            jobList.clear()
+            jobList.addAll(allJobs)
+            jobAdapter.notifyDataSetChanged()
+            binding.tvNoResults.visibility = View.GONE
+            return
+        }
+
+        val filteredList = allJobs.filter { job ->
+            job.title.contains(query, ignoreCase = true) || job.location.contains(query, ignoreCase = true)
+        }.toMutableList()
+
+        jobList.clear()
+        jobList.addAll(filteredList)
+        jobAdapter.notifyDataSetChanged()
+
+        binding.tvNoResults.visibility = if (filteredList.isEmpty()) View.VISIBLE else View.GONE
     }
 }

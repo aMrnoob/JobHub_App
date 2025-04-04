@@ -46,30 +46,17 @@
         app:layout_constraintStart_toEndOf="@+id/tvName"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <EditText
-        android:id="@+id/edtSearch"
+    <SearchView
+        android:id="@+id/searchView"
         android:layout_width="0dp"
         android:layout_height="45dp"
+        android:iconifiedByDefault="false"
+        android:queryHint="Search job"
         android:background="@drawable/edittext_background"
-        android:hint="Search"
-        android:ems="10"
-        android:textColorHint="@color/gray_600"
-        android:textColor="@color/black"
+        android:theme="@style/CustomSearchView"
         app:layout_constraintWidth_percent="0.7"
         app:layout_constraintVertical_bias="0.12"
         app:layout_constraintHorizontal_bias="0.2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
-
-    <ImageView
-        android:id="@+id/ivSearch"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:src="@drawable/icon_search"
-        app:layout_constraintVertical_bias="0.126"
-        app:layout_constraintHorizontal_bias="0.7"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -330,6 +317,21 @@
                 android:background="@drawable/background_select"/>
         </LinearLayout>
     </HorizontalScrollView>
+
+    <TextView
+        android:id="@+id/tvNoResults"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="No jobs found"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:visibility="gone"
+        android:layout_marginTop="20dp"
+        app:layout_constraintHorizontal_bias="0.9"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/hsvMenu" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvJob"

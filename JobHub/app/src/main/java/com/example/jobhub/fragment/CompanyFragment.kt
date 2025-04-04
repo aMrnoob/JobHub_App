@@ -1,6 +1,5 @@
 package com.example.jobhub.fragment
 
-import com.example.jobhub.R
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.annotation.SuppressLint
@@ -112,12 +111,6 @@ class CompanyFragment : Fragment() {
                 return true
             }
         })
-
-        val searchEditText = binding.searchView.findViewById<EditText>(androidx.appcompat.R.)
-        searchEditText.setOnEditorActionListener { _, _, _ ->
-            filterCompanies(searchEditText.text.toString())
-            true
-        }
     }
 
     @SuppressLint("NotifyDataSetChanged")

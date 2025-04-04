@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,6 +31,7 @@ class ApplicationEmployerFragment : Fragment() {
     private val jobService: JobService by lazy {
         RetrofitClient.createRetrofit().create(JobService::class.java)
     }
+    private var allJobs: MutableList<ItemJobDTO> = mutableListOf()
     private var jobList: MutableList<ItemJobDTO> = mutableListOf()
     private lateinit var jobAdapter: JobAdapter
 
@@ -40,6 +42,7 @@ class ApplicationEmployerFragment : Fragment() {
         _binding = MainApplicationEmployerBinding.inflate(inflater, container, false)
 
         setupRecyclerView()
+        setupSearchView()
         getAllJobs()
 
         binding.ivAddCompany.setOnClickListener {
@@ -76,7 +79,11 @@ class ApplicationEmployerFragment : Fragment() {
             onSuccess = { response ->
                 jobList.apply {
                     clear()
-                    response?.let { addAll(it) }
+                    response?.let {
+                        addAll(it)
+                        allJobs.clear()
+                        allJobs.addAll(it)
+                    }
                 }
                 jobAdapter.notifyDataSetChanged()
             }
@@ -97,5 +104,39 @@ class ApplicationEmployerFragment : Fragment() {
             duration = 300
             start()
         }
+    }
+
+    private fun setupSearchView() {
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                filterCompanies(newText.orEmpty())
+                return true
+            }
+        })
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun filterCompanies(query: String) {
+        if (query.isEmpty()) {
+            jobList.clear()
+            jobList.addAll(allJobs)
+            jobAdapter.notifyDataSetChanged()
+            binding.tvNoResults.visibility = View.GONE
+            return
+        }
+
+        val filteredList = allJobs.filter { job ->
+            job.title.contains(query, ignoreCase = true) || job.location.contains(query, ignoreCase = true)
+        }.toMutableList()
+
+        jobList.clear()
+        jobList.addAll(filteredList)
+        jobAdapter.notifyDataSetChanged()
+
+        binding.tvNoResults.visibility = if (filteredList.isEmpty()) View.VISIBLE else View.GONE
     }
 }
