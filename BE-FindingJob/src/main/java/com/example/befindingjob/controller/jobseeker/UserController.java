@@ -2,8 +2,10 @@ package com.example.befindingjob.controller.jobseeker;
 
 import com.example.befindingjob.dto.UserDTO;
 import com.example.befindingjob.model.ApiResponse;
+import com.example.befindingjob.service.JwtService;
 import com.example.befindingjob.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +15,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private JwtService jwtService;
 
     @PostMapping("/update-user")
     public ResponseEntity<ApiResponse<Void>> updateUser(@RequestBody UserDTO userDTO) {
@@ -24,4 +29,10 @@ public class UserController {
     public ApiResponse<UserDTO> getUser(@RequestHeader("token") String token) {
         return userService.getUser(token);
     }
+
+    @DeleteMapping("/delete-account")
+    public ApiResponse<UserDTO> deleteAccount(@RequestHeader("token") String token) {
+        return userService.deleteAccountUser(token);
+    }
+
 }

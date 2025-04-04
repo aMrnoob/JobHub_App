@@ -151,6 +151,7 @@ public class UserServiceImpl implements UserService {
             return new ApiResponse<Void>(true, "User updated successfully", null);
         }).orElseGet(() -> new ApiResponse<>(false, "User not found", null));
     }
+
     @Override
     public ApiResponse<UserDTO> getUser(String token) {
         if (!jwtService.isValidToken(token))
@@ -163,6 +164,25 @@ public class UserServiceImpl implements UserService {
         UserDTO userDTO = new UserDTO(user);
         System.out.println(userDTO.getRole());
         return new ApiResponse<>(true, "", userDTO);
+    }
+
+    @Override
+    public ApiResponse<UserDTO> deleteAccountUser(String token) {
+
+        if (!jwtService.isValidToken(token)) {
+            return new ApiResponse<>(false, "Invalid or expired token");
+        }
+
+        int userId = jwtService.extractUserId(token);
+
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            return new ApiResponse<>(false, "User not found");
+        }
+
+        userRepository.deleteById(userId);
+        return new ApiResponse<>(true, "Account deleted successfully");
+
     }
 
     @Override

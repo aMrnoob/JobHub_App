@@ -1,9 +1,12 @@
 package com.example.jobhub.adapter
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.res.ColorStateList
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -51,6 +54,18 @@ class JobAdapter(private val jobList: List<ItemJobDTO>, private val onItemClick:
                 binding.tvStatus.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(binding.tvStatus.context, R.color.green_200))
             }
 
+            if (isJobSeeker(binding.root.context)) {
+                binding.btnApply.visibility = View.VISIBLE
+            } else {
+                binding.btnApply.visibility = View.GONE
+            }
+
+
+            binding.btnApply.setOnClickListener {
+                Toast.makeText(binding.root.context, "Applied for ${itemJobDTO.title}", Toast.LENGTH_SHORT).show()
+            }
+
+
             binding.root.setOnClickListener {
                 onItemClick(itemJobDTO)
             }
@@ -68,4 +83,17 @@ class JobAdapter(private val jobList: List<ItemJobDTO>, private val onItemClick:
     }
 
     override fun getItemCount(): Int = jobList.size
+
+    fun updateList(newList: List<ItemJobDTO>) {
+        val mutableJobList = jobList.toMutableList()
+        mutableJobList.clear()
+        mutableJobList.addAll(newList)
+        notifyDataSetChanged()
+    }
+
+    private fun isJobSeeker(context: Context): Boolean {
+        val sharedPreferences = context.getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
+        return sharedPreferences.getString("userRole", "") == "JOB_SEEKER"
+    }
+
 }

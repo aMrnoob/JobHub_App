@@ -16,6 +16,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.jobhub.config.RetrofitClient
+import com.example.jobhub.databinding.MainEditprofileBinding
 import com.example.jobhub.databinding.MainProfileBinding
 import com.example.jobhub.dto.UserDTO
 import com.example.jobhub.model.ApiResponse
@@ -28,7 +29,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class ProfileActivity : AppCompatActivity() {
-    private lateinit var binding: MainProfileBinding
+    private lateinit var binding: MainEditprofileBinding
     private var userId: Int = -1
     private var selectedImageUri: Uri? = null
 
@@ -45,7 +46,7 @@ class ProfileActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = MainProfileBinding.inflate(layoutInflater)
+        binding = MainEditprofileBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         fetchUserProfile()
