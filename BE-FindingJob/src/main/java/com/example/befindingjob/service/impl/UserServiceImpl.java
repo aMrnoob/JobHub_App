@@ -52,6 +52,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public ApiResponse<Void> otpRegister(OtpRequest otpRequest) {
+        var email = otpRequest.getEmail();
+        Optional<User> userOptional = userRepository.findByEmail(otpRequest.getEmail());
+
+        if (userOptional.isEmpty()) {
+            String otp = emailService.generateOtp();
+
+            long expiryTime = System.currentTimeMillis() + 60 * 1000;
+            OtpStorage.otpStorage.put(email, new OtpEntry(otp, expiryTime));
+
+            boolean isSent = emailService.sendOtp(email, otp);
+            if (isSent) {
+                return new ApiResponse<>(true, "OTP has sent. Please check your email.");
+            } else {
+                return new ApiResponse<>(false, "OTP can not send. Please retry.");
+            }
+        }
+        return new ApiResponse<>(false, "Email has been registered. Please select another email");
+    }
+
+    @Override
     public ApiResponse<LoginResponse> login(LoginRequest loginRequest) {
         var userOptional = userRepository.findByEmail(loginRequest.getEmail());
         if (userOptional.isEmpty()) {
@@ -61,7 +82,7 @@ public class UserServiceImpl implements UserService {
         User user = userOptional.get();
 
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            return new ApiResponse<>(false, "Password or Email is incorrect");
+            return new ApiResponse<>(false, "Email or Password is incorrect");
         }
 
         String token = jwtService.generateToken(user.getUserId(), user.getFullname());
@@ -72,9 +93,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ApiResponse<Void> forgetPwdRequest(ForgetPwdRequest forgetPwdRequest) {
-        var email = forgetPwdRequest.getEmail();
-        Optional<User> userOptional = userRepository.findByEmail(forgetPwdRequest.getEmail());
+    public ApiResponse<Void> forgetPwdRequest(OtpRequest otpRequest) {
+        var email = otpRequest.getEmail();
+        Optional<User> userOptional = userRepository.findByEmail(otpRequest.getEmail());
         if (userOptional.isPresent()) {
             String otp = emailService.generateOtp();
 
@@ -103,7 +124,7 @@ public class UserServiceImpl implements UserService {
 
             if (otpEntry.getOtp().equals(otp) && otpEntry.getExpiryTime() > currentTime) {
                 OtpStorage.otpStorage.remove(email);
-                return new ApiResponse<>(true, "OTP is valid. You can change your password.");
+                return new ApiResponse<>(true, "");
             } else if (otpEntry.getExpiryTime() <= currentTime) {
                 OtpStorage.otpStorage.remove(email);
                 return new ApiResponse<>(false, "OTP expired.");

@@ -23,7 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="73dp"
-        android:text="Forgot Password"
+        android:text="Verify Account"
         android:textColor="@color/black"
         android:textSize="28sp"
         android:textStyle="bold"

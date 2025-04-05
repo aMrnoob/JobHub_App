@@ -1,7 +1,7 @@
 package com.example.jobhub.service
 
 import com.example.jobhub.dto.UserDTO
-import com.example.jobhub.dto.auth.ForgetPwdRequest
+import com.example.jobhub.dto.auth.OtpRequest
 import com.example.jobhub.dto.auth.LoginRequest
 import com.example.jobhub.dto.auth.LoginResponse
 import com.example.jobhub.dto.auth.OtpVerifyRequest
@@ -17,11 +17,14 @@ interface UserService {
     @POST("api/auth/register")
     fun register(@Body registerRequest: Register_ResetPwdRequest): Call<ApiResponse<Void>>
 
+    @POST("api/auth/otp-register")
+    fun otpRegister(@Body otpRequest: OtpRequest): Call<ApiResponse<Void>>
+
     @POST("api/auth/login")
     fun login(@Body loginRequest: LoginRequest): Call<ApiResponse<LoginResponse>>
 
     @POST("api/auth/request")
-    fun resetPasswordRequest(@Body forgetPwdRequest: ForgetPwdRequest): Call<ApiResponse<Void>>
+    fun resetPasswordRequest(@Body otpRequest: OtpRequest): Call<ApiResponse<Void>>
 
     @POST("api/auth/verify")
     fun verifyOtp(@Body otpVerifyRequest: OtpVerifyRequest): Call<ApiResponse<Void>>

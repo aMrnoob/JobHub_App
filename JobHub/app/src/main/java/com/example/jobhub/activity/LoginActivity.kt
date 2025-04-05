@@ -3,6 +3,7 @@ package com.example.jobhub.activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import com.example.jobhub.R
@@ -115,6 +116,8 @@ class LoginActivity : BaseActivity() {
         ApiHelper().callApi(
             context = this,
             call = userService.login(LoginRequest(email, password)),
+            onStart = { binding.progressBar.visibility = View.VISIBLE },
+            onComplete = { binding.progressBar.visibility = View.GONE },
             onSuccess = { loginResponse ->
                 loginResponse?.token?.let { saveToken(it) }
                 navigateToNextScreen(loginResponse?.role)

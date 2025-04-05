@@ -1,5 +1,5 @@
 package com.example.jobhub.dto.auth
 
-data class ForgetPwdRequest(
+data class OtpRequest(
     val email: String
 )

@@ -1,8 +1,12 @@
 package com.example.jobhub.activity
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
+import android.view.View
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import com.example.jobhub.R
@@ -11,6 +15,9 @@ import com.example.jobhub.config.ApiService
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.config.TokenRequest
 import com.example.jobhub.databinding.CreateAccountBinding
+import com.example.jobhub.databinding.VerifyAccountBinding
+import com.example.jobhub.dto.auth.OtpRequest
+import com.example.jobhub.dto.auth.OtpVerifyRequest
 import com.example.jobhub.dto.auth.Register_ResetPwdRequest
 import com.example.jobhub.service.UserService
 import com.example.jobhub.validation.ValidationResult
@@ -23,65 +30,116 @@ import com.google.android.gms.common.api.ApiException
 
 class SignUpActivity : BaseActivity() {
 
-    private lateinit var binding: CreateAccountBinding
+    private lateinit var bindingRegister: CreateAccountBinding
+    private lateinit var bindingVerify: VerifyAccountBinding
+    private var countDownTimer: CountDownTimer? = null
+
     private val userService: UserService by lazy {
         RetrofitClient.createRetrofit().create(UserService::class.java)
     }
     private val apiService: ApiService by lazy {
         RetrofitClient.createRetrofit().create(ApiService::class.java)
     }
+
+    private var currentStep = 1
+    private lateinit var otpCode: String
+    private lateinit var email: String
+    private lateinit var password: String
+    private lateinit var confirmPwd: String
     private var isPasswordVisible = false
     private var isConfirmPasswordVisible = false
     private lateinit var googleSignInClient: GoogleSignInClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        showStep(1)
+    }
 
-        binding = CreateAccountBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    private fun showStep(step: Int) {
+        when (step) {
+            1 -> {
+                bindingRegister = CreateAccountBinding.inflate(layoutInflater)
+                setContentView(bindingRegister.root)
 
-        binding.invisiblePwd.setOnClickListener {
-            togglePasswordVisibility(true)
-        }
+                val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken("856354548077-e00ibmh0ojbv416s43qldd8ec0j4o43m.apps.googleusercontent.com") // Thay bằng Web Client ID
+                    .requestEmail()
+                    .build()
+                googleSignInClient = GoogleSignIn.getClient(this, gso)
 
-        binding.invisibleConfirmPwd.setOnClickListener {
-            togglePasswordVisibility(false)
-        }
+                bindingRegister.invisiblePwd.setOnClickListener {
+                    togglePasswordVisibility(true)
+                }
 
-        binding.btnSignUp.setOnClickListener {
-            val email = binding.edtEmail.text.toString()
-            val password = binding.edtPassword.text.toString()
-            val confirmPwd = binding.edtConfirmPwd.text.toString()
+                bindingRegister.invisibleConfirmPwd.setOnClickListener {
+                    togglePasswordVisibility(false)
+                }
 
-            if (!validateField(validateEmail(email))) return@setOnClickListener
-            if (!validateField(validatePassword(password))) return@setOnClickListener
-            if (password != confirmPwd) {
-                Toast.makeText(this@SignUpActivity, "Confirm password does not match.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+                bindingRegister.btnSignUp.setOnClickListener {
+                    email = bindingRegister.edtEmail.text.toString()
+                    password = bindingRegister.edtPassword.text.toString()
+                    confirmPwd = bindingRegister.edtConfirmPwd.text.toString()
+
+                    if (!validateField(validateEmail(email))) return@setOnClickListener
+                    if (!validateField(validatePassword(password))) return@setOnClickListener
+                    if (password != confirmPwd) {
+                        Toast.makeText(this@SignUpActivity, "Confirm password does not match.", Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    } else {
+                        requestOtp(OtpRequest(email))
+                    }
+                }
+
+                bindingRegister.btnHaveAccount.setOnClickListener {
+                    val intent = Intent(this, LoginActivity::class.java)
+                    startActivity(intent)
+                }
+
+                bindingRegister.btnGoogle.setOnClickListener {
+                    val signInIntent = googleSignInClient.signInIntent
+                    signInLauncher.launch(signInIntent)
+                }
+
+                bindingRegister.btnFacebook.setOnClickListener {
+
+                }
             }
+            2 -> {
+                bindingVerify = VerifyAccountBinding.inflate(layoutInflater)
+                setContentView(bindingVerify.root)
 
-            signUp(email,password)
-        }
+                val otpFields = listOf(
+                    bindingVerify.otp1,
+                    bindingVerify.otp2,
+                    bindingVerify.otp3,
+                    bindingVerify.otp4,
+                    bindingVerify.otp5,
+                    bindingVerify.otp6
+                )
 
-        binding.btnHaveAccount.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
-        }
+                setupOtpFields(otpFields)
 
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken("856354548077-e00ibmh0ojbv416s43qldd8ec0j4o43m.apps.googleusercontent.com") // Thay bằng Web Client ID
-            .requestEmail()
-            .build()
+                bindingVerify.btnComeBack.setOnClickListener {
+                    startActivity(Intent(this, LoginActivity::class.java))
+                }
 
-        googleSignInClient = GoogleSignIn.getClient(this, gso)
+                bindingVerify.btnSendCode.isEnabled = false
 
-        binding.btnGoogle.setOnClickListener {
-            val signInIntent = googleSignInClient.signInIntent
-            signInLauncher.launch(signInIntent)
-        }
+                bindingVerify.btnSendCode.setOnClickListener {
+                    requestOtp(OtpRequest(email))
+                    bindingVerify.btnSendCode.isEnabled = false
+                }
 
-        binding.btnFacebook.setOnClickListener {
+                bindingVerify.btnConfirm.setOnClickListener {
+                    otpCode = otpFields.joinToString("") { it.text.toString() }.trim()
 
+                    if (otpCode.isEmpty()) {
+                        Toast.makeText(this, "Please enter the OTP", Toast.LENGTH_SHORT).show()
+                    } else {
+                        verifyOtp(OtpVerifyRequest(email, otpCode))
+                    }
+                }
+            }
         }
     }
 
@@ -94,14 +152,13 @@ class SignUpActivity : BaseActivity() {
                 Log.d("GoogleSignIn", "ID Token: $idToken")
                 sendTokenToBackend(idToken)
             } catch (e: ApiException) {
-                Log.w("GoogleSignIn", "Đăng nhập thất bại: ${e.statusCode}")
+                Log.w("GoogleSignIn", "Login Failed: ${e.statusCode}")
             }
         }
     }
 
     private fun sendTokenToBackend(idToken: String?) {
         if (idToken.isNullOrBlank()) return
-
         val request = TokenRequest(idToken)
 
         ApiHelper().callApi(
@@ -121,36 +178,74 @@ class SignUpActivity : BaseActivity() {
         ApiHelper().callApi(
             context = this,
             call = userService.register(Register_ResetPwdRequest(email, password)),
-            onSuccess = { }
+            onSuccess = { startActivity(Intent(this@SignUpActivity, LoginActivity::class.java)) }
         )
+    }
+
+    private fun requestOtp(otpRequest: OtpRequest) {
+        ApiHelper().callApi(
+            context = this,
+            call = userService.otpRegister(otpRequest),
+            onStart = { bindingRegister.progressBar.visibility = View.VISIBLE },
+            onComplete = { bindingRegister.progressBar.visibility = View.VISIBLE },
+            onSuccess = {
+                currentStep = 2
+                showStep(currentStep)
+                startResendTimer()
+            }
+        )
+    }
+
+    private fun setupOtpFields(otpFields: List<EditText>) {
+        for (i in otpFields.indices) {
+            otpFields[i].addTextChangedListener(object : android.text.TextWatcher {
+                override fun afterTextChanged(s: android.text.Editable?) {
+                    if (s?.length == 1 && i < otpFields.size - 1) {
+                        otpFields[i + 1].requestFocus()
+                    } else if (s?.isEmpty() == true && i > 0) {
+                        otpFields[i - 1].requestFocus()
+                    }
+                }
+
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            })
+
+            otpFields[i].setOnKeyListener { _, keyCode, event ->
+                if (keyCode == android.view.KeyEvent.KEYCODE_DEL && event.action == android.view.KeyEvent.ACTION_DOWN && otpFields[i].text.isEmpty() && i > 0) {
+                    otpFields[i - 1].requestFocus()
+                }
+                false
+            }
+        }
     }
 
     private fun togglePasswordVisibility(isPasswordField: Boolean) {
         if (isPasswordField) {
             if (isPasswordVisible) {
-                binding.edtPassword.inputType =
+                bindingRegister.edtPassword.inputType =
                     android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
-                binding.invisiblePwd.setImageResource(R.drawable.invisibility_icon)
+                bindingRegister.invisiblePwd.setImageResource(R.drawable.invisibility_icon)
             } else {
-                binding.edtPassword.inputType =
+                bindingRegister.edtPassword.inputType =
                     android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-                binding.invisiblePwd.setImageResource(R.drawable.visibility_icon)
+                bindingRegister.invisiblePwd.setImageResource(R.drawable.visibility_icon)
             }
-            binding.edtPassword.setSelection(binding.edtPassword.text.length)
-            binding.edtPassword.transformationMethod = binding.edtPassword.transformationMethod
+            bindingRegister.edtPassword.setSelection(bindingRegister.edtPassword.text.length)
+            bindingRegister.edtPassword.transformationMethod = bindingRegister.edtPassword.transformationMethod
             isPasswordVisible = !isPasswordVisible
         } else {
             if (isConfirmPasswordVisible) {
-                binding.edtConfirmPwd.inputType =
+                bindingRegister.edtConfirmPwd.inputType =
                     android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
-                binding.invisibleConfirmPwd.setImageResource(R.drawable.invisibility_icon)
+                bindingRegister.invisibleConfirmPwd.setImageResource(R.drawable.invisibility_icon)
             } else {
-                binding.edtConfirmPwd.inputType =
+                bindingRegister.edtConfirmPwd.inputType =
                     android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-                binding.invisibleConfirmPwd.setImageResource(R.drawable.visibility_icon)
+                bindingRegister.invisibleConfirmPwd.setImageResource(R.drawable.visibility_icon)
             }
-            binding.edtConfirmPwd.setSelection(binding.edtConfirmPwd.text.length)
-            binding.edtConfirmPwd.transformationMethod = binding.edtConfirmPwd.transformationMethod
+            bindingRegister.edtConfirmPwd.setSelection(bindingRegister.edtConfirmPwd.text.length)
+            bindingRegister.edtConfirmPwd.transformationMethod = bindingRegister.edtConfirmPwd.transformationMethod
             isConfirmPasswordVisible = !isConfirmPasswordVisible
         }
     }
@@ -168,5 +263,33 @@ class SignUpActivity : BaseActivity() {
             }
             is ValidationResult.Success -> true
         }
+    }
+
+    private fun verifyOtp(otpVerifyRequest: OtpVerifyRequest) {
+        ApiHelper().callApi(
+            context = this,
+            call = userService.verifyOtp(otpVerifyRequest),
+            onSuccess = {
+                signUp(email, password)
+            }
+        )
+    }
+
+    private fun startResendTimer() {
+        countDownTimer?.cancel()
+        countDownTimer = object : CountDownTimer(60000, 1000) {
+            @SuppressLint("SetTextI18n")
+            override fun onTick(millisUntilFinished: Long) {
+                val seconds = millisUntilFinished / 1000
+                bindingVerify.tvExpireOTP.text = "Resend code in $seconds s"
+            }
+
+            @SuppressLint("SetTextI18n")
+            override fun onFinish() {
+                bindingVerify.tvExpireOTP.text = "Over Time!"
+                bindingVerify.btnSendCode.isEnabled = true
+                otpCode = ""
+            }
+        }.start()
     }
 }

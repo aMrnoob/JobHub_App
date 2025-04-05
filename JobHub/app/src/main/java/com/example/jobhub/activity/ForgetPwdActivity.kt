@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.view.View
 import android.widget.EditText
 import android.widget.Toast
 import com.example.jobhub.R
@@ -12,7 +13,7 @@ import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.ForgetPwdBinding
 import com.example.jobhub.databinding.ResetPasswordBinding
 import com.example.jobhub.databinding.VerifyOtpBinding
-import com.example.jobhub.dto.auth.ForgetPwdRequest
+import com.example.jobhub.dto.auth.OtpRequest
 import com.example.jobhub.dto.auth.OtpVerifyRequest
 import com.example.jobhub.dto.auth.Register_ResetPwdRequest
 import com.example.jobhub.service.UserService
@@ -54,7 +55,7 @@ class ForgetPwdActivity : BaseActivity() {
                     if (userEmail.isEmpty()) {
                         Toast.makeText(this, "Please enter your email", Toast.LENGTH_SHORT).show()
                     } else {
-                        requestOtp(ForgetPwdRequest(userEmail))
+                        requestOtp(OtpRequest(userEmail))
                     }
                 }
             }
@@ -78,12 +79,10 @@ class ForgetPwdActivity : BaseActivity() {
                 }
 
                 bindingVerify.btnSendCode.isEnabled = false
-                startResendTimer(58000)
 
                 bindingVerify.btnSendCode.setOnClickListener {
-                    requestOtp(ForgetPwdRequest(userEmail))
+                    requestOtp(OtpRequest(userEmail))
                     bindingVerify.btnSendCode.isEnabled = false
-                    startResendTimer(60000)
                 }
 
                 bindingVerify.btnConfirm.setOnClickListener {
@@ -104,7 +103,7 @@ class ForgetPwdActivity : BaseActivity() {
                 isConfirmPasswordVisible = false
 
                 bindingNewPwd.btnComeBack.setOnClickListener {
-                    requestOtp(ForgetPwdRequest(userEmail))
+                    requestOtp(OtpRequest(userEmail))
                     showStep(2)
                 }
 
@@ -133,13 +132,16 @@ class ForgetPwdActivity : BaseActivity() {
         }
     }
 
-    private fun requestOtp(forgetPwdRequest: ForgetPwdRequest) {
+    private fun requestOtp(otpRequest: OtpRequest) {
         ApiHelper().callApi(
             context = this,
-            call = userService.resetPasswordRequest(forgetPwdRequest),
+            call = userService.resetPasswordRequest(otpRequest),
+            onStart = { handleProgressBar(true) },
+            onComplete = { handleProgressBar(false) },
             onSuccess = {
                 currentStep = 2
                 showStep(currentStep)
+                startResendTimer()
             }
         )
     }
@@ -196,9 +198,9 @@ class ForgetPwdActivity : BaseActivity() {
         }
     }
 
-    private fun startResendTimer(time: Long) {
+    private fun startResendTimer() {
         countDownTimer?.cancel()
-        countDownTimer = object : CountDownTimer(time, 1000) {
+        countDownTimer = object : CountDownTimer(60000, 1000) {
             @SuppressLint("SetTextI18n")
             override fun onTick(millisUntilFinished: Long) {
                 val seconds = millisUntilFinished / 1000
@@ -235,6 +237,13 @@ class ForgetPwdActivity : BaseActivity() {
                 }
                 false
             }
+        }
+    }
+
+    private fun handleProgressBar(isVisible: Boolean) {
+        when (currentStep) {
+            1 -> bindingForgetPwd.progressBar.visibility = if (isVisible) View.VISIBLE else View.GONE
+            2 -> bindingVerify.progressBar.visibility = if (isVisible) View.VISIBLE else View.GONE
         }
     }
 }

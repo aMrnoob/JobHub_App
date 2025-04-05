@@ -12,10 +12,14 @@ class ApiHelper {
     fun <T> callApi(
         context: Context,
         call: Call<ApiResponse<T>>,
-        onSuccess: (T?) -> Unit
+        onSuccess: (T?) -> Unit,
+        onStart: (() -> Unit)? = null,
+        onComplete: (() -> Unit)? = null
     ) {
+        onStart?.invoke()
         call.enqueue(object : Callback<ApiResponse<T>> {
             override fun onResponse(call: Call<ApiResponse<T>>, response: Response<ApiResponse<T>>) {
+                onComplete?.invoke()
                 if (response.isSuccessful) {
                     val apiResponse = response.body()
                     if (apiResponse?.isSuccess == true) {
@@ -24,8 +28,8 @@ class ApiHelper {
                         }
                         onSuccess(apiResponse.data)
                     } else {
-                        showToast(context, "Empty response from server")
-                        Log.e("ApiHelper", "Empty response from server")
+                        apiResponse?.message?.let { showToast(context, it) }
+                        Log.e("ApiHelper", "API responded with failure.")
                     }
                 } else {
                     val errorMessage = response.errorBody()?.string() ?: "Unknown API error"
@@ -35,9 +39,9 @@ class ApiHelper {
             }
 
             override fun onFailure(call: Call<ApiResponse<T>>, t: Throwable) {
-                val errorMessage = t.localizedMessage ?: "Unknown error"
-                showToast(context, "Request failed: $errorMessage")
-                Log.e("ApiHelper", "API Request failed: $errorMessage", t)
+                onComplete?.invoke() // Hide loading
+                showToast(context, "Request failed: ${t.localizedMessage ?: "Unknown error"}")
+                Log.e("ApiHelper", "API Request failed", t)
             }
         })
     }

@@ -21,14 +21,19 @@ public class AuthenticationController {
         return userService.register(registerRequest);
     }
 
+    @PostMapping("/otp-register")
+    public ApiResponse<Void> otpRegister(@RequestBody OtpRequest otpRequest) {
+        return userService.otpRegister(otpRequest);
+    }
+
     @PostMapping("/login")
     public ApiResponse<LoginResponse> loginUser(@RequestBody LoginRequest loginRequest) {
         return userService.login(loginRequest);
     }
 
     @PostMapping("/request")
-    public ApiResponse<Void> resetPasswordRequest(@RequestBody ForgetPwdRequest forgetPwdRequest) {
-        return userService.forgetPwdRequest(forgetPwdRequest);
+    public ApiResponse<Void> resetPasswordRequest(@RequestBody OtpRequest otpRequest) {
+        return userService.forgetPwdRequest(otpRequest);
     }
 
 

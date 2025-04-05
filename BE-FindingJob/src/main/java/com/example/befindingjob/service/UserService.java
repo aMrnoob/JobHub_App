@@ -7,8 +7,9 @@ import com.example.befindingjob.model.ApiResponse;
 
 public interface UserService {
     ApiResponse<Void> register(Register_ResetPwdRequest registerRequest);
+    ApiResponse<Void> otpRegister(OtpRequest otpRequest);
     ApiResponse<LoginResponse> login(LoginRequest loginRequest);
-    ApiResponse<Void> forgetPwdRequest(ForgetPwdRequest forgetPwdRequest);
+    ApiResponse<Void> forgetPwdRequest(OtpRequest otpRequest);
     ApiResponse<Void> verifyOtpRequest(OtpVerifyRequest otpVerifyResponse);
     ApiResponse<Void> passwordReset(Register_ResetPwdRequest resetPwdRequest);
     ApiResponse<Void> updateUser(UserDTO userDTO);
