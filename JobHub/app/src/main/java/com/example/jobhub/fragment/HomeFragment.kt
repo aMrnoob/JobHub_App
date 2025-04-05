@@ -42,11 +42,27 @@ class HomeFragment : Fragment() {
     ): View {
         _binding = MainHomeBinding.inflate(inflater, container, false)
 
-        setupCategorySelection()
         setupAnimation()
         setupRecyclerView()
-        setupSearchView()
         getAllJobs()
+        setupCategorySelection()
+        setupSearchView()
+
+        val categoryMap = mapOf(
+            binding.tvAllJob to "All Job",
+            binding.tvSoftwareDev to "Software Development",
+            binding.tvDataScience to "Data Science",
+            binding.tvMachineLearning to "Machine Learning",
+            binding.tvWebDevelopment to "Web Development",
+            binding.tvCloudComputing to "Cloud Computing",
+            binding.tvNetworkEngineer to "Network Engineering",
+            binding.tvCybersecurity to "Cybersecurity",
+            binding.tvDevOpsEngineer to "DevOps Engineering"
+        )
+
+        categoryMap.forEach { (textView, category) ->
+            textView.tag = category
+        }
 
         return binding.root
     }
@@ -114,10 +130,10 @@ class HomeFragment : Fragment() {
 
     private fun setupCategorySelection() {
         val categoryTextViews = listOf(
-            binding.tvAllJob, binding.tvWriter, binding.tvDesign,
-            binding.tvHR, binding.tvProgramer, binding.tvFinance,
-            binding.tvCustomerService, binding.tvFoodRestaurant,
-            binding.tvMusicProducer
+            binding.tvAllJob, binding.tvSoftwareDev, binding.tvDataScience,
+            binding.tvMachineLearning, binding.tvWebDevelopment, binding.tvCloudComputing,
+            binding.tvNetworkEngineer, binding.tvCybersecurity,
+            binding.tvDevOpsEngineer
         )
 
         updateSelectedCategory(binding.tvAllJob, categoryTextViews)
@@ -129,14 +145,32 @@ class HomeFragment : Fragment() {
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun updateSelectedCategory(selected: TextView, categoryTextViews: List<TextView>) {
         selected.isSelected = true
-
-        categoryTextViews.filter { it != selected }.forEach {
-            it.isSelected = false
-        }
-
+        categoryTextViews.filter { it != selected }.forEach { it.isSelected = false }
         selectedTextView = selected
+
+        val category = selected.tag as? String
+
+        if (category == "All Job" || category == null) {
+            jobList.clear()
+            jobList.addAll(allJobs)
+            jobAdapter.notifyDataSetChanged()
+            binding.tvNoResults.visibility = View.GONE
+        } else if (categoryKeywords.containsKey(category)) {
+            val keywords = categoryKeywords[category] ?: emptyList()
+            val filtered = allJobs.filter { job ->
+                keywords.any { keyword ->
+                    job.title.contains(keyword, ignoreCase = true)
+                }
+            }
+
+            jobList.clear()
+            jobList.addAll(filtered)
+            jobAdapter.notifyDataSetChanged()
+            binding.tvNoResults.visibility = if (filtered.isEmpty()) View.VISIBLE else View.GONE
+        }
     }
 
     private fun setupSearchView() {
@@ -172,4 +206,15 @@ class HomeFragment : Fragment() {
 
         binding.tvNoResults.visibility = if (filteredList.isEmpty()) View.VISIBLE else View.GONE
     }
+
+    private val categoryKeywords: Map<String, List<String>> = mapOf(
+        "Software Development" to listOf("Developer", "Software Engineer", "Programmer", "Backend Developer", "Frontend Developer", "Full-stack Developer", "C++ Developer", "Java Developer", "Python Developer"),
+        "Data Science" to listOf("Data Scientist", "Data Analyst", "Big Data", "Data Visualization", "Data Modeling", "SQL", "Predictive Modeling", "Statistical Analysis", "Data Mining"),
+        "Machine Learning" to listOf("Machine Learning Engineer", "ML Engineer", "AI Engineer", "Deep Learning", "Neural Networks", "Natural Language Processing", "Reinforcement Learning", "Computer Vision", "Algorithm Developer"),
+        "Web Development" to listOf("Web Developer", "Frontend Developer", "Backend Developer", "React Developer", "Angular Developer", "JavaScript Developer", "HTML", "CSS", "Node.js", "PHP Developer"),
+        "Cloud Computing" to listOf("Cloud Engineer", "AWS", "Azure", "Google Cloud", "Cloud Architect", "Cloud Solutions Engineer", "DevOps", "Kubernetes", "Cloud Infrastructure"),
+        "Network Engineering" to listOf("Network Engineer", "Network Administrator", "Network Architect", "Routing", "Switching", "Cisco", "Network Security", "VPN", "TCP/IP", "LAN", "WAN"),
+        "Cybersecurity" to listOf("Security Analyst", "Cybersecurity Engineer", "Ethical Hacker", "Penetration Testing", "Security Consultant", "Network Security", "Information Security", "Vulnerability Assessment", "Security Operations"),
+        "DevOps Engineering" to listOf("DevOps Engineer", "Continuous Integration", "Continuous Deployment", "Jenkins", "Docker", "Kubernetes", "Automation", "Infrastructure as Code", "CI/CD")
+    )
 }

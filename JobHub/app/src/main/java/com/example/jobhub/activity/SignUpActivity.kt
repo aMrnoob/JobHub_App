@@ -13,6 +13,9 @@ import com.example.jobhub.config.TokenRequest
 import com.example.jobhub.databinding.CreateAccountBinding
 import com.example.jobhub.dto.auth.Register_ResetPwdRequest
 import com.example.jobhub.service.UserService
+import com.example.jobhub.validation.ValidationResult
+import com.example.jobhub.validation.validateEmail
+import com.example.jobhub.validation.validatePassword
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -50,15 +53,14 @@ class SignUpActivity : BaseActivity() {
             val password = binding.edtPassword.text.toString()
             val confirmPwd = binding.edtConfirmPwd.text.toString()
 
-            if (email.isBlank()) {
-                Toast.makeText(this@SignUpActivity, "Please enter your email.", Toast.LENGTH_SHORT).show()
-            } else if(password.isBlank()) {
-                Toast.makeText(this@SignUpActivity, "Please enter your password", Toast.LENGTH_SHORT).show()
-            } else if(password != confirmPwd) {
+            if (!validateField(validateEmail(email))) return@setOnClickListener
+            if (!validateField(validatePassword(password))) return@setOnClickListener
+            if (password != confirmPwd) {
                 Toast.makeText(this@SignUpActivity, "Confirm password does not match.", Toast.LENGTH_SHORT).show()
-            } else {
-                signUp(email,password)
+                return@setOnClickListener
             }
+
+            signUp(email,password)
         }
 
         binding.btnHaveAccount.setOnClickListener {
@@ -156,5 +158,15 @@ class SignUpActivity : BaseActivity() {
     private fun saveToken(token: String) {
         val sharedPreferences = getSharedPreferences("JobHubPrefs", MODE_PRIVATE)
         sharedPreferences.edit().putString("authToken", token).apply()
+    }
+
+    private fun validateField(validationResult: ValidationResult): Boolean {
+        return when (validationResult) {
+            is ValidationResult.Error -> {
+                Toast.makeText(this@SignUpActivity, validationResult.message, Toast.LENGTH_SHORT).show()
+                false
+            }
+            is ValidationResult.Success -> true
+        }
     }
 }

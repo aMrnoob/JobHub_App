@@ -10,6 +10,7 @@ import com.bumptech.glide.Glide
 import com.example.jobhub.R
 import com.example.jobhub.databinding.ItemJobBinding
 import com.example.jobhub.dto.ItemJobDTO
+import com.example.jobhub.entity.enumm.JobType
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -29,7 +30,7 @@ class JobAdapter(private val jobList: List<ItemJobDTO>, private val onItemClick:
                 .into(binding.ivImgJob)
 
             binding.tvTitle.text = itemJobDTO.title
-            binding.tvLocationJobType.text = "${itemJobDTO.location} - ${itemJobDTO.jobType}"
+            binding.tvLocationJobType.text = "${itemJobDTO.location} - ${formatJobType(itemJobDTO.jobType)}"
             binding.tvSalary.text = itemJobDTO.salary
 
             val outputFormatter = DateTimeFormatter.ofPattern("d/M/yyyy")
@@ -68,4 +69,9 @@ class JobAdapter(private val jobList: List<ItemJobDTO>, private val onItemClick:
     }
 
     override fun getItemCount(): Int = jobList.size
+
+    private fun formatJobType(jobType: JobType): String {
+        return jobType.name.split("_")
+            .joinToString(" ") { it.lowercase().replaceFirstChar { c -> c.uppercase() } }
+    }
 }

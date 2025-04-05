@@ -29,6 +29,9 @@ import com.example.jobhub.entity.enumm.JobType
 import com.example.jobhub.service.CompanyService
 import com.example.jobhub.service.JobService
 import com.example.jobhub.service.SkillService
+import com.example.jobhub.validation.ValidationResult
+import com.example.jobhub.validation.validateSalary
+import com.example.jobhub.validation.validateTitle
 import java.util.Calendar
 
 class JobActivity : BaseActivity() {
@@ -77,8 +80,12 @@ class JobActivity : BaseActivity() {
                     val salary = bindingAboutJob.edtSalary.text.toString().trim()
                     val location = bindingAboutJob.edtLocation.text.toString().trim()
 
-                    if (!isValidInput(title, description, requirements, salary, location)) {
-                        Toast.makeText(this, "Please fill in the rmation completely!", Toast.LENGTH_SHORT).show()
+                    if (!validateField(validateTitle(title))) return@setOnClickListener
+                    if (!validateField(validateSalary(salary))) return@setOnClickListener
+
+                    if (!isValidInput(description, requirements, salary, location)) {
+                        Toast.makeText(this, "Please fill in the information completely!", Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
                     } else {
                         jobDTO = jobDTO.copy(
                             title = title,
@@ -279,5 +286,15 @@ class JobActivity : BaseActivity() {
             call = skillService.updateSkills(job.jobId, job.requiredSkills!!),
             onSuccess = {}
         )
+    }
+
+    private fun validateField(validationResult: ValidationResult): Boolean {
+        return when (validationResult) {
+            is ValidationResult.Error -> {
+                Toast.makeText(this@JobActivity, validationResult.message, Toast.LENGTH_SHORT).show()
+                false
+            }
+            is ValidationResult.Success -> true
+        }
     }
 }

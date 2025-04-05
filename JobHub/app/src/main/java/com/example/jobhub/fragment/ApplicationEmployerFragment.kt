@@ -42,8 +42,8 @@ class ApplicationEmployerFragment : Fragment() {
         _binding = MainApplicationEmployerBinding.inflate(inflater, container, false)
 
         setupRecyclerView()
-        setupSearchView()
         getAllJobs()
+        setupSearchView()
 
         binding.ivAddCompany.setOnClickListener {
             animateView(it)

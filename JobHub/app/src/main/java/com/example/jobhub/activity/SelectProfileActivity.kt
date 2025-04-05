@@ -206,7 +206,7 @@ class SelectProfileActivity : BaseActivity() {
     private fun handleClick(view: View, selectedRole: Role) {
         val currentTime = System.currentTimeMillis()
 
-        if (currentTime - lastClickTime < 300) {
+        if (currentTime - lastClickTime < 200) {
             role = selectedRole
             selectRole()
         } else {
@@ -224,7 +224,7 @@ class SelectProfileActivity : BaseActivity() {
 
     private fun selectRole() {
         if (role == Role.EMPLOYER) {
-            currentStep = 2
+            currentStep = 3
             showStep(currentStep)
         } else {
             currentStep = 2

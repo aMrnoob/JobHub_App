@@ -2,6 +2,7 @@ package com.example.jobhub.activity
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.ActivityCompanyBinding
@@ -9,6 +10,8 @@ import com.example.jobhub.dto.CompanyDTO
 import com.example.jobhub.dto.UserDTO
 import com.example.jobhub.service.CompanyService
 import com.example.jobhub.service.UserService
+import com.example.jobhub.validation.ValidationResult
+import com.example.jobhub.validation.validateCompanyName
 
 class CompanyActivity : BaseActivity() {
 
@@ -37,9 +40,16 @@ class CompanyActivity : BaseActivity() {
             val website = binding.edtWebsite.text.toString()
             val description = binding.edtDescription.text.toString()
 
-            val companyDTO = CompanyDTO(null, companyName, description, address, logoUrl, website, userDTO?.userId)
+            if (!validateField(validateCompanyName(companyName))) return@setOnClickListener
 
-            addCompany(companyDTO)
+            if (!isValidInput(address, description, logoUrl, website)) {
+                Toast.makeText(this, "Please fill in the information completely!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            } else {
+                val companyDTO = CompanyDTO(null, companyName, description, address, logoUrl, website, userDTO?.userId)
+
+                addCompany(companyDTO)
+            }
         }
 
         binding.btnComeBack.setOnClickListener {
@@ -70,5 +80,19 @@ class CompanyActivity : BaseActivity() {
                 userDTO = it
             }
         )
+    }
+
+    private fun isValidInput(vararg fields: String): Boolean {
+        return fields.all { it.isNotBlank() }
+    }
+
+    private fun validateField(validationResult: ValidationResult): Boolean {
+        return when (validationResult) {
+            is ValidationResult.Error -> {
+                Toast.makeText(this@CompanyActivity, validationResult.message, Toast.LENGTH_SHORT).show()
+                false
+            }
+            is ValidationResult.Success -> true
+        }
     }
 }
