@@ -3,10 +3,12 @@ package com.example.jobhub.fragment
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.jobhub.activity.VacancyActivity
@@ -27,7 +29,10 @@ class ApplicationJobSeekerFragment : Fragment() {
     private val jobService: JobService by lazy {
         RetrofitClient.createRetrofit().create(JobService::class.java)
     }
-    private var appliedJobs: MutableList<ItemJobDTO> = mutableListOf()
+
+    private val originalJobs: MutableList<ItemJobDTO> = mutableListOf()
+    private val filteredJobs: MutableList<ItemJobDTO> = mutableListOf()
+
     private lateinit var jobAdapter: JobAdapter
 
     override fun onCreateView(
@@ -37,18 +42,19 @@ class ApplicationJobSeekerFragment : Fragment() {
         _binding = MainApplicationJobSeekerBinding.inflate(inflater, container, false)
 
         setupRecyclerView()
-        getAppliedJobs()
+        setupSearch()
         setupFilters()
+        loadAppliedJobs()
 
         return binding.root
     }
 
     private fun setupRecyclerView() {
-        jobAdapter = JobAdapter(appliedJobs) { selectedJob ->
+        jobAdapter = JobAdapter(filteredJobs) { selectedJob ->
             val intent = Intent(requireContext(), VacancyActivity::class.java)
             val jobJson = Gson().toJson(selectedJob)
-            val sharedPreferences = requireContext().getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
-            sharedPreferences.edit().putString("job", jobJson).apply()
+            requireContext().getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
+                .edit().putString("job", jobJson).apply()
             startActivity(intent)
         }
 
@@ -58,45 +64,90 @@ class ApplicationJobSeekerFragment : Fragment() {
         }
     }
 
-    private fun getAppliedJobs() {
+    private fun loadAppliedJobs() {
         val token = getAuthToken() ?: return
 
         ApiHelper().callApi(
             context = requireContext(),
             call = jobService.getAllJobsByUser("Bearer $token"),
             onSuccess = { response ->
-                appliedJobs.apply {
-                    clear()
-                    response?.let { addAll(it) }
-                }
-                jobAdapter.notifyDataSetChanged()
-            },
+                originalJobs.clear()
+                response?.let { originalJobs.addAll(it) }
+
+                filterJobs("all")
+            }
         )
     }
 
     private fun getAuthToken(): String? {
-        val sharedPreferences = activity?.getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
-        return sharedPreferences?.getString("authToken", null)?.trim()?.takeIf { it.isNotBlank() }
+        return activity?.getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
+            ?.getString("authToken", null)
+            ?.trim()
+            ?.takeIf { it.isNotBlank() }
     }
 
+    private fun setupSearch() {
+        binding.edtSearch.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                filterJobs(currentFilter)
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+
+        binding.ivSearch.setOnClickListener {
+            hideKeyboard()
+            filterJobs(currentFilter)
+        }
+    }
+
+    private var currentFilter: String = "all"
+
     private fun setupFilters() {
-        binding.tvAllVacancies.setOnClickListener { filterJobs("all") }
-        binding.tvActive.setOnClickListener { filterJobs("active") }
-        binding.tvInactive.setOnClickListener { filterJobs("expired") }
+        binding.tvAllVacancies.setOnClickListener {
+            currentFilter = "all"
+            filterJobs(currentFilter)
+        }
+
+        binding.tvActive.setOnClickListener {
+            currentFilter = "active"
+            filterJobs(currentFilter)
+        }
+
+        binding.tvInactive.setOnClickListener {
+            currentFilter = "expired"
+            filterJobs(currentFilter)
+        }
     }
 
     private fun filterJobs(status: String) {
-        val filteredList = appliedJobs.filter { job ->
+        val query = binding.edtSearch.text.toString().trim().lowercase()
+
+        val result = originalJobs.filter { job ->
             val isExpired = job.expirationDate.isBefore(LocalDateTime.now())
-            when (status) {
+
+            val matchesStatus = when (status) {
                 "active" -> !isExpired
                 "expired" -> isExpired
                 else -> true
             }
+
+            val matchesSearch = job.title.lowercase().contains(query) ||
+                    job.company.companyName.lowercase().contains(query)
+
+            matchesStatus && matchesSearch
         }
-        jobAdapter.updateList(filteredList)
+
+        filteredJobs.clear()
+        filteredJobs.addAll(result)
+        jobAdapter.notifyDataSetChanged()
     }
 
+    private fun hideKeyboard() {
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(binding.edtSearch.windowToken, 0)
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

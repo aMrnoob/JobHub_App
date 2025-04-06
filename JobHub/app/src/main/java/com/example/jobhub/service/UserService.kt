@@ -33,7 +33,7 @@ interface UserService {
     @POST("api/users/update-user")
     fun updateUser(@Body userDTO: UserDTO): Call<ApiResponse<Void>>
 
-    @GET("/api/users/me")
+    @GET("api/users/me")
     fun getUser(@Header("token") token: String): Call<ApiResponse<UserDTO>>
 
     @DELETE("api/users/delete-account")

@@ -26,7 +26,9 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.io.ByteArrayOutputStream
 import java.util.Calendar
-import kotlin.properties.Delegates
+import android.view.MotionEvent
+import android.view.inputmethod.InputMethodManager
+
 
 class SelectProfileActivity : BaseActivity() {
 
@@ -163,8 +165,6 @@ class SelectProfileActivity : BaseActivity() {
 
                         updateUser(userInfo)
 
-                        currentStep = 4
-                        showStep(currentStep)
                     }
                 }
             }
@@ -293,7 +293,9 @@ class SelectProfileActivity : BaseActivity() {
             bindingProfile.edtDateOfBirth.text
         )
 
-        val isValid = fields.all { it.isNotBlank() } && selectedImageUri != null
+        val isValid = fields.all { it != null && it.toString().isNotBlank() } &&
+                (selectedImageUri != null || bindingProfile.uploadedImageView.drawable != null)
+
         bindingProfile.btnNext.isEnabled = isValid
         return isValid
     }
@@ -310,4 +312,14 @@ class SelectProfileActivity : BaseActivity() {
         }
         return null
     }
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        if (currentFocus != null) {
+            val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
+            currentFocus!!.clearFocus()
+        }
+        return super.dispatchTouchEvent(ev)
+    }
+
 }

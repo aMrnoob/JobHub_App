@@ -147,6 +147,7 @@ public class UserServiceImpl implements UserService {
             }
 
             existingUser.setUpdatedAt(LocalDateTime.now());
+
             userRepository.save(existingUser);
             return new ApiResponse<Void>(true, "User updated successfully", null);
         }).orElseGet(() -> new ApiResponse<>(false, "User not found", null));

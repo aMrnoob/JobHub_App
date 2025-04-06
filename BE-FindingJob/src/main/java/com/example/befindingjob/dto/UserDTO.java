@@ -29,7 +29,7 @@ public class UserDTO {
         this.role = user.getRole();
         this.phone = user.getPhone();
         this.address = user.getAddress();
-        this.dateOfBirth = user.getDateOfBirth().toString();
+        this.dateOfBirth = (user.getDateOfBirth() != null) ? user.getDateOfBirth().toString() : null;
         this.imageUrl = user.getImageUrl();
     }
 }

@@ -8,222 +8,247 @@
     android:background="@color/white"
     android:fitsSystemWindows="true">
 
-    <!-- Welcome Section with Icon and Username -->
     <LinearLayout
         android:id="@+id/welcomeSection"
-        android:layout_width="194dp"
-        android:layout_height="85dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal"
+        android:padding="16dp"
+        android:elevation="4dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <ImageView
             android:id="@+id/welcomeIcon"
-            android:layout_width="47dp"
-            android:layout_height="47dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:src="@drawable/icon_penguin" />
 
         <TextView
             android:id="@+id/welcomeText"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="Hi, username"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp"
+            android:text="Hello, Username"
             android:textColor="@color/black"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
+
     </LinearLayout>
 
-    <!-- Header with User Info -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/userInfoCard"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="40dp"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="4dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         app:layout_constraintTop_toBottomOf="@id/welcomeSection"
-        app:layout_constraintWidth_percent="0.9">
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
-            android:id="@+id/userInfoContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:paddingVertical="24dp">
-
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/userAvatar"
-                android:layout_width="110dp"
-                android:layout_height="110dp"
-                android:background="@null"
-                android:scaleType="centerCrop"
-                android:src="@drawable/icon_upload_image"
-                app:shapeAppearanceOverlay="@style/circleImageView" />
-
-            <TextView
-                android:id="@+id/userName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="User Name"
-                android:textColor="@color/black"
-                android:textSize="22sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/menuCard"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="24dp"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="4dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/userInfoCard"
-        app:layout_constraintWidth_percent="0.9">
-
-        <LinearLayout
-            android:id="@+id/menuContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
 
-            <LinearLayout
-                android:id="@+id/accountMenu"
+            <androidx.cardview.widget.CardView
+                android:id="@+id/userInfoCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/simple_border"
-                android:orientation="horizontal"
-                android:padding="12dp"
-                android:layout_marginBottom="8dp">
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Tài khoản"
-                    android:textColor="@color/black"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <ImageView
-                    android:id="@+id/btnExpandAccountMenu"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_gravity="center_vertical"
-                    android:src="@drawable/icon_arrow_down" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/accountSubMenu"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingLeft="20dp"
-                android:visibility="gone"
-                android:layout_marginBottom="8dp">
-
-                <TextView
-                    android:id="@+id/updateProfile"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingVertical="12dp"
-                    android:text="Cập nhật thông tin"
-                    android:textColor="@color/gray_700"
-                    android:textSize="16sp" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/gray_700"
-                    android:alpha="0.2" />
-
-                <TextView
-                    android:id="@+id/deleteAccount"
+                <LinearLayout
+                    android:id="@+id/userInfoContainer"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:paddingVertical="12dp"
-                    android:text="Xóa tài khoản"
-                    android:textColor="@color/gray_700"
-                    android:textSize="16sp" />
-            </LinearLayout>
+                    android:orientation="vertical"
+                    android:padding="24dp">
 
-            <LinearLayout
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/userAvatar"
+                        android:layout_width="138dp"
+                        android:layout_height="139dp"
+                        android:layout_gravity="center_horizontal"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/icon_upload_image"
+                        app:shapeAppearanceOverlay="@style/circleImageView" />
+
+                    <TextView
+                        android:id="@+id/userName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="16dp"
+                        android:text="Username"
+                        android:textColor="@color/black"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/menuCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/simple_border"
-                android:orientation="horizontal"
-                android:padding="12dp"
-                android:layout_marginBottom="8dp">
+                android:layout_marginTop="24dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
 
-                <TextView
-                    android:id="@+id/termsOfService"
-                    android:layout_width="0dp"
+                <LinearLayout
+                    android:id="@+id/menuContainer"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Điều khoản sử dụng"
-                    android:textColor="@color/black"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_gravity="center_vertical"
-                    android:src="@drawable/icon_arrow_down"
-                    android:rotation="270" />
-            </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/accountMenu"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/simple_border"
+                        android:orientation="horizontal"
+                        android:padding="12dp"
+                        android:layout_marginBottom="8dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/simple_border"
-                android:orientation="horizontal"
-                android:padding="12dp"
-                android:layout_marginBottom="16dp">
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center_vertical"
+                            android:src="@drawable/icon_penguin" />
 
-                <TextView
-                    android:id="@+id/privacyPolicy"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Chính sách bảo mật"
-                    android:textColor="@color/black"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="12dp"
+                            android:text="My Account"
+                            android:textColor="@color/black"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_gravity="center_vertical"
-                    android:src="@drawable/icon_arrow_down"
-                    android:rotation="270" />
-            </LinearLayout>
+                        <ImageView
+                            android:id="@+id/btnExpandAccountMenu"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center_vertical"
+                            android:src="@drawable/icon_arrow_down" />
+                    </LinearLayout>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnLogout"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:backgroundTint="@color/red_600"
-                android:text="Đăng xuất"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                app:cornerRadius="12dp"
-                app:elevation="2dp" />
+                    <LinearLayout
+                        android:id="@+id/accountSubMenu"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingLeft="20dp"
+                        android:visibility="gone"
+                        android:layout_marginBottom="8dp">
+
+                        <TextView
+                            android:id="@+id/updateProfile"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingVertical="12dp"
+                            android:text="Update information"
+                            android:textColor="@color/gray_700"
+                            android:textSize="16sp" />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/gray_700"
+                            android:alpha="0.2" />
+
+                        <TextView
+                            android:id="@+id/deleteAccount"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:paddingVertical="12dp"
+                            android:text="Delete account"
+                            android:textColor="@color/gray_700"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/simple_border"
+                        android:orientation="horizontal"
+                        android:padding="12dp"
+                        android:layout_marginBottom="8dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center_vertical"
+                            android:src="@drawable/icon_penguin" />
+
+                        <TextView
+                            android:id="@+id/termsOfService"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="12dp"
+                            android:text="Terms of use"
+                            android:textColor="@color/black"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center_vertical"
+                            android:src="@drawable/icon_arrow_down"
+                            android:rotation="270" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/simple_border"
+                        android:orientation="horizontal"
+                        android:padding="12dp"
+                        android:layout_marginBottom="16dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center_vertical"
+                            android:src="@drawable/icon_penguin" />
+
+                        <TextView
+                            android:id="@+id/privacyPolicy"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="12dp"
+                                android:text="Privacy policy"
+                            android:textColor="@color/black"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center_vertical"
+                            android:src="@drawable/icon_arrow_down"
+                            android:rotation="270" />
+                    </LinearLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnLogout"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:backgroundTint="@color/red_600"
+                        android:text="Log out"
+                        android:textColor="@color/white"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        app:cornerRadius="12dp"
+                        app:elevation="2dp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
-
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

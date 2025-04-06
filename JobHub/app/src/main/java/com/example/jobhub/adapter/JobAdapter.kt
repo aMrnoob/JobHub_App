@@ -13,6 +13,9 @@ import com.bumptech.glide.Glide
 import com.example.jobhub.R
 import com.example.jobhub.databinding.ItemJobBinding
 import com.example.jobhub.dto.ItemJobDTO
+import com.example.jobhub.dto.UserDTO
+import com.example.jobhub.entity.enumm.Role
+import com.google.gson.Gson
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -84,16 +87,14 @@ class JobAdapter(private val jobList: List<ItemJobDTO>, private val onItemClick:
 
     override fun getItemCount(): Int = jobList.size
 
-    fun updateList(newList: List<ItemJobDTO>) {
-        val mutableJobList = jobList.toMutableList()
-        mutableJobList.clear()
-        mutableJobList.addAll(newList)
-        notifyDataSetChanged()
-    }
-
     private fun isJobSeeker(context: Context): Boolean {
         val sharedPreferences = context.getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
-        return sharedPreferences.getString("userRole", "") == "JOB_SEEKER"
+        val json = sharedPreferences.getString("currentUser", "")
+        val gson = Gson()
+
+        val currentUser = gson.fromJson(json, UserDTO::class.java)
+
+        return currentUser?.role == Role.JOB_SEEKER
     }
 
 }

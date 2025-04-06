@@ -81,6 +81,11 @@ class ProfileFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        fetchUserProfile()
+    }
+
     private fun fetchUserProfile() {
         val token = sharedPreferences.getString("authToken", null)
 
@@ -154,7 +159,7 @@ class ProfileFragment : Fragment() {
     }
 
     private fun showTextDialog(title: String, message: String) {
-        android.app.AlertDialog.Builder(requireContext())
+        AlertDialog.Builder(requireContext())
             .setTitle(title)
             .setMessage(message)
             .setPositiveButton("Đóng") { dialog, _ -> dialog.dismiss() }
