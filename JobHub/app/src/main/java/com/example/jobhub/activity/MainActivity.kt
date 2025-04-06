@@ -19,6 +19,7 @@ import com.example.jobhub.fragment.CompanyFragment
 import com.example.jobhub.fragment.HomeFragment
 import com.example.jobhub.fragment.ProfileFragment
 import com.example.jobhub.service.UserService
+import com.google.gson.Gson
 
 class MainActivity : BaseActivity() {
 
@@ -54,6 +55,11 @@ class MainActivity : BaseActivity() {
             call = userService.getUser("Bearer $token"),
             onSuccess = {
                 userDTO = it
+                val userJson = Gson().toJson(userDTO)
+                getSharedPreferences("JobHubPrefs", MODE_PRIVATE)
+                    .edit()
+                    .putString("currentUser", userJson)
+                    .apply()
                 runOnUiThread { setupBottomNavigation() }
             }
         )

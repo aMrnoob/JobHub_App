@@ -5,10 +5,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.jobhub.activity.VacancyActivity
@@ -17,6 +19,7 @@ import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.MainApplicationJobSeekerBinding
 import com.example.jobhub.dto.ItemJobDTO
+import com.example.jobhub.dto.UserDTO
 import com.example.jobhub.service.JobService
 import com.google.gson.Gson
 import java.time.LocalDateTime
@@ -34,6 +37,8 @@ class ApplicationJobSeekerFragment : Fragment() {
     private val filteredJobs: MutableList<ItemJobDTO> = mutableListOf()
 
     private lateinit var jobAdapter: JobAdapter
+    private var userDTO: UserDTO? = null
+    private var currentFilter: String = "all"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,12 +46,29 @@ class ApplicationJobSeekerFragment : Fragment() {
     ): View {
         _binding = MainApplicationJobSeekerBinding.inflate(inflater, container, false)
 
+        loadUserFromPrefs()
         setupRecyclerView()
         setupSearch()
         setupFilters()
         loadAppliedJobs()
 
         return binding.root
+    }
+
+    private fun loadUserFromPrefs() {
+        val json = activity?.getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
+            ?.getString("currentUser", null)
+
+        if (!json.isNullOrEmpty()) {
+            userDTO = Gson().fromJson(json, UserDTO::class.java)
+        }
+    }
+
+    private fun getAuthToken(): String? {
+        return activity?.getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
+            ?.getString("authToken", null)
+            ?.trim()
+            ?.takeIf { it.isNotBlank() }
     }
 
     private fun setupRecyclerView() {
@@ -65,25 +87,27 @@ class ApplicationJobSeekerFragment : Fragment() {
     }
 
     private fun loadAppliedJobs() {
-        val token = getAuthToken() ?: return
+        val token = getAuthToken()
+        if (token.isNullOrEmpty()) {
+            Toast.makeText(requireContext(), "Vui lòng đăng nhập để xem ứng dụng của bạn", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        binding.tvName.text = "Đang tải dữ liệu..."
 
         ApiHelper().callApi(
             context = requireContext(),
             call = jobService.getAllJobsByUser("Bearer $token"),
             onSuccess = { response ->
+                binding.tvName.text = "Ứng dụng của bạn"
                 originalJobs.clear()
                 response?.let { originalJobs.addAll(it) }
 
-                filterJobs("all")
-            }
-        )
-    }
 
-    private fun getAuthToken(): String? {
-        return activity?.getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
-            ?.getString("authToken", null)
-            ?.trim()
-            ?.takeIf { it.isNotBlank() }
+                filterJobs(currentFilter)
+                jobAdapter.notifyDataSetChanged()
+            },
+        )
     }
 
     private fun setupSearch() {
@@ -101,8 +125,6 @@ class ApplicationJobSeekerFragment : Fragment() {
             filterJobs(currentFilter)
         }
     }
-
-    private var currentFilter: String = "all"
 
     private fun setupFilters() {
         binding.tvAllVacancies.setOnClickListener {
