@@ -172,6 +172,7 @@ public class UserServiceImpl implements UserService {
             return new ApiResponse<Void>(true, "User updated successfully", null);
         }).orElseGet(() -> new ApiResponse<>(false, "User not found", null));
     }
+
     @Override
     public ApiResponse<UserDTO> getUser(String token) {
         if (!jwtService.isValidToken(token))

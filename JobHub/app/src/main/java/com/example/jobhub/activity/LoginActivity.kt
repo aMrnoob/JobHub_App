@@ -13,8 +13,17 @@ import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.config.TokenRequest
 import com.example.jobhub.databinding.LoginScreenBinding
 import com.example.jobhub.dto.auth.LoginRequest
+import com.example.jobhub.dto.auth.Register_ResetPwdRequest
 import com.example.jobhub.entity.enumm.Role
 import com.example.jobhub.service.UserService
+import com.facebook.AccessToken
+import com.facebook.CallbackManager
+import com.facebook.FacebookCallback
+import com.facebook.FacebookException
+import com.facebook.FacebookSdk
+import com.facebook.GraphRequest
+import com.facebook.login.LoginManager
+import com.facebook.login.LoginResult
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -23,22 +32,33 @@ import com.google.android.gms.common.api.ApiException
 class LoginActivity : BaseActivity() {
 
     private lateinit var binding: LoginScreenBinding
+    private lateinit var googleSignInClient: GoogleSignInClient
+    private lateinit var callbackManager: CallbackManager
+
     private val userService: UserService by lazy {
         RetrofitClient.createRetrofit().create(UserService::class.java)
     }
     private val apiService: ApiService by lazy {
         RetrofitClient.createRetrofit().create(ApiService::class.java)
     }
+
     private var isPasswordVisible = false
-
-    private lateinit var googleSignInClient: GoogleSignInClient
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = LoginScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val sharedPreferences = getSharedPreferences("JobHubPrefs", MODE_PRIVATE)
+        var isRemembered = sharedPreferences.getBoolean("isRemembered", false)
+
+        if (isRemembered) {
+            val savedEmail = sharedPreferences.getString("email", "")
+            val savedPassword = sharedPreferences.getString("password", "")
+            binding.edtEmail.setText(savedEmail)
+            binding.edtPassword.setText(savedPassword)
+            binding.cbRememberPassword.isChecked = true
+        }
 
         binding.invisiblePwd.setOnClickListener {
             togglePasswordVisibility()
@@ -48,12 +68,36 @@ class LoginActivity : BaseActivity() {
             .requestIdToken("856354548077-e00ibmh0ojbv416s43qldd8ec0j4o43m.apps.googleusercontent.com") // Thay bằng Web Client ID
             .requestEmail()
             .build()
-
         googleSignInClient = GoogleSignIn.getClient(this, gso)
 
         binding.btnGoogle.setOnClickListener {
             val signInIntent = googleSignInClient.signInIntent
             signInLauncher.launch(signInIntent)
+        }
+
+        FacebookSdk.fullyInitialize()
+        callbackManager = CallbackManager.Factory.create()
+
+        binding.btnFacebook.setOnClickListener {
+            LoginManager.getInstance().logInWithReadPermissions(
+                this,
+                listOf("email")
+            )
+            LoginManager.getInstance().registerCallback(callbackManager,
+                object : FacebookCallback<LoginResult> {
+                    override fun onSuccess(result: LoginResult) {
+                        val accessToken = result.accessToken
+                        getFacebookEmail(accessToken)
+                    }
+
+                    override fun onCancel() {
+                        Toast.makeText(this@LoginActivity, "Facebook login canceled", Toast.LENGTH_SHORT).show()
+                    }
+
+                    override fun onError(error: FacebookException) {
+                        Toast.makeText(this@LoginActivity, "Facebook login error: ${error.message}", Toast.LENGTH_SHORT).show()
+                    }
+                })
         }
 
         binding.btnForgetPwd.setOnClickListener {
@@ -70,6 +114,23 @@ class LoginActivity : BaseActivity() {
             } else if (password.isBlank()){
                 Toast.makeText(this@LoginActivity, "Please enter your password", Toast.LENGTH_SHORT).show()
             } else {
+                isRemembered = binding.cbRememberPassword.isChecked
+                if (isRemembered) {
+                    sharedPreferences.edit().apply {
+                        putString("email", email)
+                        putString("password", password)
+                        putBoolean("isRemembered", true)
+                        apply()
+                    }
+                } else {
+                    sharedPreferences.edit().apply {
+                        remove("email")
+                        remove("password")
+                        remove("isRemembered")
+                        apply()
+                    }
+                }
+
                 login(email, password)
             }
         }
@@ -93,6 +154,23 @@ class LoginActivity : BaseActivity() {
             }
         }
     }
+
+    private fun getFacebookEmail(accessToken: AccessToken) {
+        val request = GraphRequest.newMeRequest(accessToken) { obj, _ ->
+            val email = obj?.optString("email")
+
+            if (!email.isNullOrBlank()) {
+                signUp(email)
+                login(email, "")
+            }
+        }
+
+        val params = Bundle()
+        params.putString("fields", "id,name,email,first_name,last_name")
+        request.parameters = params
+        request.executeAsync()
+    }
+
 
     private fun sendTokenToBackend(idToken: String?) {
         if (idToken.isNullOrBlank()) return
@@ -121,6 +199,7 @@ class LoginActivity : BaseActivity() {
             onSuccess = { loginResponse ->
                 loginResponse?.token?.let { saveToken(it) }
                 navigateToNextScreen(loginResponse?.role)
+                finish()
             }
         )
     }
@@ -134,14 +213,12 @@ class LoginActivity : BaseActivity() {
         nextActivity?.let { startActivity(Intent(this, it)) }
     }
 
-
     private fun saveToken(token: String) {
         val sharedPreferences = getSharedPreferences("JobHubPrefs", MODE_PRIVATE)
         sharedPreferences.edit().putString("authToken", token).apply()
     }
 
     private fun togglePasswordVisibility() {
-
         if (isPasswordVisible) {
             binding.edtPassword.inputType =
                 android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
@@ -155,5 +232,19 @@ class LoginActivity : BaseActivity() {
         binding.edtPassword.setSelection(binding.edtPassword.text.length)
         binding.edtPassword.transformationMethod = binding.edtPassword.transformationMethod
         isPasswordVisible = !isPasswordVisible
+    }
+
+    private fun signUp(email: String) {
+        ApiHelper().callApi(
+            context = this,
+            call = userService.register(Register_ResetPwdRequest(email, "")),
+            onSuccess = { startActivity(Intent(this@LoginActivity, LoginActivity::class.java)) }
+        )
+    }
+
+    @Deprecated("This method has been deprecated in favor of using the Activity Result API\n      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt\n      contracts for common intents available in\n      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for\n      testing, and allow receiving results in separate, testable classes independent from your\n      activity. Use\n      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)}\n      with the appropriate {@link ActivityResultContract} and handling the result in the\n      {@link ActivityResultCallback#onActivityResult(Object) callback}.")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        callbackManager.onActivityResult(requestCode, resultCode, data)
     }
 }

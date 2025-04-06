@@ -82,6 +82,19 @@
         app:layout_constraintTop_toBottomOf="@+id/edtEmail"
         app:layout_constraintBottom_toBottomOf="parent" />
 
+    <CheckBox
+        android:id="@+id/cbRememberPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Remember password"
+        android:textColor="@color/black"
+        app:layout_constraintHorizontal_bias="0.1"
+        app:layout_constraintVertical_bias="0.02"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/invisiblePwd"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
     <Button
         android:id="@+id/btnForgetPwd"
         android:layout_width="wrap_content"
@@ -90,7 +103,7 @@
         android:text="Forgot the password?"
         android:textColor="@color/blue_800"
         android:textSize="16sp"
-        app:layout_constraintHorizontal_bias="0.875"
+        app:layout_constraintHorizontal_bias="1"
         app:layout_constraintVertical_bias="0.02"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
