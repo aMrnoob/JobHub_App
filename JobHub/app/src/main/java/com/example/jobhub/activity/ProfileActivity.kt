@@ -1,7 +1,7 @@
 package com.example.jobhub.activity
 
-import android.annotation.SuppressLint
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
@@ -13,92 +13,85 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
-import com.example.jobhub.databinding.MainProfileBinding
+import com.example.jobhub.databinding.MainEditprofileBinding
 import com.example.jobhub.dto.UserDTO
+import com.example.jobhub.model.ApiResponse
 import com.example.jobhub.service.UserService
+import com.example.jobhub.entity.enumm.Role
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
+import java.util.*
 
 class ProfileActivity : AppCompatActivity() {
-
-    private lateinit var binding: MainProfileBinding
+    private lateinit var binding: MainEditprofileBinding
     private var userId: Int = -1
     private var selectedImageUri: Uri? = null
+    private var userRole: Role = Role.UNDEFINED
 
-    private val userService: UserService by lazy {
-        RetrofitClient.createRetrofit().create(UserService::class.java)
-    }
-
-    private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        if (uri != null) {
-            selectedImageUri = uri
-            binding.uploadedImageView.setImageURI(uri)
+    private val imagePicker = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri?.let {
+            selectedImageUri = it
+            binding.uploadedImageView.setImageURI(it)
             binding.iconUploadImage.visibility = View.GONE
             binding.uploadedImageView.visibility = View.VISIBLE
-        } else {
-            Log.e("ProfileActivity", "Lỗi khi chọn ảnh")
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = MainProfileBinding.inflate(layoutInflater)
+        binding = MainEditprofileBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        userId = intent.getIntExtra("userId", -1)
+        setupViews()
         fetchUserProfile()
+    }
 
-        binding.uploadImage.setOnClickListener { openImagePicker() }
-        binding.uploadedImageView.setOnClickListener { openImagePicker() }
-
+    private fun setupViews() {
+        binding.uploadImage.setOnClickListener { pickImage() }
+        binding.uploadedImageView.setOnClickListener { pickImage() }
         binding.edtDateOfBirth.setOnClickListener { showDatePicker() }
 
         binding.btnUpdateProfile.setOnClickListener {
-            if (validateFields()) {
-                updateUserProfile()
-            } else {
-                Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show()
-            }
+            if (validateFields()) updateUserProfile()
         }
+    }
+
+    private fun pickImage() {
+        imagePicker.launch("image/*")
     }
 
     private fun fetchUserProfile() {
-        val sharedPreferences = getSharedPreferences("JobHubPrefs", MODE_PRIVATE)
-        val token = sharedPreferences.getString("authToken", null)
+        val token = getSharedPreferences("JobHubPrefs", MODE_PRIVATE).getString("authToken", null)
+        if (token.isNullOrBlank()) return
 
-        if (token.isNullOrBlank()) {
-            Log.e("ProfileActivity", "Token không hợp lệ")
-            return
-        }
-
-        ApiHelper().callApi(
-            context = this,
-            call = userService.getUser("Bearer $token"),
-            onSuccess = { response ->
-                response?.let { userDTO ->
-                    userId = userDTO.userId ?: -1
-                    updateUI(userDTO)
+        RetrofitClient.createRetrofit().create(UserService::class.java)
+            .getUser("Bearer $token")
+            .enqueue(object : Callback<ApiResponse<UserDTO>> {
+                override fun onResponse(call: Call<ApiResponse<UserDTO>>, response: Response<ApiResponse<UserDTO>>) {
+                    response.body()?.data?.let { updateUI(it) }
                 }
-            }
-        )
+
+                override fun onFailure(call: Call<ApiResponse<UserDTO>>, t: Throwable) {
+                    Log.e("ProfileActivity", "Lỗi API: ${t.message}")
+                }
+            })
     }
 
-    private fun updateUI(userInfo: UserDTO) {
-        binding.edtFullName.setText(userInfo.fullName)
-        binding.edtEmail.setText(userInfo.email)
-        binding.edtPhone.setText(userInfo.phone ?: "")
-        binding.edtAddress.setText(userInfo.address ?: "")
+    private fun updateUI(user: UserDTO) {
+        userId = user.userId ?: -1
+        userRole = user.role
+        binding.edtFullName.setText(user.fullName ?: "")
+        binding.edtEmail.setText(user.email ?: "")
+        binding.edtPhone.setText(user.phone ?: "")
+        binding.edtAddress.setText(user.address ?: "")
+        binding.edtDateOfBirth.setText(formatDateForDisplay(user.dateOfBirth ?: ""))
 
-        binding.edtDateOfBirth.setText(formatDateForDisplay(userInfo.dateOfBirth))
-
-        if (!userInfo.imageUrl.isNullOrEmpty()) {
-            val bitmap = decodeBase64ToBitmap(userInfo.imageUrl.toString())
-            if (bitmap != null) {
+        user.imageUrl?.let {
+            decodeBase64ToBitmap(it)?.let { bitmap ->
                 binding.uploadedImageView.setImageBitmap(bitmap)
                 binding.iconUploadImage.visibility = View.GONE
                 binding.uploadedImageView.visibility = View.VISIBLE
@@ -107,118 +100,128 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun updateUserProfile() {
-        val sharedPreferences = getSharedPreferences("JobHubPrefs", MODE_PRIVATE)
-        val token = sharedPreferences.getString("authToken", null)
+        val token = getSharedPreferences("JobHubPrefs", MODE_PRIVATE).getString("authToken", null)
+        if (token.isNullOrBlank()) return
 
-        if (token.isNullOrBlank()) {
-            Log.e("ProfileActivity", "Token không hợp lệ")
-            return
-        }
-
-        val formattedDate = formatDateForBackend(binding.edtDateOfBirth.text.toString())
-
-        val userInfo = UserDTO(
+        val user = UserDTO(
             userId = userId,
             fullName = binding.edtFullName.text.toString(),
             email = binding.edtEmail.text.toString(),
             phone = binding.edtPhone.text.toString(),
             imageUrl = encodeImageToBase64(),
             address = binding.edtAddress.text.toString(),
-            dateOfBirth = formattedDate
+            dateOfBirth = formatDateForBackend(binding.edtDateOfBirth.text.toString()),
+            role = userRole
         )
 
-        ApiHelper().callApi(
-            context = this,
-            call = userService.updateUser(userInfo),
-            onSuccess = { }
-        )
-    }
+        RetrofitClient.createRetrofit().create(UserService::class.java)
+            .updateUser(user)
+            .enqueue(object : Callback<ApiResponse<Void>> {
+                override fun onResponse(call: Call<ApiResponse<Void>>, response: Response<ApiResponse<Void>>) {
+                    if (response.isSuccessful && response.body()?.isSuccess == true) {
+                        Toast.makeText(this@ProfileActivity, "Cập nhật thành công!", Toast.LENGTH_SHORT).show()
 
-    private fun validateFields(): Boolean {
-        val fields = listOf(
-            binding.edtFullName.text.toString(),
-            binding.edtEmail.text.toString(),
-            binding.edtPhone.text.toString(),
-            binding.edtAddress.text.toString(),
-            binding.edtDateOfBirth.text.toString()
-        )
-        return fields.all { it.isNotBlank() } && (selectedImageUri != null || binding.uploadedImageView.drawable != null)
-    }
+                        val resultIntent = Intent()
+                        resultIntent.putExtra("USERNAME", user.fullName)
+                        resultIntent.putExtra("PROFILE_UPDATED", true)
+                        setResult(RESULT_OK, resultIntent)
 
-    private fun openImagePicker() {
-        imagePickerLauncher.launch("image/*")
+                        finish()
+                    } else {
+                        Toast.makeText(this@ProfileActivity, "Cập nhật thất bại!", Toast.LENGTH_SHORT).show()
+                        Log.e("ProfileActivity", "Lỗi cập nhật: ${response.errorBody()?.string()}")
+                    }
+                }
+
+                override fun onFailure(call: Call<ApiResponse<Void>>, t: Throwable) {
+                    Toast.makeText(this@ProfileActivity, "Lỗi kết nối!", Toast.LENGTH_SHORT).show()
+                    Log.e("ProfileActivity", "API thất bại: ${t.message}")
+                }
+            })
     }
 
     private fun encodeImageToBase64(): String? {
-        val bitmap = (binding.uploadedImageView.drawable as? BitmapDrawable)?.bitmap
-        if (bitmap != null) {
-            val outputStream = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-            val byteArray = outputStream.toByteArray()
-            return Base64.encodeToString(byteArray, Base64.DEFAULT)
-        }
-        return null
-    }
+        val bitmap = (binding.uploadedImageView.drawable as? BitmapDrawable)?.bitmap ?: return null
 
-    private fun decodeBase64ToBitmap(base64Str: String): Bitmap? {
-        return try {
-            val decodedBytes = Base64.decode(base64Str, Base64.DEFAULT)
-            BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
-        } catch (e: Exception) {
-            Log.e("ProfileActivity", "Lỗi khi giải mã ảnh Base64: ${e.message}")
-            null
+        val resizedBitmap = resizeImage(bitmap, 512, 512)
+
+        return ByteArrayOutputStream().apply {
+            resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 80, this)
+        }.toByteArray().let {
+            Base64.encodeToString(it, Base64.DEFAULT)
         }
     }
 
-    private fun formatDateForBackend(inputDate: String): String {
-        return inputDate
+    private fun resizeImage(image: Bitmap, maxWidth: Int, maxHeight: Int): Bitmap {
+        val width = image.width
+        val height = image.height
+
+        val ratioBitmap = width.toFloat() / height.toFloat()
+        var newWidth = maxWidth
+        var newHeight = (newWidth / ratioBitmap).toInt()
+
+        if (newHeight > maxHeight) {
+            newHeight = maxHeight
+            newWidth = (newHeight * ratioBitmap).toInt()
+        }
+
+        return Bitmap.createScaledBitmap(image, newWidth, newHeight, true)
+    }
+
+    private fun decodeBase64ToBitmap(base64: String) = try {
+        val bytes = Base64.decode(base64, Base64.DEFAULT)
+        BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+    } catch (e: Exception) {
+        Log.e("ProfileActivity", "Giải mã ảnh lỗi: ${e.message}")
+        null
     }
 
     private fun formatDateForDisplay(apiDate: String): String {
-        return try {
-            val inputFormats = listOf(
-                SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()),
-                SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-            )
-
-            val outputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-
-            var date: Date? = null
-            for (format in inputFormats) {
-                try {
-                    date = format.parse(apiDate)
-                    if (date != null) break
-                } catch (_: Exception) {}
-            }
-
-            if (date != null) outputFormat.format(date) else apiDate
-        } catch (e: Exception) {
-            Log.e("ProfileActivity", "Lỗi định dạng ngày từ API: ${e.message}")
-            apiDate
+        val formats = listOf("yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd")
+        formats.forEach {
+            try {
+                val sdf = SimpleDateFormat(it, Locale.getDefault())
+                val date = sdf.parse(apiDate)
+                if (date != null) {
+                    return SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(date)
+                }
+            } catch (_: Exception) {}
         }
+        return apiDate
     }
 
-    @SuppressLint("DefaultLocale")
-    private fun showDatePicker() {
-        val calendar = Calendar.getInstance()
+    private fun formatDateForBackend(date: String): String = date
 
-        val currentText = binding.edtDateOfBirth.text.toString()
-        if (currentText.isNotEmpty()) {
-            val dateParts = currentText.split("/")
-            if (dateParts.size == 3) {
-                calendar.set(dateParts[2].toInt(), dateParts[1].toInt() - 1, dateParts[0].toInt())
-            }
+    private fun validateFields(): Boolean {
+        val required = listOf(
+            binding.edtFullName.text,
+            binding.edtEmail.text,
+            binding.edtPhone.text,
+            binding.edtAddress.text,
+            binding.edtDateOfBirth.text
+        )
+        return required.all { it.isNotBlank() } &&
+                (selectedImageUri != null || binding.uploadedImageView.drawable != null)
+    }
+
+    private fun showDatePicker() {
+        val cal = Calendar.getInstance()
+        binding.edtDateOfBirth.text.toString().takeIf { it.isNotEmpty() }?.let {
+            val parts = it.split("/")
+            if (parts.size == 3) cal.set(parts[2].toInt(), parts[1].toInt() - 1, parts[0].toInt())
         }
 
-        val datePicker = DatePickerDialog(
-            this, { _, year, month, dayOfMonth ->
-                val formattedDate = String.format("%02d/%02d/%04d", dayOfMonth, month + 1, year)
-                binding.edtDateOfBirth.setText(formattedDate)
+        DatePickerDialog(
+            this,
+            { _, year, month, day ->
+                binding.edtDateOfBirth.setText(String.format("%02d/%02d/%04d", day, month + 1, year))
             },
-            calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)
-        )
-
-        datePicker.datePicker.maxDate = System.currentTimeMillis()
-        datePicker.show()
+            cal.get(Calendar.YEAR),
+            cal.get(Calendar.MONTH),
+            cal.get(Calendar.DAY_OF_MONTH)
+        ).apply {
+            datePicker.maxDate = System.currentTimeMillis()
+            show()
+        }
     }
 }

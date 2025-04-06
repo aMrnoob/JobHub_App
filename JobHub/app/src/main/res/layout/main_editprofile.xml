@@ -10,7 +10,7 @@
         android:id="@+id/btnPenguin"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="15dp"
         android:scaleType="fitXY"
         android:src="@drawable/icon_penguin"
         android:background="@null"
@@ -23,13 +23,13 @@
         android:id="@+id/tvSelectJob"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:text="Profile"
+        android:layout_marginTop="26dp"
+        android:text="Username"
         android:textColor="@color/black"
-        android:textSize="28sp"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.05"
+        app:layout_constraintHorizontal_bias="0.08"
         app:layout_constraintStart_toEndOf="@+id/btnPenguin"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -40,8 +40,8 @@
         android:padding="10dp"
         android:background="@drawable/simple_border"
         android:elevation="5dp"
-        app:layout_constraintVertical_bias="0.15"
-        app:layout_constraintWidth_percent="0.8"
+        app:layout_constraintVertical_bias="0.12"
+        app:layout_constraintWidth_percent="0.7"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -51,15 +51,15 @@
 
         <ImageView
             android:id="@+id/uploadedImageView"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
             android:scaleType="centerCrop"
             android:visibility="gone" />
 
         <ImageView
             android:id="@+id/iconUploadImage"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
             android:layout_marginBottom="10dp"
             android:src="@drawable/icon_upload_image" />
 
@@ -67,8 +67,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Upload Photo Profile"
-            android:textSize="20sp"
+            android:textSize="15sp"
             android:textColor="@color/gray_600" />
+
     </LinearLayout>
 
     <TextView
@@ -78,7 +79,7 @@
         android:textColor="@color/gray_700"
         android:textSize="20sp"
         app:layout_constraintHorizontal_bias="0.15"
-        app:layout_constraintVertical_bias="0.32"
+        app:layout_constraintVertical_bias="0.3"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -94,7 +95,7 @@
         android:textColorHint="@color/gray_500"
         android:textColor="@color/black"
         android:inputType="text"
-        app:layout_constraintVertical_bias="0.37"
+        app:layout_constraintVertical_bias="0.36"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -123,7 +124,7 @@
         android:hint="Email"
         android:textColorHint="@color/gray_500"
         android:textColor="@color/black"
-        app:layout_constraintVertical_bias="0.48"
+        app:layout_constraintVertical_bias="0.49"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -137,7 +138,7 @@
         android:textColor="@color/gray_700"
         android:textSize="20sp"
         app:layout_constraintHorizontal_bias="0.15"
-        app:layout_constraintVertical_bias="0.54"
+        app:layout_constraintVertical_bias="0.56"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -154,7 +155,7 @@
         android:textColor="@color/black"
         android:inputType="none"
         android:focusable="false"
-        app:layout_constraintVertical_bias="0.59"
+        app:layout_constraintVertical_bias="0.62"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -168,7 +169,7 @@
         android:textColor="@color/gray_700"
         android:textSize="20sp"
         app:layout_constraintHorizontal_bias="0.14"
-        app:layout_constraintVertical_bias="0.65"
+        app:layout_constraintVertical_bias="0.69"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -184,7 +185,7 @@
         android:textColorHint="@color/gray_500"
         android:textColor="@color/black"
         android:inputType="phone"
-        app:layout_constraintVertical_bias="0.702"
+        app:layout_constraintVertical_bias="0.75"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -198,7 +199,7 @@
         android:textColor="@color/gray_700"
         android:textSize="20sp"
         app:layout_constraintHorizontal_bias="0.14"
-        app:layout_constraintVertical_bias="0.76"
+        app:layout_constraintVertical_bias="0.82"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -214,7 +215,7 @@
         android:textColorHint="@color/gray_500"
         android:textColor="@color/black"
         android:inputType="text"
-        app:layout_constraintVertical_bias="0.815"
+        app:layout_constraintVertical_bias="0.886"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -222,16 +223,18 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/btnNext"
+        android:id="@+id/btnUpdateProfile"
         android:layout_width="0dp"
         android:layout_height="60dp"
-        android:layout_marginTop="15dp"
         android:backgroundTint="@color/blue_700"
-        android:text="Next"
+        android:text="Update Profile"
         android:textColor="@color/white"
         android:textSize="24sp"
         app:layout_constraintWidth_percent="0.8"
+        app:layout_constraintVertical_bias="0.9"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtAddress" />
+        app:layout_constraintTop_toTopOf="@+id/edtAddress"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

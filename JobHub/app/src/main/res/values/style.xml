@@ -11,4 +11,10 @@
         <item name="android:tint">@color/gray_600</item>
         <item name="android:paddingStart">-2dp</item>
     </style>
+
+    <style name="circleImageView">
+        <item name="cornerSize">50%</item>
+        <item name="cornerFamily">rounded</item>
+    </style>
+
 </resources>

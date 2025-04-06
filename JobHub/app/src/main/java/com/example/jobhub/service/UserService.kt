@@ -9,6 +9,7 @@ import com.example.jobhub.dto.auth.Register_ResetPwdRequest
 import com.example.jobhub.model.ApiResponse
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
@@ -35,6 +36,9 @@ interface UserService {
     @POST("api/users/update-user")
     fun updateUser(@Body userDTO: UserDTO): Call<ApiResponse<Void>>
 
-    @GET("/api/users/me")
+    @GET("api/users/me")
     fun getUser(@Header("token") token: String): Call<ApiResponse<UserDTO>>
+
+    @DELETE("api/users/delete-account")
+    fun deleteAccount(@Header("token") token: String): Call<ApiResponse<UserDTO>>
 }

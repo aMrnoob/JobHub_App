@@ -1,9 +1,12 @@
 package com.example.jobhub.adapter
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.res.ColorStateList
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -11,6 +14,9 @@ import com.example.jobhub.R
 import com.example.jobhub.databinding.ItemJobBinding
 import com.example.jobhub.dto.ItemJobDTO
 import com.example.jobhub.entity.enumm.JobType
+import com.example.jobhub.dto.UserDTO
+import com.example.jobhub.entity.enumm.Role
+import com.google.gson.Gson
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -52,6 +58,16 @@ class JobAdapter(private val jobList: List<ItemJobDTO>, private val onItemClick:
                 binding.tvStatus.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(binding.tvStatus.context, R.color.green_200))
             }
 
+            if (isJobSeeker(binding.root.context)) {
+                binding.btnApply.visibility = View.VISIBLE
+            } else {
+                binding.btnApply.visibility = View.GONE
+            }
+
+            binding.btnApply.setOnClickListener {
+                Toast.makeText(binding.root.context, "Applied for ${itemJobDTO.title}", Toast.LENGTH_SHORT).show()
+            }
+
             binding.root.setOnClickListener {
                 onItemClick(itemJobDTO)
             }
@@ -74,4 +90,15 @@ class JobAdapter(private val jobList: List<ItemJobDTO>, private val onItemClick:
         return jobType.name.split("_")
             .joinToString(" ") { it.lowercase().replaceFirstChar { c -> c.uppercase() } }
     }
+
+    private fun isJobSeeker(context: Context): Boolean {
+        val sharedPreferences = context.getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
+        val json = sharedPreferences.getString("currentUser", "")
+        val gson = Gson()
+
+        val currentUser = gson.fromJson(json, UserDTO::class.java)
+
+        return currentUser?.role == Role.JOB_SEEKER
+    }
+
 }

@@ -9,7 +9,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Base64
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import com.example.jobhub.config.ApiHelper
@@ -22,7 +24,7 @@ import com.example.jobhub.entity.enumm.Role
 import com.example.jobhub.service.UserService
 import java.io.ByteArrayOutputStream
 import java.util.Calendar
-import kotlin.properties.Delegates
+
 
 class SelectProfileActivity : BaseActivity() {
 
@@ -34,7 +36,7 @@ class SelectProfileActivity : BaseActivity() {
         RetrofitClient.createRetrofit().create(UserService::class.java)
     }
 
-    private var userId by Delegates.notNull<Int>()
+    private var userId = -1
     private lateinit var role: Role
 
     private var currentStep = 1
@@ -130,41 +132,38 @@ class SelectProfileActivity : BaseActivity() {
                 val token = sharedPreferences.getString("authToken", null)
 
                 if (!token.isNullOrBlank()) {
-                    val cleanedToken = token.trim()
-                    Log.d("Token", "'$token'")
-                    decryptedToken(cleanedToken)
+                    decryptedToken(token.trim())
                 } else {
                     Log.e("SelectProfileActivity", "Invalid or empty token")
                 }
 
                 bindingProfile.edtDateOfBirth.setOnClickListener {
-                    val calendar = Calendar.getInstance()
-                    val year = calendar.get(Calendar.YEAR)
-                    val month = calendar.get(Calendar.MONTH)
-                    val day = calendar.get(Calendar.DAY_OF_MONTH)
+                    showDatePicker()
+                }
 
-                    val datePicker = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
-                        val date = "$selectedDay/${selectedMonth + 1}/$selectedYear"
-                        bindingProfile.edtDateOfBirth.setText(date)
-                    }, year, month, day)
+                bindingProfile.uploadImage.setOnClickListener {
+                    openImagePicker()
+                }
 
-                    datePicker.show()
+                bindingProfile.uploadedImageView.setOnClickListener {
+                    openImagePicker()
                 }
 
                 bindingProfile.btnNext.setOnClickListener {
-                    val fullName = bindingProfile.edtFullName.text.toString()
-                    val email = bindingProfile.edtEmail.text.toString()
-                    val dateString = bindingProfile.edtDateOfBirth.text.toString()
-                    val phone = bindingProfile.edtPhone.text.toString()
-                    val address = bindingProfile.edtAddress.text.toString()
-                    val userDTO = UserDTO(userId = userId, fullName = fullName, role = role,
-                        email = email, phone = phone, address = address, dateOfBirth = dateString
-                    )
+                    if (validateFields()) {
+                        val userInfo = UserDTO(
+                            userId = userId,
+                            fullName = bindingProfile.edtFullName.text.toString(),
+                            role = role,
+                            email = bindingProfile.edtEmail.text.toString(),
+                            phone = bindingProfile.edtPhone.text.toString(),
+                            imageUrl = encodeImageToBase64(),
+                            address = bindingProfile.edtAddress.text.toString(),
+                            dateOfBirth = bindingProfile.edtDateOfBirth.text.toString()
+                        )
 
-                    updateUser(userDTO)
-
-                    currentStep = 4
-                    showStep(currentStep)
+                        updateUser(userInfo)
+                    }
                 }
             }
             4 -> {
@@ -206,7 +205,7 @@ class SelectProfileActivity : BaseActivity() {
     private fun handleClick(view: View, selectedRole: Role) {
         val currentTime = System.currentTimeMillis()
 
-        if (currentTime - lastClickTime < 200) {
+        if (currentTime - lastClickTime < 300) {
             role = selectedRole
             selectRole()
         } else {
@@ -224,7 +223,7 @@ class SelectProfileActivity : BaseActivity() {
 
     private fun selectRole() {
         if (role == Role.EMPLOYER) {
-            currentStep = 3
+            currentStep = 2
             showStep(currentStep)
         } else {
             currentStep = 2
@@ -285,5 +284,14 @@ class SelectProfileActivity : BaseActivity() {
             }
         }
         return null
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        if (currentFocus != null) {
+            val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
+            currentFocus!!.clearFocus()
+        }
+        return super.dispatchTouchEvent(ev)
     }
 }

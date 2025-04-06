@@ -40,7 +40,8 @@ public class User {
     @Column(name = "address")
     private String address;
 
-    @Column(name = "date_of_birth")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @Column(name = "date_of_birth", nullable = true)
     private LocalDateTime dateOfBirth;
 
     @Column(name = "phone")
