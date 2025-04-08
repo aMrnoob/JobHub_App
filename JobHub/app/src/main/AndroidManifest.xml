@@ -32,7 +32,7 @@
 
         <provider android:name="com.facebook.FacebookContentProvider"
             android:authorities="com.facebook.app.FacebookContentProvider1591049248278162"
-            android:exported="false" />
+            android:exported="true" />
 
         <activity
             android:name=".activity.VacancyActivity"

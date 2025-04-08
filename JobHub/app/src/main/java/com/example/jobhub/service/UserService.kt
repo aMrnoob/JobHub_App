@@ -39,6 +39,9 @@ interface UserService {
     @GET("api/users/me")
     fun getUser(@Header("token") token: String): Call<ApiResponse<UserDTO>>
 
+    @GET("api/users/find-by-email")
+    fun findByEmail(@Header("email") email: String): Call<ApiResponse<UserDTO>>
+
     @DELETE("api/users/delete-account")
     fun deleteAccount(@Header("token") token: String): Call<ApiResponse<UserDTO>>
 }

@@ -30,6 +30,11 @@ public class UserController {
         return userService.getUser(token);
     }
 
+    @GetMapping("/find-by-email")
+    public ApiResponse<UserDTO> findByEmail(@RequestHeader("email") String email) {
+        return userService.findByEmail(email);
+    }
+
     @DeleteMapping("/delete-account")
     public ApiResponse<UserDTO> deleteAccount(@RequestHeader("token") String token) {
         return userService.deleteAccountUser(token);

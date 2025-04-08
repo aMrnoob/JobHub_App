@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public ApiResponse<Void> register (Register_ResetPwdRequest registerRequest) {
         if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
-            return new ApiResponse<>(false, "Email exist. Can not register!", null);
+            return new ApiResponse<>(false, "", null);
         }
 
         User user = new User();
@@ -211,9 +211,9 @@ public class UserServiceImpl implements UserService {
     public ApiResponse<UserDTO> findByEmail(String email) {
         Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isEmpty()) {
-            return new ApiResponse<>(false, "User not found");
+            return new ApiResponse<>(false, "");
         }
-        return new ApiResponse<>(true, "User found");
+        return new ApiResponse<>(true, "");
     }
 
     @Override

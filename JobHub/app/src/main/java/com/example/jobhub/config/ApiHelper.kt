@@ -13,6 +13,7 @@ class ApiHelper {
         context: Context,
         call: Call<ApiResponse<T>>,
         onSuccess: (T?) -> Unit,
+        onError: ((Throwable?) -> Unit)? = null,
         onStart: (() -> Unit)? = null,
         onComplete: (() -> Unit)? = null
     ) {
@@ -30,18 +31,21 @@ class ApiHelper {
                     } else {
                         apiResponse?.message?.let { showToast(context, it) }
                         Log.e("ApiHelper", "API responded with failure.")
+                        onError?.invoke(null)
                     }
                 } else {
                     val errorMessage = response.errorBody()?.string() ?: "Unknown API error"
                     showToast(context, "API Error: $errorMessage")
                     Log.e("ApiHelper", "API Error: HTTP ${response.code()} - $errorMessage")
+                    onError?.invoke(null)
                 }
             }
 
             override fun onFailure(call: Call<ApiResponse<T>>, t: Throwable) {
-                onComplete?.invoke() // Hide loading
+                onComplete?.invoke()
                 showToast(context, "Request failed: ${t.localizedMessage ?: "Unknown error"}")
                 Log.e("ApiHelper", "API Request failed", t)
+                onError?.invoke(t)
             }
         })
     }
