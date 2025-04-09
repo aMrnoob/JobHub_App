@@ -69,8 +69,10 @@ class JobAdapter(
                 binding.btnApply.visibility = View.GONE
             }
 
-            binding.btnApply.setOnClickListener {
-                Toast.makeText(binding.root.context, "Applied for ${itemJobDTO.title}", Toast.LENGTH_SHORT).show()
+            binding.btnApply.visibility = if (isJobSeeker(binding.root.context)) {
+                View.VISIBLE
+            } else {
+                View.GONE
             }
 
             binding.root.setOnClickListener {
@@ -123,11 +125,12 @@ class JobAdapter(
 
     private fun isJobSeeker(context: Context): Boolean {
         val sharedPreferences = context.getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
-        val json = sharedPreferences.getString("currentUser", "")
-        val gson = Gson()
-
-        val currentUser = gson.fromJson(json, UserDTO::class.java)
-
-        return currentUser?.role == Role.JOB_SEEKER
+        val json = sharedPreferences.getString("currentUser", null) ?: return false
+        return try {
+            val currentUser = Gson().fromJson(json, UserDTO::class.java)
+            currentUser?.role == Role.JOB_SEEKER
+        } catch (e: Exception) {
+            false
+        }
     }
 }

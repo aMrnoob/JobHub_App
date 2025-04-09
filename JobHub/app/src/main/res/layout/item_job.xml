@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:layout_width="match_parent"
+<LinearLayout
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_marginStart="10dp"
@@ -10,18 +11,21 @@
     android:elevation="10dp"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Hình ảnh công việc -->
+
+    <!-- Thông tin công việc -->
     <ImageView
         android:id="@+id/ivImgJob"
-        android:layout_width="0dp"
-        android:layout_height="85dp"
+        android:layout_width="109dp"
+        android:layout_height="108dp"
         android:layout_weight="2"
-        android:src="@drawable/icon_app"
         android:paddingStart="10dp"
-        android:paddingEnd="10dp"/>
+        android:paddingEnd="10dp"
+        android:src="@drawable/icon_app" />
 
     <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_width="290dp"
+        android:layout_height="match_parent"
         android:layout_weight="7"
         android:orientation="vertical"
         android:paddingTop="5dp"
@@ -99,8 +103,9 @@
 
         <Button
             android:id="@+id/btnApply"
-            android:layout_width="154dp"
-            android:layout_height="wrap_content"
+            android:layout_width="139dp"
+            android:layout_height="38dp"
+            android:layout_gravity="center_horizontal"
             android:layout_marginTop="5dp"
             android:backgroundTint="@color/blue_500"
             android:padding="5dp"
@@ -108,7 +113,7 @@
             android:textColor="@color/white"
             android:textSize="13sp"
             android:textStyle="bold"
-            android:visibility="gone"/>
+
     </LinearLayout>
 
     <LinearLayout
@@ -133,4 +138,3 @@
             android:src="@drawable/icon_remove"/>
     </LinearLayout>
 </LinearLayout>
-
