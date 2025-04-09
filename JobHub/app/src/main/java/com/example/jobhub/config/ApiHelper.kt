@@ -13,13 +13,11 @@ class ApiHelper {
         context: Context,
         call: Call<ApiResponse<T>>,
         onSuccess: (T?) -> Unit,
+        onError: ((Throwable?) -> Unit)? = null,
         onStart: (() -> Unit)? = null,
-        onComplete: (() -> Unit)? = null,
-        onError: ((String) -> Unit)? = null,
-        onFailure: ((Throwable) -> Unit)? = null
+        onComplete: (() -> Unit)? = null
     ) {
         onStart?.invoke()
-
         call.enqueue(object : Callback<ApiResponse<T>> {
             override fun onResponse(call: Call<ApiResponse<T>>, response: Response<ApiResponse<T>>) {
                 onComplete?.invoke()
@@ -31,21 +29,23 @@ class ApiHelper {
                         }
                         onSuccess(apiResponse.data)
                     } else {
-                        val message = apiResponse?.message ?: "Unknown error from server"
-                        onError?.invoke(message) ?: showToast(context, message)
-                        Log.e("ApiHelper", "API responded with failure: $message")
+                        apiResponse?.message?.let { showToast(context, it) }
+                        Log.e("ApiHelper", "API responded with failure.")
+                        onError?.invoke(null)
                     }
                 } else {
                     val errorMessage = response.errorBody()?.string() ?: "Unknown API error"
-                    onError?.invoke(errorMessage) ?: showToast(context, "API Error: $errorMessage")
+                    showToast(context, "API Error: $errorMessage")
                     Log.e("ApiHelper", "API Error: HTTP ${response.code()} - $errorMessage")
+                    onError?.invoke(null)
                 }
             }
 
             override fun onFailure(call: Call<ApiResponse<T>>, t: Throwable) {
                 onComplete?.invoke()
-                onFailure?.invoke(t) ?: showToast(context, "Request failed: ${t.localizedMessage ?: "Unknown error"}")
+                showToast(context, "Request failed: ${t.localizedMessage ?: "Unknown error"}")
                 Log.e("ApiHelper", "API Request failed", t)
+                onError?.invoke(t)
             }
         })
     }
