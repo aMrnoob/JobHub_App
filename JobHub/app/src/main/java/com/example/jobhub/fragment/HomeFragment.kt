@@ -5,6 +5,7 @@ import android.animation.PropertyValuesHolder
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -64,17 +65,34 @@ class HomeFragment : Fragment() {
             textView.tag = category
         }
 
+        binding.tvViewMore.setOnClickListener {
+            val url = "http://192.168.1.15:8080/api/admin/tips"
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.data = Uri.parse(url)
+            startActivity(intent)
+        }
+
+        binding.btnReadMore.setOnClickListener {
+            val url = "http://192.168.1.15:8080/api/admin/tips"
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.data = Uri.parse(url)
+            startActivity(intent)
+        }
+
         return binding.root
     }
 
     private fun setupRecyclerView() {
-        jobAdapter = JobAdapter(jobList) { selectedJob ->
-            val intent = Intent(requireContext(), VacancyActivity::class.java)
-            val jobJson = Gson().toJson(selectedJob)
-            val sharedPreferences = requireContext().getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
-            sharedPreferences.edit().putString("job", jobJson).apply()
-            startActivity(intent)
-        }
+        jobAdapter = JobAdapter(
+            jobList,
+            onItemClick = { selectedJob ->
+                val intent = Intent(requireContext(), VacancyActivity::class.java)
+                val jobJson = Gson().toJson(selectedJob)
+                val sharedPreferences = requireContext().getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
+                sharedPreferences.edit().putString("job", jobJson).apply()
+                startActivity(intent)
+            }
+        )
 
         binding.rvJob.apply {
             adapter = jobAdapter

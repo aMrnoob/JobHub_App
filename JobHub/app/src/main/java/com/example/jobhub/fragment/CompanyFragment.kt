@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -53,7 +54,16 @@ class CompanyFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        companyAdapter = CompanyAdapter(companyList)
+        companyAdapter = CompanyAdapter(
+            companyList,
+            onEditClick = { company ->
+                Toast.makeText(requireContext(), "Edit ${company.companyId}", Toast.LENGTH_SHORT).show()
+            },
+            onDeleteClick = { company ->
+                Toast.makeText(requireContext(), "Delete ${company.companyId}", Toast.LENGTH_SHORT).show()
+            }
+        )
+
         binding.rvCompany.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = companyAdapter

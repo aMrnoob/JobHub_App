@@ -20,15 +20,20 @@ import com.google.gson.Gson
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class JobAdapter(private val jobList: List<ItemJobDTO>, private val onItemClick: (ItemJobDTO) -> Unit) :
-    RecyclerView.Adapter<JobAdapter.JobViewHolder>() {
+class JobAdapter(
+    private val jobList: List<ItemJobDTO>,
+    private val onItemClick: ((ItemJobDTO) -> Unit),
+    private val onEditClick: ((ItemJobDTO) -> Unit)? = null,
+    private val onDeleteClick: ((ItemJobDTO) -> Unit)? = null
+) : RecyclerView.Adapter<JobAdapter.JobViewHolder>() {
+
+    private var lastShownPosition: Int = -1
 
     inner class JobViewHolder(private val binding: ItemJobBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        @SuppressLint("SetTextI18n")
-        fun bind(itemJobDTO: ItemJobDTO) {
-
+        @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
+        fun bind(itemJobDTO: ItemJobDTO, position: Int) {
             Glide.with(binding.root.context)
                 .load(itemJobDTO.company.logoUrl)
                 .placeholder(R.drawable.error_image)
@@ -71,6 +76,31 @@ class JobAdapter(private val jobList: List<ItemJobDTO>, private val onItemClick:
             binding.root.setOnClickListener {
                 onItemClick(itemJobDTO)
             }
+
+            binding.layoutActions.visibility = if (position == lastShownPosition) View.VISIBLE else View.GONE
+
+            binding.root.setOnClickListener {
+                onItemClick(itemJobDTO)
+                if (lastShownPosition != -1) {
+                    val oldPosition = lastShownPosition
+                    lastShownPosition = -1
+                    notifyItemChanged(oldPosition)
+                }
+            }
+
+            binding.root.setOnLongClickListener {
+                lastShownPosition = if (lastShownPosition == position) -1 else position
+                notifyDataSetChanged()
+                true
+            }
+
+            binding.ivEdit.setOnClickListener {
+                onEditClick?.let { it1 -> it1(itemJobDTO) }
+            }
+
+            binding.ivRemove.setOnClickListener {
+                onDeleteClick?.let { it1 -> it1(itemJobDTO) }
+            }
         }
     }
 
@@ -81,7 +111,7 @@ class JobAdapter(private val jobList: List<ItemJobDTO>, private val onItemClick:
     }
 
     override fun onBindViewHolder(holder: JobViewHolder, position: Int) {
-        holder.bind(jobList[position])
+        holder.bind(jobList[position], position)
     }
 
     override fun getItemCount(): Int = jobList.size
@@ -100,5 +130,4 @@ class JobAdapter(private val jobList: List<ItemJobDTO>, private val onItemClick:
 
         return currentUser?.role == Role.JOB_SEEKER
     }
-
 }

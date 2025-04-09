@@ -1,5 +1,6 @@
 package com.example.jobhub.fragment
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -50,13 +51,16 @@ class ApplicationJobSeekerFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        jobAdapter = JobAdapter(filteredJobs) { selectedJob ->
-            val intent = Intent(requireContext(), VacancyActivity::class.java)
-            val jobJson = Gson().toJson(selectedJob)
-            requireContext().getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
-                .edit().putString("job", jobJson).apply()
-            startActivity(intent)
-        }
+        jobAdapter = JobAdapter(
+            filteredJobs,
+            onItemClick = { selectedJob ->
+                val intent = Intent(requireContext(), VacancyActivity::class.java)
+                val jobJson = Gson().toJson(selectedJob)
+                val sharedPreferences = requireContext().getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
+                sharedPreferences.edit().putString("job", jobJson).apply()
+                startActivity(intent)
+            }
+        )
 
         binding.rvApplications.apply {
             adapter = jobAdapter
@@ -121,6 +125,7 @@ class ApplicationJobSeekerFragment : Fragment() {
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun filterJobs(status: String) {
         val query = binding.edtSearch.text.toString().trim().lowercase()
 

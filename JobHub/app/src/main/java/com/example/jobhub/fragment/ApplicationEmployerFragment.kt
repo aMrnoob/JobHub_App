@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -55,13 +56,20 @@ class ApplicationEmployerFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        jobAdapter = JobAdapter(jobList) { selectedJob ->
-            val intent = Intent(requireContext(), VacancyActivity::class.java)
-            val jobJson = Gson().toJson(selectedJob)
-            val sharedPreferences = requireContext().getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
-            sharedPreferences.edit().putString("job", jobJson).apply()
-            startActivity(intent)
-        }
+        jobAdapter = JobAdapter(
+            jobList,
+            onItemClick = { },
+            onEditClick = { selectedJob ->
+                val intent = Intent(requireContext(), VacancyActivity::class.java)
+                val jobJson = Gson().toJson(selectedJob)
+                val sharedPreferences = requireContext().getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
+                sharedPreferences.edit().putString("job", jobJson).apply()
+                startActivity(intent)
+            },
+            onDeleteClick = { job ->
+                Toast.makeText(requireContext(), "Delete ${job.jobId}", Toast.LENGTH_SHORT).show()
+            }
+        )
 
         binding.rvApplications.apply {
             adapter = jobAdapter
