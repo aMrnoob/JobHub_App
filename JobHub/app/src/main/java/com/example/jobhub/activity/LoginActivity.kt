@@ -10,6 +10,7 @@ import com.example.jobhub.R
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.ApiService
 import com.example.jobhub.config.RetrofitClient
+import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.config.TokenRequest
 import com.example.jobhub.databinding.LoginScreenBinding
 import com.example.jobhub.dto.auth.LoginRequest
@@ -34,76 +35,58 @@ class LoginActivity : BaseActivity() {
     private lateinit var binding: LoginScreenBinding
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var callbackManager: CallbackManager
+    private lateinit var sharedPrefs: SharedPrefsManager
 
-    private val userService: UserService by lazy {
-        RetrofitClient.createRetrofit().create(UserService::class.java)
-    }
-    private val apiService: ApiService by lazy {
-        RetrofitClient.createRetrofit().create(ApiService::class.java)
-    }
+    private val userService: UserService by lazy { RetrofitClient.createRetrofit().create(UserService::class.java) }
+    private val apiService: ApiService by lazy { RetrofitClient.createRetrofit().create(ApiService::class.java) }
 
     private var isPasswordVisible = false
+    private var facebookId = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = LoginScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        sharedPrefs = SharedPrefsManager(this)
 
-        val sharedPreferences = getSharedPreferences("JobHubPrefs", MODE_PRIVATE)
-        var isRemembered = sharedPreferences.getBoolean("isRemembered", false)
-
-        if (isRemembered) {
-            val savedEmail = sharedPreferences.getString("email", "")
-            val savedPassword = sharedPreferences.getString("password", "")
-            binding.edtEmail.setText(savedEmail)
-            binding.edtPassword.setText(savedPassword)
+        if (sharedPrefs.isRemembered) {
+            binding.edtEmail.setText(sharedPrefs.email)
+            binding.edtPassword.setText(sharedPrefs.password)
             binding.cbRememberPassword.isChecked = true
         }
 
-        binding.invisiblePwd.setOnClickListener {
-            togglePasswordVisibility()
-        }
-
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken("856354548077-e00ibmh0ojbv416s43qldd8ec0j4o43m.apps.googleusercontent.com") // Thay bằng Web Client ID
-            .requestEmail()
-            .build()
-        googleSignInClient = GoogleSignIn.getClient(this, gso)
+        binding.invisiblePwd.setOnClickListener { togglePasswordVisibility() }
 
         binding.btnGoogle.setOnClickListener {
+            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken("856354548077-e00ibmh0ojbv416s43qldd8ec0j4o43m.apps.googleusercontent.com") // Thay bằng Web Client ID
+                .requestEmail()
+                .build()
+            googleSignInClient = GoogleSignIn.getClient(this, gso)
+
             val signInIntent = googleSignInClient.signInIntent
             signInLauncher.launch(signInIntent)
         }
 
-        FacebookSdk.fullyInitialize()
-        callbackManager = CallbackManager.Factory.create()
-
         binding.btnFacebook.setOnClickListener {
-            LoginManager.getInstance().logInWithReadPermissions(
-                this,
-                listOf("email")
-            )
+            FacebookSdk.fullyInitialize()
+            callbackManager = CallbackManager.Factory.create()
+
+            LoginManager.getInstance().logInWithReadPermissions(this, emptyList())
             LoginManager.getInstance().registerCallback(callbackManager,
                 object : FacebookCallback<LoginResult> {
                     override fun onSuccess(result: LoginResult) {
                         val accessToken = result.accessToken
-                        getFacebookEmail(accessToken)
+                        getFacebookId(accessToken)
                     }
 
-                    override fun onCancel() {
-                        Toast.makeText(this@LoginActivity, "Facebook login canceled", Toast.LENGTH_SHORT).show()
-                    }
+                    override fun onCancel() { Toast.makeText(this@LoginActivity, "Facebook login canceled", Toast.LENGTH_SHORT).show() }
 
-                    override fun onError(error: FacebookException) {
-                        Toast.makeText(this@LoginActivity, "Facebook login error: ${error.message}", Toast.LENGTH_SHORT).show()
-                    }
+                    override fun onError(error: FacebookException) { Toast.makeText(this@LoginActivity, "Facebook login error: ${error.message}", Toast.LENGTH_SHORT).show() }
                 })
         }
 
-        binding.btnForgetPwd.setOnClickListener {
-            val intent = Intent(this, ForgetPwdActivity::class.java)
-            startActivity(intent)
-        }
+        binding.btnForgetPwd.setOnClickListener { startActivity(Intent(this, ForgetPwdActivity::class.java)) }
 
         binding.btnLogin.setOnClickListener {
             val email = binding.edtEmail.text.toString()
@@ -114,31 +97,18 @@ class LoginActivity : BaseActivity() {
             } else if (password.isBlank()){
                 Toast.makeText(this@LoginActivity, "Please enter your password", Toast.LENGTH_SHORT).show()
             } else {
-                isRemembered = binding.cbRememberPassword.isChecked
-                if (isRemembered) {
-                    sharedPreferences.edit().apply {
-                        putString("email", email)
-                        putString("password", password)
-                        putBoolean("isRemembered", true)
-                        apply()
-                    }
+                if (binding.cbRememberPassword.isChecked) {
+                    sharedPrefs.email = email
+                    sharedPrefs.password = password
+                    sharedPrefs.isRemembered = true
                 } else {
-                    sharedPreferences.edit().apply {
-                        remove("email")
-                        remove("password")
-                        remove("isRemembered")
-                        apply()
-                    }
+                    sharedPrefs.clearRememberedCredentials()
                 }
-
                 login(email, password)
             }
         }
 
-        binding.btnRegister.setOnClickListener {
-            val intent = Intent(this, SignUpActivity::class.java)
-            startActivity(intent)
-        }
+        binding.btnRegister.setOnClickListener { startActivity(Intent(this, SignUpActivity::class.java)) }
     }
 
     private val signInLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -155,26 +125,32 @@ class LoginActivity : BaseActivity() {
         }
     }
 
-    private fun getFacebookEmail(accessToken: AccessToken) {
+    private fun getFacebookId(accessToken: AccessToken) {
         val request = GraphRequest.newMeRequest(accessToken) { obj, _ ->
-            val email = obj?.optString("email")
+            val id = obj?.optString("id")
 
-            if (!email.isNullOrBlank()) {
-                signUp(email)
-                login(email, "")
+            if (!id.isNullOrBlank()) {
+                facebookId = "$id@facebook.com"
+                checkAccountExist(facebookId) { exist ->
+                    if (exist) {
+                        login(facebookId, "")
+                    } else {
+                        signUp(facebookId) {
+                            login(facebookId, "")
+                        }
+                    }
+                }
             }
         }
 
         val params = Bundle()
-        params.putString("fields", "id,name,email,first_name,last_name")
+        params.putString("fields", "id")
         request.parameters = params
         request.executeAsync()
     }
 
-
     private fun sendTokenToBackend(idToken: String?) {
         if (idToken.isNullOrBlank()) return
-
         val request = TokenRequest(idToken)
 
         ApiHelper().callApi(
@@ -204,6 +180,15 @@ class LoginActivity : BaseActivity() {
         )
     }
 
+    private fun checkAccountExist(email: String, onResult: (Boolean) -> Unit) {
+        ApiHelper().callApi(
+            context = this,
+            call = userService.findByEmail(email),
+            onSuccess = { onResult(true) },
+            onError = { onResult(false) }
+        )
+    }
+
     private fun navigateToNextScreen(role: Role?) {
         val nextActivity = when (role) {
             Role.UNDEFINED -> SelectProfileActivity::class.java
@@ -213,32 +198,27 @@ class LoginActivity : BaseActivity() {
         nextActivity?.let { startActivity(Intent(this, it)) }
     }
 
-    private fun saveToken(token: String) {
-        val sharedPreferences = getSharedPreferences("JobHubPrefs", MODE_PRIVATE)
-        sharedPreferences.edit().putString("authToken", token).apply()
-    }
+    private fun saveToken(token: String) { sharedPrefs.authToken = token }
 
     private fun togglePasswordVisibility() {
-        if (isPasswordVisible) {
-            binding.edtPassword.inputType =
-                android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
-            binding.invisiblePwd.setImageResource(R.drawable.invisibility_icon)
+        val (inputType, iconRes) = if (isPasswordVisible) {
+            android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD to R.drawable.invisibility_icon
         } else {
-            binding.edtPassword.inputType =
-                android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-            binding.invisiblePwd.setImageResource(R.drawable.visibility_icon)
+            android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD to R.drawable.visibility_icon
         }
 
+        binding.edtPassword.inputType = inputType
+        binding.invisiblePwd.setImageResource(iconRes)
         binding.edtPassword.setSelection(binding.edtPassword.text.length)
-        binding.edtPassword.transformationMethod = binding.edtPassword.transformationMethod
+
         isPasswordVisible = !isPasswordVisible
     }
 
-    private fun signUp(email: String) {
+    private fun signUp(email: String, onComplete: () -> Unit) {
         ApiHelper().callApi(
             context = this,
             call = userService.register(Register_ResetPwdRequest(email, "")),
-            onSuccess = { startActivity(Intent(this@LoginActivity, LoginActivity::class.java)) }
+            onSuccess = { onComplete() }
         )
     }
 
