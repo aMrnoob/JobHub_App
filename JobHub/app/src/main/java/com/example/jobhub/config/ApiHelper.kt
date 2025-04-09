@@ -14,9 +14,12 @@ class ApiHelper {
         call: Call<ApiResponse<T>>,
         onSuccess: (T?) -> Unit,
         onStart: (() -> Unit)? = null,
-        onComplete: (() -> Unit)? = null
+        onComplete: (() -> Unit)? = null,
+        onError: ((String) -> Unit)? = null,
+        onFailure: ((Throwable) -> Unit)? = null
     ) {
         onStart?.invoke()
+
         call.enqueue(object : Callback<ApiResponse<T>> {
             override fun onResponse(call: Call<ApiResponse<T>>, response: Response<ApiResponse<T>>) {
                 onComplete?.invoke()
@@ -28,19 +31,20 @@ class ApiHelper {
                         }
                         onSuccess(apiResponse.data)
                     } else {
-                        apiResponse?.message?.let { showToast(context, it) }
-                        Log.e("ApiHelper", "API responded with failure.")
+                        val message = apiResponse?.message ?: "Unknown error from server"
+                        onError?.invoke(message) ?: showToast(context, message)
+                        Log.e("ApiHelper", "API responded with failure: $message")
                     }
                 } else {
                     val errorMessage = response.errorBody()?.string() ?: "Unknown API error"
-                    showToast(context, "API Error: $errorMessage")
+                    onError?.invoke(errorMessage) ?: showToast(context, "API Error: $errorMessage")
                     Log.e("ApiHelper", "API Error: HTTP ${response.code()} - $errorMessage")
                 }
             }
 
             override fun onFailure(call: Call<ApiResponse<T>>, t: Throwable) {
-                onComplete?.invoke() // Hide loading
-                showToast(context, "Request failed: ${t.localizedMessage ?: "Unknown error"}")
+                onComplete?.invoke()
+                onFailure?.invoke(t) ?: showToast(context, "Request failed: ${t.localizedMessage ?: "Unknown error"}")
                 Log.e("ApiHelper", "API Request failed", t)
             }
         })
@@ -50,4 +54,3 @@ class ApiHelper {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 }
-

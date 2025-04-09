@@ -13,7 +13,7 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 public class JobDTO {
-    private String jobId;
+    private Integer jobId;
     private String title;
     private String description;
     private String requirements;
