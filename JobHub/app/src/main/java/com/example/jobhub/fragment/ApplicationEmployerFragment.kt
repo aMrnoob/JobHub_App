@@ -3,7 +3,6 @@ package com.example.jobhub.fragment
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,7 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.jobhub.activity.JobActivity
@@ -19,6 +17,7 @@ import com.example.jobhub.activity.VacancyActivity
 import com.example.jobhub.adapter.JobAdapter
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
+import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.MainApplicationEmployerBinding
 import com.example.jobhub.dto.ItemJobDTO
 import com.example.jobhub.service.JobService
@@ -26,21 +25,24 @@ import com.google.gson.Gson
 
 class ApplicationEmployerFragment : Fragment() {
 
-    private var _binding: MainApplicationEmployerBinding? = null
-    private val binding get() = _binding!!
+    private lateinit var jobAdapter: JobAdapter
+    private lateinit var sharedPrefsManager: SharedPrefsManager
 
+    private var _binding: MainApplicationEmployerBinding? = null
+    private var allJobs: MutableList<ItemJobDTO> = mutableListOf()
+    private var jobList: MutableList<ItemJobDTO> = mutableListOf()
+
+    private val binding get() = _binding!!
     private val jobService: JobService by lazy {
         RetrofitClient.createRetrofit().create(JobService::class.java)
     }
-    private var allJobs: MutableList<ItemJobDTO> = mutableListOf()
-    private var jobList: MutableList<ItemJobDTO> = mutableListOf()
-    private lateinit var jobAdapter: JobAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = MainApplicationEmployerBinding.inflate(inflater, container, false)
+        sharedPrefsManager = SharedPrefsManager(requireContext())
 
         setupRecyclerView()
         getAllJobs()
@@ -62,8 +64,7 @@ class ApplicationEmployerFragment : Fragment() {
             onEditClick = { selectedJob ->
                 val intent = Intent(requireContext(), VacancyActivity::class.java)
                 val jobJson = Gson().toJson(selectedJob)
-                val sharedPreferences = requireContext().getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
-                sharedPreferences.edit().putString("job", jobJson).apply()
+                sharedPrefsManager.currentJob = jobJson
                 startActivity(intent)
             },
             onDeleteClick = { job ->
@@ -79,7 +80,7 @@ class ApplicationEmployerFragment : Fragment() {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun getAllJobs() {
-        val token = getAuthToken() ?: return
+        val token = sharedPrefsManager.authToken ?: return
 
         ApiHelper().callApi(
             context = requireContext(),
@@ -96,11 +97,6 @@ class ApplicationEmployerFragment : Fragment() {
                 jobAdapter.notifyDataSetChanged()
             }
         )
-    }
-
-    private fun getAuthToken(): String? {
-        val sharedPreferences = activity?.getSharedPreferences("JobHubPrefs", AppCompatActivity.MODE_PRIVATE)
-        return sharedPreferences?.getString("authToken", null)?.trim()?.takeIf { it.isNotBlank() }
     }
 
     private fun animateView(view: View) {

@@ -1,14 +1,10 @@
 package com.example.jobhub.activity
 
-import android.animation.ObjectAnimator
-import android.animation.PropertyValuesHolder
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.TextView
-import androidx.core.animation.addListener
-import androidx.fragment.app.Fragment
-import com.example.jobhub.R
+import androidx.viewpager2.widget.ViewPager2
+import com.example.jobhub.adapter.FragmentPagerAdapter
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.ActivityVacancyBinding
@@ -23,29 +19,54 @@ import com.example.jobhub.service.UserService
 class VacancyActivity : BaseActivity(), FragmentInterface {
 
     private lateinit var binding: ActivityVacancyBinding
+    private lateinit var fragmentPagerAdapter: FragmentPagerAdapter
 
     private var userDTO: UserDTO? = null
-    private var jobDetailFragment: JobDetailFragment? = null
-    private var requirementsFragment: RequirementsFragment? = null
-    private var companyJobFragment: CompanyJobFragment? = null
-    private var currentFragment: Fragment? = null
+    private var currentPosition = 0
+
+    private val fragments = listOf(
+        JobDetailFragment(),
+        RequirementsFragment(),
+        CompanyJobFragment()
+    )
     private val userService: UserService by lazy {
         RetrofitClient.createRetrofit().create(UserService::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityVacancyBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.btnComeBack.setOnClickListener {
-            finish()
-        }
+        binding.btnComeBack.setOnClickListener { finish() }
+        binding.btnEdit.setOnClickListener{ onEditClicked() }
 
         getAuthToken()?.let { decrypteken(it) } ?: Log.e("VacancyActivity", "Invalid or empty token")
+        setupViewPager()
         setupCategorySelection()
-        setupAnimation()
+    }
+
+    private fun setupViewPager() {
+        fragmentPagerAdapter = FragmentPagerAdapter(this, fragments)
+        binding.viewPager.adapter = fragmentPagerAdapter
+
+        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                currentPosition = position
+                fragmentPagerAdapter.updateCurrentPosition(position)
+                updateEditButtonVisibility()
+                updateCategorySelection(position)
+            }
+        })
+    }
+
+    private fun updateEditButtonVisibility() {
+        binding.btnEdit.visibility = if (userDTO?.role == Role.EMPLOYER) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
     }
 
     private fun getAuthToken(): String? {
@@ -67,55 +88,10 @@ class VacancyActivity : BaseActivity(), FragmentInterface {
     }
 
     private fun setupBottomNavigation() {
-        if (userDTO?.role == Role.EMPLOYER) {
-            binding.btnEdit.visibility = View.VISIBLE
+        binding.btnEdit.visibility = if (userDTO?.role == Role.EMPLOYER) {
+            View.VISIBLE
         } else {
-            binding.btnEdit.visibility = View.GONE
-        }
-
-        jobDetailFragment = JobDetailFragment()
-        loadFragment(JobDetailFragment())
-    }
-
-    private fun loadFragment(fragment: Fragment) {
-        currentFragment = fragment
-
-        when (fragment) {
-            is RequirementsFragment -> requirementsFragment = fragment
-            is JobDetailFragment -> jobDetailFragment = fragment
-            is CompanyJobFragment -> companyJobFragment = fragment
-        }
-
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentContainer, fragment)
-            .commit()
-    }
-
-    private fun setupAnimation() {
-        binding.btnComeBack.setOnClickListener {
-            animateView(it) { finish() }
-        }
-
-        binding.btnEdit.setOnClickListener {
-            animateView(it) {
-                when {
-                    jobDetailFragment?.isVisible == true -> jobDetailFragment?.enableEditing()
-                    requirementsFragment?.isVisible == true -> requirementsFragment?.enableEditing()
-                    companyJobFragment?.isVisible == true -> companyJobFragment?.enableEditing()
-                }
-            }
-        }
-    }
-
-    private fun animateView(view: View, onEnd: () -> Unit) {
-        ObjectAnimator.ofPropertyValuesHolder(
-            view,
-            PropertyValuesHolder.ofFloat(View.SCALE_X, 1f, 1.1f, 1f),
-            PropertyValuesHolder.ofFloat(View.SCALE_Y, 1f, 1.1f, 1f)
-        ).apply {
-            duration = 200
-            addListener(onEnd = { onEnd() })
-            start()
+            View.GONE
         }
     }
 
@@ -126,50 +102,40 @@ class VacancyActivity : BaseActivity(), FragmentInterface {
             binding.tvCompany
         )
 
-        updateSelectedCategory(binding.tvJobDetail, categoryTextViews)
-
-        categoryTextViews.forEach { textView ->
+        categoryTextViews.forEachIndexed { index, textView ->
             textView.setOnClickListener {
-                updateSelectedCategory(textView, categoryTextViews)
-
-                binding.btnEdit.visibility = if (userDTO?.role == Role.EMPLOYER) View.VISIBLE else View.GONE
-
-                val fragment = when (textView) {
-                    binding.tvJobDetail -> {
-                        if (jobDetailFragment == null) {
-                            jobDetailFragment = JobDetailFragment()
-                        }
-                        jobDetailFragment!!
+                if (index != currentPosition) {
+                    if (index > currentPosition) {
+                        binding.viewPager.setCurrentItem(index, true)
+                    } else {
+                        binding.viewPager.setCurrentItem(index, true)
                     }
-                    binding.tvRequirementJob -> {
-                        if (requirementsFragment == null) {
-                            requirementsFragment = RequirementsFragment()
-                        }
-                        requirementsFragment!!
-                    }
-                    binding.tvCompany -> {
-                        if (companyJobFragment == null) {
-                            companyJobFragment = CompanyJobFragment()
-                        }
-                        companyJobFragment!!
-                    }
-                    else -> return@setOnClickListener
                 }
-
-                loadFragment(fragment)
             }
         }
     }
 
-    private fun updateSelectedCategory(selected: TextView, categoryTextViews: List<TextView>) {
-        categoryTextViews.forEach { it.isSelected = it == selected }
+    private fun updateCategorySelection(position: Int) {
+        val categoryTextViews = listOf(
+            binding.tvJobDetail,
+            binding.tvRequirementJob,
+            binding.tvCompany
+        )
+
+        categoryTextViews.forEachIndexed { index, textView ->
+            textView.isSelected = index == position
+        }
     }
 
     override fun onEditClicked() {
-        when {
-            jobDetailFragment?.isVisible == true -> jobDetailFragment?.enableEditing()
-            requirementsFragment?.isVisible == true -> requirementsFragment?.enableEditing()
-            companyJobFragment?.isVisible == true -> companyJobFragment?.enableEditing()
+        if (userDTO?.role == Role.EMPLOYER) {
+            fragments.forEach { fragment ->
+                when (fragment) {
+                    is JobDetailFragment -> fragment.enableEditing()
+                    is RequirementsFragment -> fragment.enableEditing()
+                    is CompanyJobFragment -> fragment.enableEditing()
+                }
+            }
         }
     }
 }

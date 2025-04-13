@@ -17,6 +17,7 @@ import com.example.jobhub.activity.CompanyActivity
 import com.example.jobhub.adapter.CompanyAdapter
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
+import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.MainCompanyBinding
 import com.example.jobhub.entity.Company
 import com.example.jobhub.service.CompanyService
@@ -24,21 +25,24 @@ import com.example.jobhub.service.CompanyService
 
 class CompanyFragment : Fragment() {
 
-    private var _binding: MainCompanyBinding? = null
-    private val binding get() = _binding!!
+    private lateinit var companyAdapter: CompanyAdapter
+    private lateinit var sharedPrefs: SharedPrefsManager
 
+    private var _binding: MainCompanyBinding? = null
+    private var allCompanies: MutableList<Company> = mutableListOf()
+    private var companyList: MutableList<Company> = mutableListOf()
+
+    private val binding get() = _binding!!
     private val companyService: CompanyService by lazy {
         RetrofitClient.createRetrofit().create(CompanyService::class.java)
     }
-    private lateinit var companyAdapter: CompanyAdapter
-    private var allCompanies: MutableList<Company> = mutableListOf()
-    private var companyList: MutableList<Company> = mutableListOf()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = MainCompanyBinding.inflate(inflater, container, false)
+        sharedPrefs = SharedPrefsManager(requireContext())
 
         binding.ivAddCompany.setOnClickListener {
             animateView(it)
@@ -72,7 +76,7 @@ class CompanyFragment : Fragment() {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun fetchAllCompanies() {
-        val token = getAuthToken() ?: return
+        val token = sharedPrefs.authToken ?: return
 
         ApiHelper().callApi(
             context = requireContext(),
@@ -89,13 +93,6 @@ class CompanyFragment : Fragment() {
                 companyAdapter.notifyDataSetChanged()
             }
         )
-    }
-
-    private fun getAuthToken(): String? {
-        return requireContext().getSharedPreferences("JobHubPrefs", AppCompatActivity.MODE_PRIVATE)
-            .getString("authToken", null)
-            ?.trim()
-            ?.takeIf { it.isNotBlank() }
     }
 
     private fun animateView(view: View) {

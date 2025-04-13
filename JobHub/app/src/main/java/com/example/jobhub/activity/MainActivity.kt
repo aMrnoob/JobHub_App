@@ -5,10 +5,10 @@ import android.animation.PropertyValuesHolder
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import androidx.fragment.app.Fragment
-import com.example.jobhub.R
+import com.example.jobhub.adapter.FragmentPagerAdapter
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
+import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.ActivityMainBinding
 import com.example.jobhub.dto.UserDTO
 import com.example.jobhub.entity.enumm.Role
@@ -24,6 +24,8 @@ import com.google.gson.Gson
 class MainActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var viewPagerAdapter: FragmentPagerAdapter
+    private lateinit var sharedPrefs: SharedPrefsManager
 
     private var userDTO: UserDTO? = null
     private val userService: UserService by lazy {
@@ -32,21 +34,11 @@ class MainActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        sharedPrefs = SharedPrefsManager(this)
 
-        getAuthToken()?.let { decrypteken(it) } ?: Log.e("MainActivity", "Invalid or empty token")
-        setupBottomNavigation()
-
-        setupAnimation()
-    }
-
-    private fun getAuthToken(): String? {
-        return getSharedPreferences("JobHubPrefs", MODE_PRIVATE)
-            .getString("authToken", null)
-            ?.trim()
-            ?.takeIf { it.isNotBlank() }
+        sharedPrefs.authToken?.let { decrypteken(it) } ?: Log.e("MainActivity", "Invalid or empty token")
     }
 
     private fun decrypteken(token: String) {
@@ -56,11 +48,9 @@ class MainActivity : BaseActivity() {
             onSuccess = {
                 userDTO = it
                 val userJson = Gson().toJson(userDTO)
-                getSharedPreferences("JobHubPrefs", MODE_PRIVATE)
-                    .edit()
-                    .putString("currentUser", userJson)
-                    .apply()
-                runOnUiThread { setupBottomNavigation() }
+                sharedPrefs.saveCurrentUser(userJson)
+
+                runOnUiThread { setupViewPager() }
             }
         )
     }
@@ -73,41 +63,49 @@ class MainActivity : BaseActivity() {
             binding.tvApply.visibility = View.VISIBLE
             binding.tvCompany.visibility = View.GONE
         }
-
-        if (supportFragmentManager.findFragmentById(R.id.fragmentContainer) == null) {
-            loadFragment(HomeFragment())
-        }
     }
 
-    private fun loadFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentContainer, fragment)
-            .commit()
+    private fun setupViewPager() {
+        val fragments = mutableListOf(
+            HomeFragment(),
+            if (userDTO?.role == Role.EMPLOYER) ApplicationEmployerFragment() else ApplicationJobSeekerFragment(),
+            if (userDTO?.role == Role.EMPLOYER) CompanyFragment() else ApplyFragment(),
+            ProfileFragment()
+        )
+
+        viewPagerAdapter = FragmentPagerAdapter(this, fragments)
+        binding.viewPager.adapter = viewPagerAdapter
+        binding.viewPager.isUserInputEnabled = true
+
+        setupBottomNavigation()
+        setupAnimation()
     }
 
     private fun setupAnimation() {
-        listOf(binding.tvHome, binding.tvApplication, binding.tvApply, binding.tvCompany, binding.tvProfile)
-            .forEach { view ->
-                view.setOnClickListener {
-                    animateView(it)
-                    val fragment = when (it) {
-                        binding.tvHome -> HomeFragment()
-                        binding.tvApplication -> {
-                            if (userDTO?.role == Role.EMPLOYER) {
-                                ApplicationEmployerFragment()
-                            } else {
-                                ApplicationJobSeekerFragment()
-                            }
-                        }
-                        binding.tvApply -> ApplyFragment()
-                        binding.tvCompany -> CompanyFragment()
-                        binding.tvProfile -> ProfileFragment()
-                        else -> return@setOnClickListener
-                    }
+        binding.tvHome.setOnClickListener {
+            animateView(it)
+            binding.viewPager.currentItem = 0
+        }
 
-                    loadFragment(fragment)
-                }
-            }
+        binding.tvApplication.setOnClickListener {
+            animateView(it)
+            binding.viewPager.currentItem = 1
+        }
+
+        binding.tvApply.setOnClickListener {
+            animateView(it)
+            binding.viewPager.currentItem = 2
+        }
+
+        binding.tvCompany.setOnClickListener {
+            animateView(it)
+            binding.viewPager.currentItem = 2
+        }
+
+        binding.tvProfile.setOnClickListener {
+            animateView(it)
+            binding.viewPager.currentItem = 3
+        }
     }
 
     private fun animateView(view: View) {

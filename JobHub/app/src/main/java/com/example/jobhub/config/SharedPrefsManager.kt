@@ -2,6 +2,8 @@ package com.example.jobhub.config
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.example.jobhub.dto.UserDTO
+import com.google.gson.Gson
 
 class SharedPrefsManager(context: Context) {
 
@@ -31,4 +33,22 @@ class SharedPrefsManager(context: Context) {
             .remove("isRemembered")
             .apply()
     }
+
+    var currentUserJson: String?
+        get() = prefs.getString("currentUser", null)
+        set(value) = prefs.edit().putString("currentUser", value).apply()
+
+    fun saveCurrentUser(userJson: String) {
+        currentUserJson = userJson
+    }
+
+    fun getCurrentUser(): UserDTO? {
+        return currentUserJson?.let {
+            Gson().fromJson(it, UserDTO::class.java)
+        }
+    }
+
+    var currentJob: String?
+        get() = prefs.getString("job", null)
+        set(value) = prefs.edit().putString("job", value).apply()
 }

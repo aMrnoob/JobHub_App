@@ -3,7 +3,6 @@ package com.example.jobhub.fragment
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -12,36 +11,38 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.jobhub.activity.VacancyActivity
 import com.example.jobhub.adapter.JobAdapter
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
+import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.MainHomeBinding
 import com.example.jobhub.dto.ItemJobDTO
 import com.example.jobhub.service.JobService
 import com.google.gson.Gson
 
 class HomeFragment : Fragment() {
+    private lateinit var jobAdapter: JobAdapter
+    private lateinit var sharedPrefs: SharedPrefsManager
 
     private var _binding: MainHomeBinding? = null
-    private val binding get() = _binding!!
-
     private var selectedTextView: TextView? = null
+    private var allJobs: MutableList<ItemJobDTO> = mutableListOf()
+    private var jobList: MutableList<ItemJobDTO> = mutableListOf()
+
+    private val binding get() = _binding!!
     private val jobService: JobService by lazy {
         RetrofitClient.createRetrofit().create(JobService::class.java)
     }
-    private var allJobs: MutableList<ItemJobDTO> = mutableListOf()
-    private var jobList: MutableList<ItemJobDTO> = mutableListOf()
-    private lateinit var jobAdapter: JobAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = MainHomeBinding.inflate(inflater, container, false)
+        sharedPrefs = SharedPrefsManager(requireContext())
 
         setupAnimation()
         setupRecyclerView()
@@ -88,8 +89,7 @@ class HomeFragment : Fragment() {
             onItemClick = { selectedJob ->
                 val intent = Intent(requireContext(), VacancyActivity::class.java)
                 val jobJson = Gson().toJson(selectedJob)
-                val sharedPreferences = requireContext().getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
-                sharedPreferences.edit().putString("job", jobJson).apply()
+                sharedPrefs.currentJob = jobJson
                 startActivity(intent)
             }
         )
@@ -102,7 +102,7 @@ class HomeFragment : Fragment() {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun getAllJobs() {
-        val token = getAuthToken() ?: return
+        val token = sharedPrefs.authToken ?: return
 
         ApiHelper().callApi(
             context = requireContext(),
@@ -119,13 +119,6 @@ class HomeFragment : Fragment() {
                 jobAdapter.notifyDataSetChanged()
             }
         )
-    }
-
-    private fun getAuthToken(): String? {
-        return requireContext().getSharedPreferences("JobHubPrefs", AppCompatActivity.MODE_PRIVATE)
-            .getString("authToken", null)
-            ?.trim()
-            ?.takeIf { it.isNotBlank() }
     }
 
     private fun animateView(view: View) {

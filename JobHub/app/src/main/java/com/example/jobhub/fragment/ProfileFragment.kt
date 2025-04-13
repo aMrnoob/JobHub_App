@@ -13,6 +13,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationSet
+import android.view.animation.AnimationUtils
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.jobhub.R
@@ -140,11 +144,28 @@ class ProfileFragment : Fragment() {
 
     private fun toggleSubMenu() {
         if (binding.accountSubMenu.visibility == View.GONE) {
+            val slideUp = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_up)
+            binding.accountSubMenu.startAnimation(slideUp)
             binding.accountSubMenu.visibility = View.VISIBLE
-            binding.btnExpandAccountMenu.setImageResource(R.drawable.icon_arrow_up)
+
+            slideUp.setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationStart(animation: Animation?) { binding.btnExpandAccountMenu.setImageResource(R.drawable.icon_arrow_down) }
+
+                override fun onAnimationRepeat(animation: Animation?) {}
+
+                override fun onAnimationEnd(animation: Animation?) {}
+            })
         } else {
-            binding.accountSubMenu.visibility = View.GONE
-            binding.btnExpandAccountMenu.setImageResource(R.drawable.icon_arrow_down)
+            val slideDown = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_up)
+            binding.accountSubMenu.startAnimation(slideDown)
+
+            slideDown.setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationStart(animation: Animation?) { binding.btnExpandAccountMenu.setImageResource(R.drawable.icon_arrow_right) }
+
+                override fun onAnimationRepeat(animation: Animation?) {}
+
+                override fun onAnimationEnd(animation: Animation?) { binding.accountSubMenu.visibility = View.GONE}
+            })
         }
     }
 
@@ -159,11 +180,21 @@ class ProfileFragment : Fragment() {
     }
 
     private fun showTextDialog(title: String, message: String) {
-        AlertDialog.Builder(requireContext())
+        val dialog = AlertDialog.Builder(requireContext())
             .setTitle(title)
             .setMessage(message)
             .setPositiveButton("Đóng") { dialog, _ -> dialog.dismiss() }
-            .show()
+            .create()
+        dialog.show()
+
+        val textView = dialog.findViewById<TextView>(android.R.id.message)
+        val scaleIn = AnimationUtils.loadAnimation(requireContext(), R.anim.scale_in)
+        val fadeIn = AnimationUtils.loadAnimation(requireContext(), R.anim.fade_in)
+        val animationSet = AnimationSet(true)
+
+        animationSet.addAnimation(scaleIn)
+        animationSet.addAnimation(fadeIn)
+        textView?.startAnimation(animationSet)
     }
 
     private fun logout() {

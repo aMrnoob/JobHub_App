@@ -6,15 +6,14 @@ import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.jobhub.R
 import com.example.jobhub.databinding.ItemJobBinding
 import com.example.jobhub.dto.ItemJobDTO
-import com.example.jobhub.entity.enumm.JobType
 import com.example.jobhub.dto.UserDTO
+import com.example.jobhub.entity.enumm.JobType
 import com.example.jobhub.entity.enumm.Role
 import com.google.gson.Gson
 import java.time.LocalDateTime
