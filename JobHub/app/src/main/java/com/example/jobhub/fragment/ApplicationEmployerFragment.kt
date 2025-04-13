@@ -9,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.jobhub.activity.JobActivity
@@ -20,29 +19,27 @@ import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.MainApplicationEmployerBinding
 import com.example.jobhub.dto.ItemJobDTO
+import com.example.jobhub.entity.enumm.ActionType
 import com.example.jobhub.service.JobService
-import com.google.gson.Gson
 
 class ApplicationEmployerFragment : Fragment() {
 
     private lateinit var jobAdapter: JobAdapter
-    private lateinit var sharedPrefsManager: SharedPrefsManager
+    private lateinit var sharedPrefs: SharedPrefsManager
 
     private var _binding: MainApplicationEmployerBinding? = null
     private var allJobs: MutableList<ItemJobDTO> = mutableListOf()
     private var jobList: MutableList<ItemJobDTO> = mutableListOf()
 
     private val binding get() = _binding!!
-    private val jobService: JobService by lazy {
-        RetrofitClient.createRetrofit().create(JobService::class.java)
-    }
+    private val jobService: JobService by lazy { RetrofitClient.createRetrofit().create(JobService::class.java) }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = MainApplicationEmployerBinding.inflate(inflater, container, false)
-        sharedPrefsManager = SharedPrefsManager(requireContext())
+        sharedPrefs = SharedPrefsManager(requireContext())
 
         setupRecyclerView()
         getAllJobs()
@@ -60,15 +57,22 @@ class ApplicationEmployerFragment : Fragment() {
     private fun setupRecyclerView() {
         jobAdapter = JobAdapter(
             jobList,
-            onItemClick = { },
-            onEditClick = { selectedJob ->
-                val intent = Intent(requireContext(), VacancyActivity::class.java)
-                val jobJson = Gson().toJson(selectedJob)
-                sharedPrefsManager.currentJob = jobJson
-                startActivity(intent)
-            },
-            onDeleteClick = { job ->
-                Toast.makeText(requireContext(), "Delete ${job.jobId}", Toast.LENGTH_SHORT).show()
+            onActionClick = { selectedJob, action ->
+                when (action) {
+                    ActionType.CLICK -> {
+
+                    }
+
+                    ActionType.EDIT -> {
+                        val intent = Intent(requireContext(), VacancyActivity::class.java)
+                        sharedPrefs.saveCurrentJob(selectedJob)
+                        startActivity(intent)
+                    }
+
+                    ActionType.DELETE -> {
+
+                    } else -> {}
+                }
             }
         )
 
@@ -80,20 +84,18 @@ class ApplicationEmployerFragment : Fragment() {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun getAllJobs() {
-        val token = sharedPrefsManager.authToken ?: return
+        val token = sharedPrefs.authToken ?: return
 
         ApiHelper().callApi(
             context = requireContext(),
             call = jobService.getAllJobsByUser("Bearer $token"),
             onSuccess = { response ->
-                jobList.apply {
-                    clear()
-                    response?.let {
-                        addAll(it)
-                        allJobs.clear()
-                        allJobs.addAll(it)
-                    }
-                }
+                allJobs.clear()
+                response?.let { allJobs.addAll(it) }
+
+                jobList.clear()
+                jobList.addAll(allJobs)
+
                 jobAdapter.notifyDataSetChanged()
             }
         )
@@ -117,14 +119,14 @@ class ApplicationEmployerFragment : Fragment() {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                filterCompanies(newText.orEmpty())
+                filterJobs(newText.orEmpty())
                 return true
             }
         })
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private fun filterCompanies(query: String) {
+    private fun filterJobs(query: String) {
         if (query.isEmpty()) {
             jobList.clear()
             jobList.addAll(allJobs)

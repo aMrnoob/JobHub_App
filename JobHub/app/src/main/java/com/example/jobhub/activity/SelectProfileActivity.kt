@@ -274,7 +274,7 @@ class SelectProfileActivity : BaseActivity() {
     }
 
     private fun encodeImageToBase64(): String? {
-        selectedImageUri?.let { uri ->
+        selectedImageUri?.let {
             val bitmap = (bindingProfile.uploadedImageView.drawable as? BitmapDrawable)?.bitmap
             if (bitmap != null) {
                 val outputStream = ByteArrayOutputStream()

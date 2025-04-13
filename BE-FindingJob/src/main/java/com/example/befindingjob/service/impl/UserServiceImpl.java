@@ -160,7 +160,6 @@ public class UserServiceImpl implements UserService {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/M/yyyy");
             LocalDate dateOfBirth = LocalDate.parse(userDTO.getDateOfBirth(), formatter);
             existingUser.setDateOfBirth(dateOfBirth.atStartOfDay());
-            System.out.println(userDTO.getRole());
             existingUser.setPhone(userDTO.getPhone());
 
             if (userDTO.getImageUrl() != null && !userDTO.getImageUrl().isBlank()) {
@@ -171,7 +170,7 @@ public class UserServiceImpl implements UserService {
 
             userRepository.save(existingUser);
             return new ApiResponse<Void>(true, "User updated successfully", null);
-        }).orElseGet(() -> new ApiResponse<>(false, "User not found", null));
+        }).orElseGet(() -> new ApiResponse<>(false, "User updated failed", null));
     }
 
     @Override
@@ -190,21 +189,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ApiResponse<UserDTO> deleteAccountUser(String token) {
-
         if (!jwtService.isValidToken(token)) {
-            return new ApiResponse<>(false, "Invalid or expired token");
+            return new ApiResponse<>(false, "Delete account failed");
         }
 
         int userId = jwtService.extractUserId(token);
 
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
-            return new ApiResponse<>(false, "User not found");
+            return new ApiResponse<>(false, "Delete account failed");
         }
 
         userRepository.deleteById(userId);
-        return new ApiResponse<>(true, "Account deleted successfully");
-
+        return new ApiResponse<>(true, "Delete account successfully");
     }
 
     @Override

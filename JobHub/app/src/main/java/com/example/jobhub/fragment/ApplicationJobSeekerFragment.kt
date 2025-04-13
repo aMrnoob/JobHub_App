@@ -4,22 +4,22 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
+import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.jobhub.activity.VacancyActivity
 import com.example.jobhub.adapter.JobAdapter
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
+import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.MainApplicationJobSeekerBinding
 import com.example.jobhub.dto.ItemJobDTO
 import com.example.jobhub.dto.UserDTO
+import com.example.jobhub.entity.enumm.ActionType
+import com.example.jobhub.entity.enumm.Role
 import com.example.jobhub.service.JobService
 import com.google.gson.Gson
 import java.time.LocalDateTime
@@ -28,29 +28,27 @@ class ApplicationJobSeekerFragment : Fragment() {
 
     private var _binding: MainApplicationJobSeekerBinding? = null
     private val binding get() = _binding!!
+    private lateinit var sharedPrefs: SharedPrefsManager
 
-    private val jobService: JobService by lazy {
-        RetrofitClient.createRetrofit().create(JobService::class.java)
-    }
+    private val jobService: JobService by lazy { RetrofitClient.createRetrofit().create(JobService::class.java) }
 
     private val originalJobs: MutableList<ItemJobDTO> = mutableListOf()
     private val filteredJobs: MutableList<ItemJobDTO> = mutableListOf()
 
     private lateinit var jobAdapter: JobAdapter
     private var userDTO: UserDTO? = null
-    private var currentFilter: String = "all"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = MainApplicationJobSeekerBinding.inflate(inflater, container, false)
+        sharedPrefs = SharedPrefsManager(requireContext())
 
         loadUserFromPrefs()
         setupRecyclerView()
-        setupSearch()
-        setupFilters()
         loadAppliedJobs()
+        setupSearchView()
 
         return binding.root
     }
@@ -64,22 +62,25 @@ class ApplicationJobSeekerFragment : Fragment() {
         }
     }
 
-    private fun getAuthToken(): String? {
-        return activity?.getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
-            ?.getString("authToken", null)
-            ?.trim()
-            ?.takeIf { it.isNotBlank() }
-    }
-
     private fun setupRecyclerView() {
         jobAdapter = JobAdapter(
             filteredJobs,
-            onItemClick = { selectedJob ->
-                val intent = Intent(requireContext(), VacancyActivity::class.java)
-                val jobJson = Gson().toJson(selectedJob)
-                val sharedPreferences = requireContext().getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
-                sharedPreferences.edit().putString("job", jobJson).apply()
-                startActivity(intent)
+            onActionClick = { selectedJob, action ->
+                when (action) {
+                    ActionType.CLICK -> {
+                        val intent = Intent(requireContext(), VacancyActivity::class.java)
+                        sharedPrefs.saveCurrentJob(selectedJob)
+                        startActivity(intent)
+                    }
+
+                    ActionType.BOOKMARK -> {
+
+                    }
+
+                    ActionType.APPLY -> {
+
+                    } else -> {}
+                }
             }
         )
 
@@ -89,94 +90,64 @@ class ApplicationJobSeekerFragment : Fragment() {
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun loadAppliedJobs() {
-        val token = getAuthToken()
-        if (token.isNullOrEmpty()) {
-            Toast.makeText(requireContext(), "Vui lòng đăng nhập để xem ứng dụng của bạn", Toast.LENGTH_LONG).show()
-            return
-        }
-
-        binding.tvName.text = "Đang tải dữ liệu..."
+        val token = sharedPrefs.authToken ?: return
+        val currentRole = sharedPrefs.role
 
         ApiHelper().callApi(
             context = requireContext(),
             call = jobService.getAllJobsByUser("Bearer $token"),
             onSuccess = { response ->
-                binding.tvName.text = "Ứng dụng của bạn"
                 originalJobs.clear()
-                response?.let { originalJobs.addAll(it) }
+                val jobs = response?.let {
+                    if (currentRole == Role.JOB_SEEKER) {
+                        it.filter { job -> job.expirationDate.isAfter(LocalDateTime.now()) }
+                    } else {
+                        it
+                    }
+                } ?: emptyList()
+                originalJobs.addAll(jobs)
 
+                filteredJobs.clear()
+                filteredJobs.addAll(originalJobs)
 
-                filterJobs(currentFilter)
                 jobAdapter.notifyDataSetChanged()
             },
         )
     }
 
-    private fun setupSearch() {
-        binding.edtSearch.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                filterJobs(currentFilter)
+    private fun setupSearchView() {
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
             }
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun onQueryTextChange(newText: String?): Boolean {
+                filterJobs(newText.orEmpty())
+                return true
+            }
         })
-
-        binding.ivSearch.setOnClickListener {
-            hideKeyboard()
-            filterJobs(currentFilter)
-        }
-    }
-
-    private fun setupFilters() {
-        binding.tvAllVacancies.setOnClickListener {
-            currentFilter = "all"
-            filterJobs(currentFilter)
-        }
-
-        binding.tvActive.setOnClickListener {
-            currentFilter = "active"
-            filterJobs(currentFilter)
-        }
-
-        binding.tvInactive.setOnClickListener {
-            currentFilter = "expired"
-            filterJobs(currentFilter)
-        }
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private fun filterJobs(status: String) {
-        val query = binding.edtSearch.text.toString().trim().lowercase()
-
-        val result = originalJobs.filter { job ->
-            val isExpired = job.expirationDate.isBefore(LocalDateTime.now())
-
-            val matchesStatus = when (status) {
-                "active" -> !isExpired
-                "expired" -> isExpired
-                else -> true
-            }
-
-            val matchesSearch = job.title.lowercase().contains(query) ||
-                    job.company.companyName.lowercase().contains(query)
-
-            matchesStatus && matchesSearch
+    private fun filterJobs(query: String) {
+        if (query.isEmpty()) {
+            filteredJobs.clear()
+            filteredJobs.addAll(originalJobs)
+            jobAdapter.notifyDataSetChanged()
+            binding.tvNoResults.visibility = View.GONE
+            return
         }
 
+        val filteredList = originalJobs.filter { job ->
+            job.title.contains(query, ignoreCase = true) || job.location.contains(query, ignoreCase = true)
+        }.toMutableList()
+
         filteredJobs.clear()
-        filteredJobs.addAll(result)
+        filteredJobs.addAll(filteredList)
         jobAdapter.notifyDataSetChanged()
-    }
 
-    private fun hideKeyboard() {
-        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(binding.edtSearch.windowToken, 0)
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+        binding.tvNoResults.visibility = if (filteredList.isEmpty()) View.VISIBLE else View.GONE
     }
 }

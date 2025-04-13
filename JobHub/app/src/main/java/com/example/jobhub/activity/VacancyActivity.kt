@@ -1,27 +1,24 @@
 package com.example.jobhub.activity
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.viewpager2.widget.ViewPager2
 import com.example.jobhub.adapter.FragmentPagerAdapter
-import com.example.jobhub.config.ApiHelper
-import com.example.jobhub.config.RetrofitClient
+import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.ActivityVacancyBinding
-import com.example.jobhub.dto.UserDTO
 import com.example.jobhub.entity.enumm.Role
 import com.example.jobhub.fragment.CompanyJobFragment
 import com.example.jobhub.fragment.JobDetailFragment
 import com.example.jobhub.fragment.RequirementsFragment
 import com.example.jobhub.fragment.fragmentinterface.FragmentInterface
-import com.example.jobhub.service.UserService
 
 class VacancyActivity : BaseActivity(), FragmentInterface {
 
     private lateinit var binding: ActivityVacancyBinding
     private lateinit var fragmentPagerAdapter: FragmentPagerAdapter
+    private lateinit var sharedPrefs: SharedPrefsManager
 
-    private var userDTO: UserDTO? = null
+    private var role: Role? = null
     private var currentPosition = 0
 
     private val fragments = listOf(
@@ -29,19 +26,18 @@ class VacancyActivity : BaseActivity(), FragmentInterface {
         RequirementsFragment(),
         CompanyJobFragment()
     )
-    private val userService: UserService by lazy {
-        RetrofitClient.createRetrofit().create(UserService::class.java)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityVacancyBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        sharedPrefs = SharedPrefsManager(this)
 
         binding.btnComeBack.setOnClickListener { finish() }
         binding.btnEdit.setOnClickListener{ onEditClicked() }
 
-        getAuthToken()?.let { decrypteken(it) } ?: Log.e("VacancyActivity", "Invalid or empty token")
+        role = sharedPrefs.role
+        setupBottomNavigation()
         setupViewPager()
         setupCategorySelection()
     }
@@ -62,33 +58,15 @@ class VacancyActivity : BaseActivity(), FragmentInterface {
     }
 
     private fun updateEditButtonVisibility() {
-        binding.btnEdit.visibility = if (userDTO?.role == Role.EMPLOYER) {
+        binding.btnEdit.visibility = if (role == Role.EMPLOYER) {
             View.VISIBLE
         } else {
             View.GONE
         }
     }
 
-    private fun getAuthToken(): String? {
-        return getSharedPreferences("JobHubPrefs", MODE_PRIVATE)
-            .getString("authToken", null)
-            ?.trim()
-            ?.takeIf { it.isNotBlank() }
-    }
-
-    private fun decrypteken(token: String) {
-        ApiHelper().callApi(
-            context = this,
-            call = userService.getUser("Bearer $token"),
-            onSuccess = {
-                userDTO = it
-                runOnUiThread { setupBottomNavigation() }
-            }
-        )
-    }
-
     private fun setupBottomNavigation() {
-        binding.btnEdit.visibility = if (userDTO?.role == Role.EMPLOYER) {
+        binding.btnEdit.visibility = if (role == Role.EMPLOYER) {
             View.VISIBLE
         } else {
             View.GONE
@@ -128,7 +106,7 @@ class VacancyActivity : BaseActivity(), FragmentInterface {
     }
 
     override fun onEditClicked() {
-        if (userDTO?.role == Role.EMPLOYER) {
+        if (role == Role.EMPLOYER) {
             fragments.forEach { fragment ->
                 when (fragment) {
                     is JobDetailFragment -> fragment.enableEditing()

@@ -3,138 +3,205 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_marginStart="10dp"
     android:layout_marginEnd="10dp"
     android:layout_marginBottom="15dp"
-    android:orientation="horizontal"
-    android:background="@drawable/item_company"
     android:elevation="10dp"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Hình ảnh công việc -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/item_company">
 
-    <!-- Thông tin công việc -->
-    <ImageView
-        android:id="@+id/ivImgJob"
-        android:layout_width="109dp"
-        android:layout_height="108dp"
-        android:layout_weight="2"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:src="@drawable/icon_app" />
+        <ImageView
+            android:id="@+id/ivImgJob"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_weight="2"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:src="@drawable/icon_app" />
+
+        <LinearLayout
+            android:layout_width="290dp"
+            android:layout_height="match_parent"
+            android:layout_weight="7"
+            android:orientation="vertical"
+            android:paddingTop="5dp"
+            android:paddingEnd="20dp"
+            tools:ignore="RtlSymmetry">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="20"
+                    android:text="Title"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    tools:ignore="NestedWeights" />
+
+                <TextView
+                    android:id="@+id/tvStatus"
+                    android:layout_width="0dp"
+                    android:layout_height="25dp"
+                    android:layout_gravity="end"
+                    android:layout_weight="7"
+                    android:background="@drawable/border_status"
+                    android:gravity="center"
+                    android:text="Expired"
+                    android:textColor="@color/green_500"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    tools:ignore="NestedWeights" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvPostExpirationDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Posting date - Expiration date"
+                android:textColor="@color/gray_700"
+                android:textSize="15sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvLocationJobType"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="8"
+                    android:breakStrategy="simple"
+                    android:maxLines="2"
+                    android:text="Location - Job type"
+                    android:textColor="@color/gray_700"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/tvSalary"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="Salary"
+                    android:textColor="@color/blue_500"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
 
     <LinearLayout
-        android:layout_width="290dp"
-        android:layout_height="match_parent"
-        android:layout_weight="7"
-        android:orientation="vertical"
-        android:paddingTop="5dp"
-        android:paddingEnd="20dp"
-        tools:ignore="RtlSymmetry">
+        android:id="@+id/layoutApply"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginHorizontal="40dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/tvTitle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="20"
-                android:text="Title"
-                android:textColor="@color/black"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                tools:ignore="NestedWeights" />
-
-            <TextView
-                android:id="@+id/tvStatus"
-                android:layout_width="0dp"
-                android:layout_height="25dp"
-                android:layout_gravity="end"
-                android:layout_weight="7"
-                android:background="@drawable/border_status"
-                android:gravity="center"
-                android:text="Expired"
-                android:textColor="@color/green_500"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                tools:ignore="NestedWeights" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/tvPostExpirationDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Posting date - Expiration date"
-            android:textColor="@color/gray_700"
-            android:textSize="15sp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
+        <Button
+            android:id="@+id/btnBookmark"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="40dp"
             android:layout_weight="1"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/tvLocationJobType"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="8"
-                android:breakStrategy="simple"
-                android:maxLines="2"
-                android:text="Location - Job type"
-                android:textColor="@color/gray_700"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/tvSalary"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="3"
-                android:gravity="center"
-                android:maxLines="1"
-                android:text="Salary"
-                android:textColor="@color/blue_500"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-        </LinearLayout>
+            android:backgroundTint="#FFC107"
+            android:text="Bookmarks"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/btnApply"
-            android:layout_width="139dp"
-            android:layout_height="38dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="5dp"
-            android:backgroundTint="@color/blue_500"
-            android:padding="5dp"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/green_500"
             android:text="Apply"
             android:textColor="@color/white"
-            android:textSize="13sp"
+            android:textSize="16sp"
             android:textStyle="bold"/>
-
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/layoutActions"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_marginEnd="10dp"
-        android:orientation="vertical">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="40dp"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal">
 
-        <ImageView
-            android:id="@+id/ivEdit"
-            android:layout_width="30dp"
-            android:layout_height="0dp"
+        <LinearLayout
+            android:id="@+id/btnRemove"
+            android:layout_width="0dp"
+            android:layout_height="32dp"
             android:layout_weight="1"
-            android:src="@drawable/icon_edit"/>
+            android:layout_marginEnd="40dp"
+            android:orientation="horizontal"
+            android:background="@drawable/border_btn"
+            android:backgroundTint="@color/red_500">
 
-        <ImageView
-            android:id="@+id/ivRemove"
-            android:layout_width="30dp"
-            android:layout_height="0dp"
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="24dp"
+                android:src="@drawable/icon_remove"
+                android:paddingVertical="5dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="10dp"
+                android:text="Remove"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/btnEdit"
+            android:layout_width="0dp"
+            android:layout_height="32dp"
             android:layout_weight="1"
-            android:src="@drawable/icon_remove"/>
+            android:orientation="horizontal"
+            android:background="@drawable/border_btn"
+            android:backgroundTint="@color/green_500">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="24dp"
+                android:src="@drawable/icon_edit"
+                android:paddingVertical="5dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="10dp"
+                android:text="Edit"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"/>
+        </LinearLayout>
+
+
     </LinearLayout>
+
 </LinearLayout>
+
+

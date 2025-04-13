@@ -6,6 +6,8 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,8 +22,10 @@ import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.MainHomeBinding
 import com.example.jobhub.dto.ItemJobDTO
+import com.example.jobhub.entity.enumm.ActionType
+import com.example.jobhub.entity.enumm.Role
 import com.example.jobhub.service.JobService
-import com.google.gson.Gson
+import java.time.LocalDateTime
 
 class HomeFragment : Fragment() {
     private lateinit var jobAdapter: JobAdapter
@@ -33,9 +37,8 @@ class HomeFragment : Fragment() {
     private var jobList: MutableList<ItemJobDTO> = mutableListOf()
 
     private val binding get() = _binding!!
-    private val jobService: JobService by lazy {
-        RetrofitClient.createRetrofit().create(JobService::class.java)
-    }
+    private val refreshHandler = Handler(Looper.getMainLooper())
+    private val jobService: JobService by lazy { RetrofitClient.createRetrofit().create(JobService::class.java) }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -84,13 +87,38 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
+        val currentRole = sharedPrefs.role
+
         jobAdapter = JobAdapter(
             jobList,
-            onItemClick = { selectedJob ->
-                val intent = Intent(requireContext(), VacancyActivity::class.java)
-                val jobJson = Gson().toJson(selectedJob)
-                sharedPrefs.currentJob = jobJson
-                startActivity(intent)
+            onActionClick = { selectedJob, action ->
+                when (action) {
+                    ActionType.CLICK -> {
+                        if (currentRole == Role.JOB_SEEKER) {
+                            val intent = Intent(requireContext(), VacancyActivity::class.java)
+                            sharedPrefs.saveCurrentJob(selectedJob)
+                            startActivity(intent)
+                        }
+                    }
+
+                    ActionType.BOOKMARK -> {
+
+                    }
+
+                    ActionType.APPLY -> {
+
+                    }
+
+                    ActionType.EDIT -> {
+                        val intent = Intent(requireContext(), VacancyActivity::class.java)
+                        sharedPrefs.saveCurrentJob(selectedJob)
+                        startActivity(intent)
+                    }
+
+                    ActionType.DELETE -> {
+
+                    }
+                }
             }
         )
 
@@ -103,18 +131,25 @@ class HomeFragment : Fragment() {
     @SuppressLint("NotifyDataSetChanged")
     private fun getAllJobs() {
         val token = sharedPrefs.authToken ?: return
+        val currentRole = sharedPrefs.role
 
         ApiHelper().callApi(
             context = requireContext(),
             call = jobService.getAllJobsByUser("Bearer $token"),
             onSuccess = { response ->
-                jobList.apply {
-                    clear()
-                    response?.let {
-                        addAll(it)
-                        allJobs.clear()
-                        allJobs.addAll(it)
+                val jobs = response?.let {
+                    if (currentRole == Role.JOB_SEEKER) {
+                        it.filter { job -> job.expirationDate.isAfter(LocalDateTime.now()) }
+                    } else {
+                        it
                     }
+                } ?: emptyList()
+
+                allJobs.clear()
+                allJobs.addAll(jobs)
+                if (jobList.isEmpty()) {
+                    jobList.clear()
+                    jobList.addAll(allJobs)
                 }
                 jobAdapter.notifyDataSetChanged()
             }
@@ -228,4 +263,21 @@ class HomeFragment : Fragment() {
         "Cybersecurity" to listOf("Security Analyst", "Cybersecurity Engineer", "Ethical Hacker", "Penetration Testing", "Security Consultant", "Network Security", "Information Security", "Vulnerability Assessment", "Security Operations"),
         "DevOps Engineering" to listOf("DevOps Engineer", "Continuous Integration", "Continuous Deployment", "Jenkins", "Docker", "Kubernetes", "Automation", "Infrastructure as Code", "CI/CD")
     )
+
+    private val refreshRunnable = object : Runnable {
+        override fun run() {
+            getAllJobs()
+            refreshHandler.postDelayed(this, 3000)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        refreshHandler.postDelayed(refreshRunnable, 3000)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        refreshHandler.removeCallbacks(refreshRunnable)
+    }
 }

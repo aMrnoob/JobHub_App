@@ -1,7 +1,7 @@
 package com.example.jobhub.activity
 
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
@@ -10,33 +10,33 @@ import android.os.Bundle
 import android.util.Base64
 import android.util.Log
 import android.view.View
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
+import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
+import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.MainEditprofileBinding
 import com.example.jobhub.dto.UserDTO
-import com.example.jobhub.model.ApiResponse
-import com.example.jobhub.service.UserService
 import com.example.jobhub.entity.enumm.Role
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.example.jobhub.service.UserService
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 
-class ProfileActivity : AppCompatActivity() {
+class ProfileActivity : BaseActivity() {
     private lateinit var binding: MainEditprofileBinding
+    private lateinit var sharedPrefs: SharedPrefsManager
+
     private var userId: Int = -1
     private var selectedImageUri: Uri? = null
     private var userRole: Role = Role.UNDEFINED
 
+    private val userService: UserService by lazy { RetrofitClient.createRetrofit().create(UserService::class.java) }
     private val imagePicker = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let {
             selectedImageUri = it
             binding.uploadedImageView.setImageURI(it)
-            binding.iconUploadImage.visibility = View.GONE
+            binding.userAvatar.visibility = View.GONE
             binding.uploadedImageView.visibility = View.VISIBLE
         }
     }
@@ -45,6 +45,7 @@ class ProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = MainEditprofileBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        sharedPrefs = SharedPrefsManager(this)
 
         setupViews()
         fetchUserProfile()
@@ -65,44 +66,34 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun fetchUserProfile() {
-        val token = getSharedPreferences("JobHubPrefs", MODE_PRIVATE).getString("authToken", null)
-        if (token.isNullOrBlank()) return
+        val token = sharedPrefs.authToken ?: return
 
-        RetrofitClient.createRetrofit().create(UserService::class.java)
-            .getUser("Bearer $token")
-            .enqueue(object : Callback<ApiResponse<UserDTO>> {
-                override fun onResponse(call: Call<ApiResponse<UserDTO>>, response: Response<ApiResponse<UserDTO>>) {
-                    response.body()?.data?.let { updateUI(it) }
-                }
-
-                override fun onFailure(call: Call<ApiResponse<UserDTO>>, t: Throwable) {
-                    Log.e("ProfileActivity", "Lỗi API: ${t.message}")
-                }
-            })
+        ApiHelper().callApi(
+            context = this,
+            call = userService.getUser("Bearer $token"),
+            onSuccess = { if (it != null) { updateUI(it) } }
+        )
     }
 
     private fun updateUI(user: UserDTO) {
         userId = user.userId ?: -1
         userRole = user.role
-        binding.edtFullName.setText(user.fullName ?: "")
-        binding.edtEmail.setText(user.email ?: "")
+        binding.edtFullName.setText(user.fullName)
+        binding.edtEmail.setText(user.email)
         binding.edtPhone.setText(user.phone ?: "")
         binding.edtAddress.setText(user.address ?: "")
-        binding.edtDateOfBirth.setText(formatDateForDisplay(user.dateOfBirth ?: ""))
+        binding.edtDateOfBirth.setText(formatDateForDisplay(user.dateOfBirth))
 
         user.imageUrl?.let {
             decodeBase64ToBitmap(it)?.let { bitmap ->
                 binding.uploadedImageView.setImageBitmap(bitmap)
-                binding.iconUploadImage.visibility = View.GONE
+                binding.userAvatar.visibility = View.GONE
                 binding.uploadedImageView.visibility = View.VISIBLE
             }
         }
     }
 
     private fun updateUserProfile() {
-        val token = getSharedPreferences("JobHubPrefs", MODE_PRIVATE).getString("authToken", null)
-        if (token.isNullOrBlank()) return
-
         val user = UserDTO(
             userId = userId,
             fullName = binding.edtFullName.text.toString(),
@@ -114,36 +105,19 @@ class ProfileActivity : AppCompatActivity() {
             role = userRole
         )
 
-        RetrofitClient.createRetrofit().create(UserService::class.java)
-            .updateUser(user)
-            .enqueue(object : Callback<ApiResponse<Void>> {
-                override fun onResponse(call: Call<ApiResponse<Void>>, response: Response<ApiResponse<Void>>) {
-                    if (response.isSuccessful && response.body()?.isSuccess == true) {
-                        Toast.makeText(this@ProfileActivity, "Cập nhật thành công!", Toast.LENGTH_SHORT).show()
+        ApiHelper().callApi(
+            context = this,
+            call = userService.updateUser(user),
+            onSuccess = {
 
-                        val resultIntent = Intent()
-                        resultIntent.putExtra("USERNAME", user.fullName)
-                        resultIntent.putExtra("PROFILE_UPDATED", true)
-                        setResult(RESULT_OK, resultIntent)
-
-                        finish()
-                    } else {
-                        Toast.makeText(this@ProfileActivity, "Cập nhật thất bại!", Toast.LENGTH_SHORT).show()
-                        Log.e("ProfileActivity", "Lỗi cập nhật: ${response.errorBody()?.string()}")
-                    }
-                }
-
-                override fun onFailure(call: Call<ApiResponse<Void>>, t: Throwable) {
-                    Toast.makeText(this@ProfileActivity, "Lỗi kết nối!", Toast.LENGTH_SHORT).show()
-                    Log.e("ProfileActivity", "API thất bại: ${t.message}")
-                }
-            })
+            }
+        )
     }
 
     private fun encodeImageToBase64(): String? {
         val bitmap = (binding.uploadedImageView.drawable as? BitmapDrawable)?.bitmap ?: return null
 
-        val resizedBitmap = resizeImage(bitmap, 512, 512)
+        val resizedBitmap = resizeImage(bitmap)
 
         return ByteArrayOutputStream().apply {
             resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 80, this)
@@ -152,16 +126,16 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
 
-    private fun resizeImage(image: Bitmap, maxWidth: Int, maxHeight: Int): Bitmap {
+    private fun resizeImage(image: Bitmap): Bitmap {
         val width = image.width
         val height = image.height
 
         val ratioBitmap = width.toFloat() / height.toFloat()
-        var newWidth = maxWidth
+        var newWidth = 512
         var newHeight = (newWidth / ratioBitmap).toInt()
 
-        if (newHeight > maxHeight) {
-            newHeight = maxHeight
+        if (newHeight > 512) {
+            newHeight = 512
             newWidth = (newHeight * ratioBitmap).toInt()
         }
 
@@ -204,6 +178,7 @@ class ProfileActivity : AppCompatActivity() {
                 (selectedImageUri != null || binding.uploadedImageView.drawable != null)
     }
 
+    @SuppressLint("DefaultLocale")
     private fun showDatePicker() {
         val cal = Calendar.getInstance()
         binding.edtDateOfBirth.text.toString().takeIf { it.isNotEmpty() }?.let {

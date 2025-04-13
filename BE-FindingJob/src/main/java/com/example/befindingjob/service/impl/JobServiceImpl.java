@@ -5,6 +5,7 @@ import com.example.befindingjob.dto.JobDTO;
 import com.example.befindingjob.entity.Company;
 import com.example.befindingjob.entity.Job;
 import com.example.befindingjob.entity.User;
+import com.example.befindingjob.entity.enumm.Role;
 import com.example.befindingjob.mapper.JobMapper;
 import com.example.befindingjob.model.ApiResponse;
 import com.example.befindingjob.repository.CompanyRepository;
@@ -86,10 +87,22 @@ public class JobServiceImpl implements JobService {
             return new ApiResponse<>(false, "", null);
         }
 
-        List<ItemJobDTO> jobs = userOpt.get().getCompanies().stream()
-                .flatMap(company -> jobRepository.findByCompany(company).stream())
-                .map(ItemJobDTO::new)
-                .collect(Collectors.toList());
+        User user = userOpt.get();
+        Role role = user.getRole();
+        List<ItemJobDTO> jobs;
+
+        if (role == Role.EMPLOYER) {
+            jobs = user.getCompanies().stream()
+                    .flatMap(company -> jobRepository.findByCompany(company).stream())
+                    .map(ItemJobDTO::new)
+                    .collect(Collectors.toList());
+        } else if (role == Role.JOB_SEEKER) {
+            jobs = jobRepository.findAll().stream()
+                    .map(ItemJobDTO::new)
+                    .collect(Collectors.toList());
+        } else {
+            return new ApiResponse<>(false, "User role not supported", null);
+        }
 
         return new ApiResponse<>(true, "", jobs);
     }

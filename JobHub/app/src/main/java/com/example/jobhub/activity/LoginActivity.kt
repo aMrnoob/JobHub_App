@@ -102,7 +102,7 @@ class LoginActivity : BaseActivity() {
                     sharedPrefs.password = password
                     sharedPrefs.isRemembered = true
                 } else {
-                    sharedPrefs.clearRememberedCredentials()
+                    sharedPrefs.clearRemembered()
                 }
                 login(email, password)
             }
@@ -158,7 +158,7 @@ class LoginActivity : BaseActivity() {
             call = apiService.sendGoogleToken(request),
             onSuccess = { apiResponse ->
                 apiResponse?.let {
-                    saveToken(it.token)
+                    sharedPrefs.authToken = it.token
                     startActivity(Intent(this, SelectProfileActivity::class.java))
                     finish()
                 }
@@ -173,9 +173,13 @@ class LoginActivity : BaseActivity() {
             onStart = { binding.progressBar.visibility = View.VISIBLE },
             onComplete = { binding.progressBar.visibility = View.GONE },
             onSuccess = { loginResponse ->
-                loginResponse?.token?.let { saveToken(it) }
-                navigateToNextScreen(loginResponse?.role)
-                finish()
+                loginResponse?.let {
+                    sharedPrefs.authToken = it.token
+                    sharedPrefs.role = it.role
+                    sharedPrefs.fullName = it.fullName
+                    navigateToNextScreen(it.role)
+                    finish()
+                }
             }
         )
     }
@@ -197,8 +201,6 @@ class LoginActivity : BaseActivity() {
         }
         nextActivity?.let { startActivity(Intent(this, it)) }
     }
-
-    private fun saveToken(token: String) { sharedPrefs.authToken = token }
 
     private fun togglePasswordVisibility() {
         val (inputType, iconRes) = if (isPasswordVisible) {

@@ -11,30 +11,26 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.jobhub.adapter.SkillAdapter
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
+import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.MainRequirementsBinding
 import com.example.jobhub.dto.ItemJobDTO
 import com.example.jobhub.dto.SkillDTO
 import com.example.jobhub.entity.Job
 import com.example.jobhub.fragment.fragmentinterface.FragmentInterface
 import com.example.jobhub.service.SkillService
-import com.google.gson.Gson
 
 class RequirementsFragment : Fragment() {
 
+    private lateinit var sharedPrefs: SharedPrefsManager
+
     private var _binding: MainRequirementsBinding? = null
-    private val binding get() = _binding!!
     private var itemJobDTO: ItemJobDTO? = null
     private var jobRequirementsInterface: FragmentInterface? = null
-    private lateinit var skillAdapter: SkillAdapter
+    private var skillAdapter: SkillAdapter? = null
+
+    private val binding get() = _binding ?: throw IllegalStateException("Binding is null")
     private val skillService: SkillService by lazy {
         RetrofitClient.createRetrofit().create(SkillService::class.java)
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (context is FragmentInterface) {
-            jobRequirementsInterface = context
-        }
     }
 
     override fun onCreateView(
@@ -42,13 +38,9 @@ class RequirementsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = MainRequirementsBinding.inflate(inflater, container, false)
+        sharedPrefs = SharedPrefsManager(requireContext())
 
-        val sharedPreferences = requireContext().getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
-        val jobJson = sharedPreferences.getString("job", null)
-
-        if (!jobJson.isNullOrEmpty()) {
-            itemJobDTO = Gson().fromJson(jobJson, ItemJobDTO::class.java)
-        }
+        itemJobDTO = sharedPrefs.getCurrentJob()
 
         setupRecyclerView()
         setEditTextEnabled(false)
@@ -64,7 +56,7 @@ class RequirementsFragment : Fragment() {
     @SuppressLint("NotifyDataSetChanged")
     fun enableEditing() {
         setEditTextEnabled(true)
-        skillAdapter.notifyDataSetChanged()
+        skillAdapter?.notifyDataSetChanged()
     }
 
     private fun setupRecyclerView() {
@@ -77,17 +69,19 @@ class RequirementsFragment : Fragment() {
         binding.tvAddSkill.setOnClickListener {
             val newSkill = SkillDTO(
                 skillName = "",
-                skillId = skillAdapter.itemCount + 1
+                skillId = skillAdapter!!.itemCount + 1
             )
 
-            skillAdapter.addSkill(newSkill)
+            skillAdapter!!.addSkill(newSkill)
         }
     }
 
     private fun setEditTextEnabled(enabled: Boolean) {
-        skillAdapter.setEditable(enabled)
-        binding.tvAddSkill.isEnabled = enabled
-        binding.btnUpdate.isEnabled = enabled
+        _binding?.let { binding ->
+            skillAdapter?.setEditable(enabled)
+            binding.tvAddSkill.isEnabled = enabled
+            binding.btnUpdate.isEnabled = enabled
+        }
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -98,21 +92,22 @@ class RequirementsFragment : Fragment() {
         }
 
         job.jobId = itemJobDTO!!.jobId
-        job.requiredSkills = skillAdapter.getSkills().toSet()
+        job.requiredSkills = skillAdapter?.getSkills()?.toSet()
 
         ApiHelper().callApi(
             context = requireContext(),
             call = skillService.updateSkills(job.jobId, job.requiredSkills!!),
             onSuccess = {
-                itemJobDTO?.requiredSkills = skillAdapter.getSkillsDTO().toSet()
-                saveJobToPrefs()
+                itemJobDTO?.requiredSkills = skillAdapter?.getSkillsDTO()?.toSet()!!
+                sharedPrefs.saveCurrentJob(itemJobDTO!!)
             }
         )
     }
 
-    private fun saveJobToPrefs() {
-        val sharedPreferences = requireContext().getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
-        val jobJson = Gson().toJson(itemJobDTO)
-        sharedPreferences.edit().putString("job", jobJson).apply()
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is FragmentInterface) {
+            jobRequirementsInterface = context
+        }
     }
 }

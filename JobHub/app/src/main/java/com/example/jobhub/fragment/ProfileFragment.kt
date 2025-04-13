@@ -1,10 +1,9 @@
 package com.example.jobhub.fragment
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
@@ -17,24 +16,22 @@ import android.view.animation.Animation
 import android.view.animation.AnimationSet
 import android.view.animation.AnimationUtils
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.jobhub.R
 import com.example.jobhub.activity.LoginActivity
 import com.example.jobhub.activity.ProfileActivity
+import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
+import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.MainProfileBinding
 import com.example.jobhub.dto.UserDTO
-import com.example.jobhub.model.ApiResponse
 import com.example.jobhub.service.UserService
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class ProfileFragment : Fragment() {
     private lateinit var binding: MainProfileBinding
-    private var userId: Int = -1
-    private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var sharedPrefs: SharedPrefsManager
+
+    private val userService: UserService by lazy { RetrofitClient.createRetrofit().create(UserService::class.java) }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,8 +43,7 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        sharedPreferences = requireContext().getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
+        sharedPrefs = SharedPrefsManager(requireContext())
 
         fetchUserProfile()
 
@@ -57,27 +53,26 @@ class ProfileFragment : Fragment() {
 
         binding.updateProfile.setOnClickListener {
             val intent = Intent(requireContext(), ProfileActivity::class.java)
-            intent.putExtra("userId", userId)
             startActivityForResult(intent, UPDATE_PROFILE_REQUEST)
         }
 
         binding.deleteAccount.setOnClickListener {
             AlertDialog.Builder(requireContext())
-                .setTitle("Xác nhận xóa tài khoản")
-                .setMessage("Bạn có chắc chắn muốn xóa tài khoản không? Hành động này không thể hoàn tác!")
-                .setPositiveButton("Xóa") { _, _ -> deleteAccount() }
-                .setNegativeButton("Hủy", null)
+                .setTitle("Delete account")
+                .setMessage("Are you sure to delete account? This action cannot be undone.")
+                .setPositiveButton("Delete") { _, _ -> deleteAccount() }
+                .setNegativeButton("Cancel", null)
                 .show()
         }
 
         binding.termsOfService.setOnClickListener {
             val content = readTextFileFromRaw(R.raw.terms)
-            showTextDialog("Điều khoản sử dụng", content)
+            showTextDialog("Terms of use", content)
         }
 
         binding.privacyPolicy.setOnClickListener {
             val content = readTextFileFromRaw(R.raw.privacy_policy)
-            showTextDialog("Chính sách bảo mật", content)
+            showTextDialog("Privacy policy", content)
         }
 
         binding.btnLogout.setOnClickListener {
@@ -85,39 +80,17 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        fetchUserProfile()
-    }
-
     private fun fetchUserProfile() {
-        val token = sharedPreferences.getString("authToken", null)
+        val token = sharedPrefs.authToken ?: return
 
-        if (token.isNullOrBlank()) {
-            Log.e("ProfileFragment", "Token không hợp lệ")
-            return
-        }
-
-        val apiService = RetrofitClient.createRetrofit().create(UserService::class.java)
-        apiService.getUser("Bearer $token").enqueue(object :
-            Callback<ApiResponse<UserDTO>> {
-            override fun onResponse(call: Call<ApiResponse<UserDTO>>, response: Response<ApiResponse<UserDTO>>) {
-                if (response.isSuccessful) {
-                    response.body()?.data?.let { userInfo ->
-                        userId = userInfo.userId ?: -1
-                        updateUI(userInfo)
-                    }
-                } else {
-                    Log.e("ProfileFragment", "Lỗi khi lấy thông tin user: ${response.errorBody()?.string()}")
-                }
-            }
-
-            override fun onFailure(call: Call<ApiResponse<UserDTO>>, t: Throwable) {
-                Log.e("ProfileFragment", "API call thất bại: ${t.message}")
-            }
-        })
+        ApiHelper().callApi(
+            context = requireContext(),
+            call = userService.getUser("Bearer $token"),
+            onSuccess = { if (it != null) { updateUI(it) } }
+        )
     }
 
+    @SuppressLint("SetTextI18n")
     private fun updateUI(userInfo: UserDTO) {
         binding.userName.text = userInfo.fullName
         binding.welcomeText.text = "Hi, ${userInfo.fullName}"
@@ -198,9 +171,7 @@ class ProfileFragment : Fragment() {
     }
 
     private fun logout() {
-        val editor = sharedPreferences.edit()
-        editor.remove("authToken")
-        editor.apply()
+        sharedPrefs.clearAuthToken()
 
         val intent = Intent(requireContext(), LoginActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -209,23 +180,13 @@ class ProfileFragment : Fragment() {
     }
 
     private fun deleteAccount() {
-        val token = sharedPreferences.getString("authToken", null) ?: return
+        val token = sharedPrefs.authToken ?: return
 
-        val apiService = RetrofitClient.createRetrofit().create(UserService::class.java)
-        apiService.deleteAccount("Bearer $token").enqueue(object : Callback<ApiResponse<UserDTO>> {
-            override fun onResponse(call: Call<ApiResponse<UserDTO>>, response: Response<ApiResponse<UserDTO>>) {
-                if (response.isSuccessful && response.body()?.isSuccess == true) {
-                    Toast.makeText(requireContext(), "Xóa tài khoản thành công!", Toast.LENGTH_SHORT).show()
-                    logout()
-                } else {
-                    Toast.makeText(requireContext(), "Xóa tài khoản thất bại!", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onFailure(call: Call<ApiResponse<UserDTO>>, t: Throwable) {
-                Toast.makeText(requireContext(), "Lỗi kết nối: ${t.message}", Toast.LENGTH_SHORT).show()
-            }
-        })
+        ApiHelper().callApi(
+            context = requireContext(),
+            call = userService.deleteAccount("Bearer $token"),
+            onSuccess = {}
+        )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -242,6 +203,11 @@ class ProfileFragment : Fragment() {
                 binding.userAvatar.setImageBitmap(decodedBitmap)
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        fetchUserProfile()
     }
 
     companion object {

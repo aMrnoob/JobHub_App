@@ -1,14 +1,33 @@
 package com.example.jobhub.config
 
 import android.content.Context
-import android.content.SharedPreferences
-import com.example.jobhub.dto.UserDTO
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
+import com.example.jobhub.dto.ItemJobDTO
+import com.example.jobhub.entity.enumm.Role
 import com.google.gson.Gson
 
 class SharedPrefsManager(context: Context) {
 
-    private val prefs: SharedPreferences =
-        context.getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
+    private val masterKey = MasterKey.Builder(context)
+        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+        .build()
+
+    private val prefs = EncryptedSharedPreferences.create(
+        context,
+        "JobHubPrefs",
+        masterKey,
+        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+    )
+
+    var role: Role?
+        get() = prefs.getString("role", null)?.let { Role.valueOf(it) }
+        set(value) = prefs.edit().putString("role", value?.name).apply()
+
+    var fullName: String?
+        get() = prefs.getString("full_name", null)
+        set(value) = prefs.edit().putString("full_name", value).apply()
 
     var email: String?
         get() = prefs.getString("email", "")
@@ -22,11 +41,7 @@ class SharedPrefsManager(context: Context) {
         get() = prefs.getBoolean("isRemembered", false)
         set(value) = prefs.edit().putBoolean("isRemembered", value).apply()
 
-    var authToken: String?
-        get() = prefs.getString("authToken", null)
-        set(value) = prefs.edit().putString("authToken", value).apply()
-
-    fun clearRememberedCredentials() {
+    fun clearRemembered() {
         prefs.edit()
             .remove("email")
             .remove("password")
@@ -34,21 +49,26 @@ class SharedPrefsManager(context: Context) {
             .apply()
     }
 
-    var currentUserJson: String?
-        get() = prefs.getString("currentUser", null)
-        set(value) = prefs.edit().putString("currentUser", value).apply()
+    var authToken: String?
+        get() = prefs.getString("authToken", null)
+        set(value) = prefs.edit().putString("authToken", value).apply()
 
-    fun saveCurrentUser(userJson: String) {
-        currentUserJson = userJson
+    fun clearAuthToken() {
+        prefs.edit().remove("authToken").apply()
     }
 
-    fun getCurrentUser(): UserDTO? {
-        return currentUserJson?.let {
-            Gson().fromJson(it, UserDTO::class.java)
-        }
-    }
-
-    var currentJob: String?
+    private var currentJob: String?
         get() = prefs.getString("job", null)
         set(value) = prefs.edit().putString("job", value).apply()
+
+    fun saveCurrentJob(itemJobDTO: ItemJobDTO) {
+        val jobJson = Gson().toJson(itemJobDTO)
+        currentJob = jobJson
+    }
+
+    fun getCurrentJob(): ItemJobDTO? {
+        return currentJob?.let {
+            Gson().fromJson(it, ItemJobDTO::class.java)
+        }
+    }
 }
