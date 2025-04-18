@@ -42,6 +42,9 @@ public class Application {
     @Column(columnDefinition = "TEXT")
     private String coverLetter;
 
+    @Column(name = "cv_url")
+    private String cvUrl;
+
     @JsonIgnore
     @OneToOne(mappedBy = "application", cascade = CascadeType.ALL, orphanRemoval = true)
     private Resume resume;
