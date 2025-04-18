@@ -18,4 +18,3 @@ fun ItemCompanyDTO.toCompany(): Company {
         logoUrl = this.logoUrl
     )
 }
-
