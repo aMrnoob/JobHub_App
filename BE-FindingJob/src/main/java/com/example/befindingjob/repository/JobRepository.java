@@ -15,5 +15,6 @@ import java.util.Optional;
 public interface JobRepository extends JpaRepository<Job, Integer> {
     List<Job> findByCompany(Company company);
 
-    List<Job> findByCompanyUserId(Integer userId);
+    @Query("SELECT j FROM Job j WHERE j.company.user.userId = :userId")
+    List<Job> findByEmployerId(@Param("userId") Integer userId);
 }

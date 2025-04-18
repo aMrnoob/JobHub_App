@@ -1,5 +1,6 @@
 package com.example.befindingjob.service.impl;
 
+import com.example.befindingjob.config.FileStorageProperties;
 import com.example.befindingjob.dto.*;
 import com.example.befindingjob.entity.Application;
 import com.example.befindingjob.entity.Job;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -40,6 +42,9 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Autowired
     private ResumeRepository resumeRepository;
+
+    @Autowired
+    private FileStorageProperties fileStorageProperties;
 
     @Autowired
     private JwtService jwtService;
@@ -70,13 +75,11 @@ public class ApplicationServiceImpl implements ApplicationService {
             application.setUser(user);
             application.setJob(job);
             application.setCoverLetter(applicationDTO.getCoverLetter());
-            application.setStatus(applicationDTO.getStatus() != null ? applicationDTO.getStatus() : ApplicationStatus.APPLIED);
+            application.setStatus(Optional.ofNullable(applicationDTO.getStatus()).orElse(ApplicationStatus.APPLIED));
             application.setApplicationDate(LocalDateTime.now());
 
-            Application savedApplication = applicationRepository.save(application);
-
-            ApplicationDTO responseDTO = convertToDTO(savedApplication);
-            return new ApiResponse<>(true, "Application submitted successfully", responseDTO);
+            Application saved = applicationRepository.save(application);
+            return new ApiResponse<>(true, "Application submitted successfully", convertToDTO(saved));
         } catch (Exception e) {
             return new ApiResponse<>(false, "Failed to submit application: " + e.getMessage(), null);
         }
@@ -89,17 +92,17 @@ public class ApplicationServiceImpl implements ApplicationService {
                 return new ApiResponse<>(false, "Invalid token", null);
             }
 
-            Path uploadPath = Paths.get(resumeUploadPath);
+            Path uploadPath = Paths.get(fileStorageProperties.getUploadDir());
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
 
             String originalFilename = file.getOriginalFilename();
-            String fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
-            String filename = UUID.randomUUID().toString() + fileExtension;
+            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            String filename = UUID.randomUUID() + extension;
 
             Path filePath = uploadPath.resolve(filename);
-            Files.copy(file.getInputStream(), filePath);
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
             String resumeUrl = "/uploads/resumes/" + filename;
             return new ApiResponse<>(true, "Resume uploaded successfully", resumeUrl);
@@ -124,17 +127,16 @@ public class ApplicationServiceImpl implements ApplicationService {
             resume.setCreatedAt(LocalDateTime.now());
             resume.setUpdatedAt(LocalDateTime.now());
 
-            Resume savedResume = resumeRepository.save(resume);
-
-            ResumeDTO responseDTO = new ResumeDTO(
-                    savedResume.getResumeId(),
-                    savedResume.getApplication().getApplicationId(),
-                    savedResume.getResumeUrl(),
-                    savedResume.getCreatedAt(),
-                    savedResume.getUpdatedAt()
+            Resume saved = resumeRepository.save(resume);
+            ResumeDTO response = new ResumeDTO(
+                    saved.getResumeId(),
+                    saved.getApplication().getApplicationId(),
+                    saved.getResumeUrl(),
+                    saved.getCreatedAt(),
+                    saved.getUpdatedAt()
             );
 
-            return new ApiResponse<>(true, "Resume saved successfully", responseDTO);
+            return new ApiResponse<>(true, "Resume saved successfully", response);
         } catch (Exception e) {
             return new ApiResponse<>(false, "Failed to save resume: " + e.getMessage(), null);
         }
@@ -173,7 +175,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                 return new ApiResponse<>(false, "Only employers can access this resource", null);
             }
 
-            List<Job> employerJobs = jobRepository.findByCompanyUserId(employerId);
+            List<Job> employerJobs = jobRepository.findByEmployerId(employerId);
             if (employerJobs.isEmpty()) {
                 return new ApiResponse<>(true, "No job postings found for this employer", new ArrayList<>());
             }
@@ -383,7 +385,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                 return new ApiResponse<>(false, "You can only access your own employer stats", null);
             }
 
-            List<Job> employerJobs = jobRepository.findByCompanyUserId(employerId);
+            List<Job> employerJobs = jobRepository.findByEmployerId(employerId);
             if (employerJobs.isEmpty()) {
                 Map<String, Integer> emptyStats = new HashMap<>();
                 emptyStats.put("APPLIED", 0);
@@ -457,10 +459,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                 job.getExperienceRequired(),
                 job.getExpirationDate(),
                 companyDTO,
-                job.getRequiredSkills().stream()
-                        .map(SkillDTO::new)
-                        .collect(Collectors.toList())
+                job.getRequiredSkills().stream().map(SkillDTO::new).collect(Collectors.toList())
         );
     }
-
 }
