@@ -17,17 +17,14 @@ public class CompanyController {
     private CompanyService companyService;
 
     @PostMapping("/add-company")
-    public ApiResponse<Void> addCompany(@RequestBody CompanyDTO companyDTO) {
-        return companyService.addCompany(companyDTO);
-    }
-
-    @PostMapping("/get-all-companies-by-userId")
-    public ApiResponse<List<Company>> getAllCompaniesByUserId(@RequestHeader("token") String token) {
-        return companyService.getAllCompaniesByUserId(token);
-    }
+    public ApiResponse<Void> addCompany(@RequestBody CompanyDTO companyDTO) { return companyService.addCompany(companyDTO);}
 
     @PostMapping("/update-company")
-    public ApiResponse<Void> updateCompany(@RequestBody Company company) {
-        return companyService.updateCompany(company);
-    }
+    public ApiResponse<Void> updateCompany(@RequestBody CompanyDTO companyDTO) {return companyService.updateCompany(companyDTO);}
+
+    @PostMapping("/delete-company")
+    public ApiResponse<Void> deleteCompany(@RequestBody int companyId) {return companyService.deleteCompany(companyId);}
+
+    @PostMapping("/get-all-companies-by-userId")
+    public ApiResponse<List<Company>> getAllCompaniesByUserId(@RequestHeader("token") String token) {return companyService.getAllCompaniesByUserId(token);}
 }

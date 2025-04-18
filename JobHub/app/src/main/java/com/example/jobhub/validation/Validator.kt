@@ -42,7 +42,7 @@ fun validateTitle(title: String): ValidationResult {
         return ValidationResult.Error("Title must be between 8 and 27 characters long")
     }
 
-    if (!title.any { it.isDigit() }) {
+    if (title.any { it.isDigit() }) {
         return ValidationResult.Error("Title must not contain digit")
     }
 
@@ -68,7 +68,7 @@ fun validateCompanyName(companyName: String): ValidationResult {
         return ValidationResult.Error("Company name must be between 8 and 30 characters long")
     }
 
-    if (!companyName.any { it.isDigit() }) {
+    if (companyName.any { it.isDigit() }) {
         return ValidationResult.Error("Company name must not contain digit")
     }
 

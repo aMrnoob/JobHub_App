@@ -3,6 +3,7 @@ package com.example.jobhub.fragment
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -15,6 +16,7 @@ import android.widget.SearchView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.jobhub.R
 import com.example.jobhub.activity.VacancyActivity
 import com.example.jobhub.adapter.JobAdapter
 import com.example.jobhub.config.ApiHelper
@@ -22,7 +24,7 @@ import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.MainHomeBinding
 import com.example.jobhub.dto.ItemJobDTO
-import com.example.jobhub.entity.enumm.ActionType
+import com.example.jobhub.entity.enumm.JobAction
 import com.example.jobhub.entity.enumm.Role
 import com.example.jobhub.service.JobService
 import java.time.LocalDateTime
@@ -35,9 +37,9 @@ class HomeFragment : Fragment() {
     private var selectedTextView: TextView? = null
     private var allJobs: MutableList<ItemJobDTO> = mutableListOf()
     private var jobList: MutableList<ItemJobDTO> = mutableListOf()
+    private var isFragmentVisible = false
 
     private val binding get() = _binding!!
-    private val refreshHandler = Handler(Looper.getMainLooper())
     private val jobService: JobService by lazy { RetrofitClient.createRetrofit().create(JobService::class.java) }
 
     override fun onCreateView(
@@ -46,6 +48,7 @@ class HomeFragment : Fragment() {
     ): View {
         _binding = MainHomeBinding.inflate(inflater, container, false)
         sharedPrefs = SharedPrefsManager(requireContext())
+        refreshHandler.post(refreshRunnable)
 
         setupAnimation()
         setupRecyclerView()
@@ -91,33 +94,31 @@ class HomeFragment : Fragment() {
 
         jobAdapter = JobAdapter(
             jobList,
-            onActionClick = { selectedJob, action ->
+            onActionClick = { job, action ->
                 when (action) {
-                    ActionType.CLICK -> {
+                    JobAction.CLICK -> {
                         if (currentRole == Role.JOB_SEEKER) {
                             val intent = Intent(requireContext(), VacancyActivity::class.java)
-                            sharedPrefs.saveCurrentJob(selectedJob)
+                            sharedPrefs.saveCurrentJob(job)
                             startActivity(intent)
                         }
                     }
 
-                    ActionType.BOOKMARK -> {
+                    JobAction.BOOKMARK -> {
 
                     }
 
-                    ActionType.APPLY -> {
+                    JobAction.APPLY -> {
 
                     }
 
-                    ActionType.EDIT -> {
+                    JobAction.EDIT -> {
                         val intent = Intent(requireContext(), VacancyActivity::class.java)
-                        sharedPrefs.saveCurrentJob(selectedJob)
+                        sharedPrefs.saveCurrentJob(job)
                         startActivity(intent)
                     }
 
-                    ActionType.DELETE -> {
-
-                    }
+                    JobAction.DELETE -> { deleteJob(job.jobId) }
                 }
             }
         )
@@ -147,13 +148,35 @@ class HomeFragment : Fragment() {
 
                 allJobs.clear()
                 allJobs.addAll(jobs)
-                if (jobList.isEmpty()) {
+                if (binding.searchView.query.isNullOrEmpty()) {
                     jobList.clear()
                     jobList.addAll(allJobs)
                 }
                 jobAdapter.notifyDataSetChanged()
             }
         )
+    }
+
+    private fun deleteJob(jobId: Int) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_confirm_delete, null)
+        val dialogBuilder = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .setCancelable(false)
+
+        val btnYes = dialogView.findViewById<TextView>(R.id.btnYes)
+        val btnNo = dialogView.findViewById<TextView>(R.id.btnNo)
+        val alertDialog = dialogBuilder.create()
+
+        btnYes.setOnClickListener {
+            ApiHelper().callApi(
+                context = requireContext(),
+                call = jobService.deleteJob(jobId),
+                onSuccess = { alertDialog.dismiss() }
+            )
+        }
+
+        btnNo.setOnClickListener { alertDialog.dismiss() }
+        alertDialog.show()
     }
 
     private fun animateView(view: View) {
@@ -264,20 +287,23 @@ class HomeFragment : Fragment() {
         "DevOps Engineering" to listOf("DevOps Engineer", "Continuous Integration", "Continuous Deployment", "Jenkins", "Docker", "Kubernetes", "Automation", "Infrastructure as Code", "CI/CD")
     )
 
+    private val refreshHandler = Handler(Looper.getMainLooper())
     private val refreshRunnable = object : Runnable {
         override fun run() {
-            getAllJobs()
-            refreshHandler.postDelayed(this, 3000)
+            if (isFragmentVisible && binding.searchView.query.isNullOrEmpty()) { getAllJobs() }
+            refreshHandler.postDelayed(this, 10000)
         }
     }
 
     override fun onResume() {
         super.onResume()
-        refreshHandler.postDelayed(refreshRunnable, 3000)
+        isFragmentVisible = true
+        refreshHandler.post(refreshRunnable)
     }
 
     override fun onPause() {
         super.onPause()
+        isFragmentVisible = false
         refreshHandler.removeCallbacks(refreshRunnable)
     }
 }

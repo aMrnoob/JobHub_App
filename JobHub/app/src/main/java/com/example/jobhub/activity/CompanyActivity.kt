@@ -1,37 +1,44 @@
 package com.example.jobhub.activity
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
+import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.ActivityCompanyBinding
 import com.example.jobhub.dto.CompanyDTO
-import com.example.jobhub.dto.UserDTO
+import com.example.jobhub.entity.Company
 import com.example.jobhub.service.CompanyService
-import com.example.jobhub.service.UserService
 import com.example.jobhub.validation.ValidationResult
 import com.example.jobhub.validation.validateCompanyName
 
 class CompanyActivity : BaseActivity() {
 
     private lateinit var binding: ActivityCompanyBinding
-    private val companyService: CompanyService by lazy {
-        RetrofitClient.createRetrofit().create(CompanyService::class.java)
-    }
-    private val userService: UserService by lazy {
-        RetrofitClient.createRetrofit().create(UserService::class.java)
-    }
+    private lateinit var sharedPrefs: SharedPrefsManager
 
-    private var userDTO: UserDTO? = null
+    private val companyService: CompanyService by lazy { RetrofitClient.createRetrofit().create(CompanyService::class.java) }
 
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityCompanyBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        sharedPrefs = SharedPrefsManager(this)
 
-        getAuthToken()?.let { decryptoken(it) } ?: Log.e("MainActivity", "Invalid or empty token")
+        val company = intent.getParcelableExtra<Company>("company")
+
+        if (company != null) {
+            binding.edtCompanyName.setText(company.companyName)
+            binding.edtAddress.setText(company.address)
+            binding.edtLogoUrl.setText(company.logoUrl)
+            binding.edtWebsite.setText(company.website)
+            binding.edtDescription.setText(company.description)
+            binding.btnAdd.text = "Update"
+            binding.tvCompany.text = "Edit company"
+        }
 
         binding.btnAdd.setOnClickListener {
             val companyName = binding.edtCompanyName.text.toString()
@@ -41,50 +48,48 @@ class CompanyActivity : BaseActivity() {
             val description = binding.edtDescription.text.toString()
 
             if (!validateField(validateCompanyName(companyName))) return@setOnClickListener
-
             if (!isValidInput(address, description, logoUrl, website)) {
                 Toast.makeText(this, "Please fill in the information completely!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
-            } else {
-                val companyDTO = CompanyDTO(null, companyName, description, address, logoUrl, website, userDTO?.userId)
+            }
 
+            val companyDTO = CompanyDTO(
+                company?.companyId,
+                companyName,
+                description,
+                address,
+                logoUrl,
+                website,
+                sharedPrefs.userId,
+            )
+            Log.e("userId", sharedPrefs.userId.toString())
+            if (company == null) {
                 addCompany(companyDTO)
+            } else {
+                updateCompany(companyDTO)
             }
         }
 
-        binding.btnComeBack.setOnClickListener {
-            finish()
-        }
+        binding.btnComeBack.setOnClickListener { finish() }
     }
 
     private fun addCompany(companyDTO: CompanyDTO) {
         ApiHelper().callApi(
             context = this,
             call = companyService.addCompany(companyDTO),
-            onSuccess = { }
+            onSuccess = { finish() }
         )
     }
 
-    private fun getAuthToken(): String? {
-        return getSharedPreferences("JobHubPrefs", MODE_PRIVATE)
-            .getString("authToken", null)
-            ?.trim()
-            ?.takeIf { it.isNotBlank() }
-    }
-
-    private fun decryptoken(token: String) {
+    private fun updateCompany(companyDTO: CompanyDTO) {
         ApiHelper().callApi(
             context = this,
-            call = userService.getUser("Bearer $token"),
-            onSuccess = {
-                userDTO = it
-            }
+            call = companyService.updateCompany(companyDTO),
+            onSuccess = { finish() }
         )
     }
 
-    private fun isValidInput(vararg fields: String): Boolean {
-        return fields.all { it.isNotBlank() }
-    }
+    private fun isValidInput(vararg fields: String): Boolean { return fields.all { it.isNotBlank() } }
 
     private fun validateField(validationResult: ValidationResult): Boolean {
         return when (validationResult) {

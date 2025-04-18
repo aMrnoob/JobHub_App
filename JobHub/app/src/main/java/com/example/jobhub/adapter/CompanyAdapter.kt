@@ -11,14 +11,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.jobhub.R
 import com.example.jobhub.entity.Company
+import com.example.jobhub.entity.enumm.CompanyAction
 
 class CompanyAdapter(
     private var companyList: List<Company>,
-    private val onEditClick: ((Company) -> Unit)? = null,
-    private val onDeleteClick: ((Company) -> Unit)? = null
+    private val onActionClick: ((Company, CompanyAction) -> Unit)? = null
 ) : RecyclerView.Adapter<CompanyAdapter.CompanyViewHolder>() {
 
-    private var lastShownPosition: Int = -1
     private var expandedPosition = RecyclerView.NO_POSITION
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CompanyViewHolder {
@@ -27,7 +26,7 @@ class CompanyAdapter(
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    override fun onBindViewHolder(holder: CompanyViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: CompanyViewHolder, @SuppressLint("RecyclerView") position: Int) {
         val company = companyList[position]
         holder.tvCompanyName.text = company.companyName
         holder.tvAddress.text = company.address
@@ -44,34 +43,22 @@ class CompanyAdapter(
 
         holder.itemView.setOnClickListener {
             val previousExpandedPosition = expandedPosition
-            expandedPosition = if (isExpanded) RecyclerView.NO_POSITION else position
+
+            expandedPosition = if (isExpanded) {
+                RecyclerView.NO_POSITION
+            } else { position }
 
             notifyItemChanged(previousExpandedPosition)
             notifyItemChanged(expandedPosition)
+            onActionClick?.let { it1 -> it1(company, CompanyAction.CLICK) }
         }
 
-        holder.layoutActions.visibility = if (position == lastShownPosition) View.VISIBLE else View.GONE
-
-        holder.itemView.setOnClickListener {
-            if (lastShownPosition != -1) {
-                val oldPosition = lastShownPosition
-                lastShownPosition = -1
-                notifyItemChanged(oldPosition)
-            }
+        holder.btnEdit.setOnClickListener {
+            onActionClick?.let { it1 -> it1(company, CompanyAction.EDIT) }
         }
 
-        holder.itemView.setOnLongClickListener {
-            lastShownPosition = if (lastShownPosition == position) -1 else position
-            notifyDataSetChanged()
-            true
-        }
-
-        holder.ivEdit.setOnClickListener {
-            onEditClick?.invoke(company)
-        }
-
-        holder.ivRemove.setOnClickListener {
-            onDeleteClick?.invoke(company)
+        holder.btnRemove.setOnClickListener {
+            onActionClick?.let { it1 -> it1(company, CompanyAction.DELETE) }
         }
     }
 
@@ -82,8 +69,7 @@ class CompanyAdapter(
         val tvCompanyName: TextView = itemView.findViewById(R.id.tvCompanyName)
         val tvAddress: TextView = itemView.findViewById(R.id.tvAddress)
         val tvDescription: TextView = itemView.findViewById(R.id.tvDescription)
-        val layoutActions: LinearLayout = itemView.findViewById(R.id.layoutActions)
-        val ivEdit: ImageView = itemView.findViewById(R.id.ivEdit)
-        val ivRemove: ImageView = itemView.findViewById(R.id.ivRemove)
+        val btnEdit: LinearLayout = itemView.findViewById(R.id.btnEdit)
+        val btnRemove: LinearLayout = itemView.findViewById(R.id.btnRemove)
     }
 }

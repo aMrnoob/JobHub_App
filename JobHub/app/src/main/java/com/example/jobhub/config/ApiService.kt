@@ -15,7 +15,3 @@ data class TokenRequest(
     val idToken: String
 )
 
-data class TokenResponse(
-    val success: Boolean,
-    val message: String? = null
-)

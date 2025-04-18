@@ -5,6 +5,7 @@ import android.R
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.jobhub.adapter.SkillAdapter
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
+import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.ActivityAboutJobBinding
 import com.example.jobhub.databinding.ActivityDetailJobBinding
 import com.example.jobhub.databinding.ActivityRequirementJobBinding
@@ -36,26 +38,23 @@ import java.util.Calendar
 
 class JobActivity : BaseActivity() {
 
+    private lateinit var sharedPrefs: SharedPrefsManager
+    private lateinit var skillAdapter: SkillAdapter
     private lateinit var bindingAboutJob: ActivityAboutJobBinding
     private lateinit var bindingDetailJob: ActivityDetailJobBinding
     private lateinit var bindingRequirementJob: ActivityRequirementJobBinding
-    private val jobService: JobService by lazy {
-        RetrofitClient.createRetrofit().create(JobService::class.java)
-    }
-    private val skillService: SkillService by lazy {
-        RetrofitClient.createRetrofit().create(SkillService::class.java)
-    }
-    private val companyService: CompanyService by lazy {
-        RetrofitClient.createRetrofit().create(CompanyService::class.java)
-    }
 
     private var jobDTO: JobDTO = JobDTO()
-    private lateinit var skillAdapter: SkillAdapter
     private var companyList: MutableList<Company> = mutableListOf()
     private var currentStep = 1
 
+    private val jobService: JobService by lazy { RetrofitClient.createRetrofit().create(JobService::class.java) }
+    private val skillService: SkillService by lazy { RetrofitClient.createRetrofit().create(SkillService::class.java) }
+    private val companyService: CompanyService by lazy { RetrofitClient.createRetrofit().create(CompanyService::class.java) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        sharedPrefs = SharedPrefsManager(this)
 
         bindingAboutJob = ActivityAboutJobBinding.inflate(layoutInflater)
         bindingDetailJob = ActivityDetailJobBinding.inflate(layoutInflater)
@@ -103,7 +102,7 @@ class JobActivity : BaseActivity() {
             2 -> {
                 bindingDetailJob = ActivityDetailJobBinding.inflate(layoutInflater)
                 setContentView(bindingDetailJob.root)
-
+                Log.d("abcdeff", "Size: ${companyList.size}")
                 getAllCompaniesByUserId()
                 setupDatePickers()
 
@@ -239,7 +238,7 @@ class JobActivity : BaseActivity() {
     }
 
     private fun getAllCompaniesByUserId() {
-        val token = getAuthToken() ?: return
+        val token = sharedPrefs.authToken ?: return
 
         ApiHelper().callApi(
             context = this,
@@ -251,13 +250,6 @@ class JobActivity : BaseActivity() {
                 }
             }
         )
-    }
-
-    private fun getAuthToken(): String? {
-        return getSharedPreferences("JobHubPrefs", MODE_PRIVATE)
-            .getString("authToken", null)
-            ?.trim()
-            ?.takeIf { it.isNotBlank() }
     }
 
     private fun isValidInput(vararg fields: String): Boolean {
@@ -277,7 +269,6 @@ class JobActivity : BaseActivity() {
     @SuppressLint("NotifyDataSetChanged")
     private fun updateSkill() {
         val job = Job()
-
         job.jobId = jobDTO.jobId!!
         job.requiredSkills = skillAdapter.getSkills().toSet()
 

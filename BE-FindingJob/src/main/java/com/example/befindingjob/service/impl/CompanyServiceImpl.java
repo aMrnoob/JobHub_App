@@ -45,13 +45,13 @@ public class CompanyServiceImpl implements CompanyService {
             return new ApiResponse<>(true, "Company added successfully!");
         } catch (Exception e) {
             e.printStackTrace();
-            return new ApiResponse<>(false, "", null);
+            return new ApiResponse<>(false, "Company added failed", null);
         }
     }
 
     @Override
-    public ApiResponse<Void> updateCompany(Company company) {
-        Optional<Company> existingCompanyOpt = companyRepository.findById(company.getCompanyId());
+    public ApiResponse<Void> updateCompany(CompanyDTO companyDTO) {
+        Optional<Company> existingCompanyOpt = companyRepository.findById(companyDTO.getCompanyId());
 
         if (existingCompanyOpt.isEmpty()) {
             return new ApiResponse<>(false, "");
@@ -59,14 +59,26 @@ public class CompanyServiceImpl implements CompanyService {
 
         Company existingCompany = existingCompanyOpt.get();
 
-        if (company.getCompanyName() != null) existingCompany.setCompanyName(company.getCompanyName());
-        if (company.getDescription() != null) existingCompany.setDescription(company.getDescription());
-        if (company.getAddress() != null) existingCompany.setAddress(company.getAddress());
-        if (company.getLogoUrl() != null) existingCompany.setLogoUrl(company.getLogoUrl());
-        if (company.getWebsite() != null) existingCompany.setWebsite(company.getWebsite());
+        if (companyDTO.getCompanyName() != null) existingCompany.setCompanyName(companyDTO.getCompanyName());
+        if (companyDTO.getDescription() != null) existingCompany.setDescription(companyDTO.getDescription());
+        if (companyDTO.getAddress() != null) existingCompany.setAddress(companyDTO.getAddress());
+        if (companyDTO.getLogoUrl() != null) existingCompany.setLogoUrl(companyDTO.getLogoUrl());
+        if (companyDTO.getWebsite() != null) existingCompany.setWebsite(companyDTO.getWebsite());
 
         companyRepository.save(existingCompany);
         return new ApiResponse<>(true, "Company updated successfully.");
+    }
+
+    @Override
+    public ApiResponse<Void> deleteCompany(int companyId) {
+        Optional<Company> companyOpt = companyRepository.findById(companyId);
+
+        if (companyOpt.isEmpty()) {
+            return new ApiResponse<>(false, "Company does not exist" + companyId, null);
+        }
+
+        companyRepository.deleteById(companyId);
+        return new ApiResponse<>(true, "Delete company successfully", null);
     }
 
     @Override

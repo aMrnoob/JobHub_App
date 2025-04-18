@@ -13,7 +13,10 @@ interface CompanyService {
     fun addCompany(@Body companyDTO: CompanyDTO): Call<ApiResponse<Void>>
 
     @POST("api/company/update-company")
-    fun updateCompany(@Body company: Company): Call<ApiResponse<Void>>
+    fun updateCompany(@Body companyDTO: CompanyDTO): Call<ApiResponse<Void>>
+
+    @POST("api/company/delete-company")
+    fun deleteCompany(@Body companyId: Int): Call<ApiResponse<Void>>
 
     @POST("api/company/get-all-companies-by-userId")
     fun getAllCompaniesByUserId(@Header("token") token: String): Call<ApiResponse<List<Company>>>

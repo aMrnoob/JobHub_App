@@ -13,7 +13,7 @@ import com.example.jobhub.R
 import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.ItemJobBinding
 import com.example.jobhub.dto.ItemJobDTO
-import com.example.jobhub.entity.enumm.ActionType
+import com.example.jobhub.entity.enumm.JobAction
 import com.example.jobhub.entity.enumm.JobType
 import com.example.jobhub.entity.enumm.Role
 import java.time.LocalDateTime
@@ -21,7 +21,7 @@ import java.time.format.DateTimeFormatter
 
 class JobAdapter(
     private val jobList: List<ItemJobDTO>,
-    private val onActionClick: ((ItemJobDTO, ActionType) -> Unit)? = null
+    private val onActionClick: ((ItemJobDTO, JobAction) -> Unit)? = null
 ) : RecyclerView.Adapter<JobAdapter.JobViewHolder>() {
 
     inner class JobViewHolder(private val binding: ItemJobBinding) :
@@ -95,23 +95,23 @@ class JobAdapter(
             }
 
             binding.root.setOnClickListener {
-                onActionClick?.let { it1 -> it1(itemJobDTO, ActionType.CLICK) }
+                onActionClick?.let { it1 -> it1(itemJobDTO, JobAction.CLICK) }
             }
 
             binding.btnBookmark.setOnClickListener {
-                onActionClick?.let { it1 -> it1(itemJobDTO, ActionType.BOOKMARK) }
+                onActionClick?.let { it1 -> it1(itemJobDTO, JobAction.BOOKMARK) }
             }
 
             binding.btnApply.setOnClickListener {
-                onActionClick?.let { it1 -> it1(itemJobDTO, ActionType.APPLY) }
+                onActionClick?.let { it1 -> it1(itemJobDTO, JobAction.APPLY) }
             }
 
             binding.btnEdit.setOnClickListener {
-                onActionClick?.let { it1 -> it1(itemJobDTO, ActionType.EDIT) }
+                onActionClick?.let { it1 -> it1(itemJobDTO, JobAction.EDIT) }
             }
 
             binding.btnRemove.setOnClickListener {
-                onActionClick?.let { it1 -> it1(itemJobDTO, ActionType.DELETE) }
+                onActionClick?.let { it1 -> it1(itemJobDTO, JobAction.DELETE) }
             }
         }
     }

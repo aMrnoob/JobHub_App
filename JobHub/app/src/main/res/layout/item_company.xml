@@ -52,27 +52,69 @@
                 android:textSize="15sp"
                 android:textColor="@color/gray_700"/>
         </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutActions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="30dp"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal">
 
         <LinearLayout
-            android:id="@+id/layoutActions"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="10dp"
-            android:orientation="vertical">
+            android:id="@+id/btnRemove"
+            android:layout_width="0dp"
+            android:layout_height="32dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="40dp"
+            android:orientation="horizontal"
+            android:background="@drawable/border_btn"
+            android:backgroundTint="@color/red_400">
 
             <ImageView
-                android:id="@+id/ivEdit"
-                android:layout_width="30dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:src="@drawable/icon_edit"/>
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="24dp"
+                android:src="@drawable/icon_remove"
+                android:paddingVertical="5dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="10dp"
+                android:text="Remove"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/btnEdit"
+            android:layout_width="0dp"
+            android:layout_height="32dp"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:background="@drawable/border_btn"
+            android:backgroundTint="@color/green_500">
 
             <ImageView
-                android:id="@+id/ivRemove"
                 android:layout_width="30dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:src="@drawable/icon_remove"/>
+                android:layout_height="match_parent"
+                android:layout_marginStart="24dp"
+                android:src="@drawable/icon_edit"
+                android:paddingVertical="5dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="10dp"
+                android:text="Edit"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"/>
         </LinearLayout>
     </LinearLayout>
 

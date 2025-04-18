@@ -16,6 +16,9 @@ interface JobService {
     @POST("api/job/update-job")
     fun updateJob(@Body job: Job): Call<ApiResponse<Void>>
 
+    @POST("api/job/delete-job")
+    fun deleteJob(@Body jobId: Int): Call<ApiResponse<Void>>
+
     @POST("api/job/get-all-jobs-by-user")
     fun getAllJobsByUser(@Header("token") token: String): Call<ApiResponse<List<ItemJobDTO>>>
 }

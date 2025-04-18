@@ -3,16 +3,19 @@ package com.example.jobhub.fragment
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.jobhub.R
 import com.example.jobhub.activity.CompanyActivity
 import com.example.jobhub.adapter.CompanyAdapter
 import com.example.jobhub.config.ApiHelper
@@ -20,6 +23,7 @@ import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.MainCompanyBinding
 import com.example.jobhub.entity.Company
+import com.example.jobhub.entity.enumm.CompanyAction
 import com.example.jobhub.service.CompanyService
 
 
@@ -31,11 +35,10 @@ class CompanyFragment : Fragment() {
     private var _binding: MainCompanyBinding? = null
     private var allCompanies: MutableList<Company> = mutableListOf()
     private var companyList: MutableList<Company> = mutableListOf()
+    private var isFragmentVisible = false
 
     private val binding get() = _binding!!
-    private val companyService: CompanyService by lazy {
-        RetrofitClient.createRetrofit().create(CompanyService::class.java)
-    }
+    private val companyService: CompanyService by lazy { RetrofitClient.createRetrofit().create(CompanyService::class.java) }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,11 +46,11 @@ class CompanyFragment : Fragment() {
     ): View {
         _binding = MainCompanyBinding.inflate(inflater, container, false)
         sharedPrefs = SharedPrefsManager(requireContext())
+        refreshHandler.post(refreshRunnable)
 
         binding.ivAddCompany.setOnClickListener {
             animateView(it)
-            val intent = Intent(requireContext(), CompanyActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(requireContext(), CompanyActivity::class.java))
         }
 
         setupRecyclerView()
@@ -60,11 +63,18 @@ class CompanyFragment : Fragment() {
     private fun setupRecyclerView() {
         companyAdapter = CompanyAdapter(
             companyList,
-            onEditClick = { company ->
-                Toast.makeText(requireContext(), "Edit ${company.companyId}", Toast.LENGTH_SHORT).show()
-            },
-            onDeleteClick = { company ->
-                Toast.makeText(requireContext(), "Delete ${company.companyId}", Toast.LENGTH_SHORT).show()
+            onActionClick = { company, action ->
+                when (action) {
+                    CompanyAction.CLICK -> { }
+
+                    CompanyAction.EDIT -> {
+                        val intent = Intent(requireContext(), CompanyActivity::class.java)
+                        intent.putExtra("company", company)
+                        startActivity(intent)
+                    }
+
+                    CompanyAction.DELETE -> { company.companyId?.let { deleteCompany(it) } }
+                }
             }
         )
 
@@ -82,17 +92,40 @@ class CompanyFragment : Fragment() {
             context = requireContext(),
             call = companyService.getAllCompaniesByUserId("Bearer $token"),
             onSuccess = { response ->
-                companyList.apply {
-                    clear()
-                    response?.let {
-                        addAll(it)
-                        allCompanies.clear()
-                        allCompanies.addAll(it)
-                    }
+                response?.let {
+                    allCompanies.clear()
+                    allCompanies.addAll(it)
+                }
+
+                if (binding.searchView.query.isNullOrEmpty()) {
+                    companyList.clear()
+                    companyList.addAll(allCompanies)
                 }
                 companyAdapter.notifyDataSetChanged()
             }
         )
+    }
+
+    private fun deleteCompany(companyId: Int) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_confirm_delete, null)
+        val dialogBuilder = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .setCancelable(false)
+
+        val btnYes = dialogView.findViewById<TextView>(R.id.btnYes)
+        val btnNo = dialogView.findViewById<TextView>(R.id.btnNo)
+        val alertDialog = dialogBuilder.create()
+
+        btnYes.setOnClickListener {
+            ApiHelper().callApi(
+                context = requireContext(),
+                call = companyService.deleteCompany(companyId),
+                onSuccess = { alertDialog.dismiss() }
+            )
+        }
+
+        btnNo.setOnClickListener { alertDialog.dismiss() }
+        alertDialog.show()
     }
 
     private fun animateView(view: View) {
@@ -140,5 +173,25 @@ class CompanyFragment : Fragment() {
         companyAdapter.notifyDataSetChanged()
 
         binding.tvNoResults.visibility = if (filteredList.isEmpty()) View.VISIBLE else View.GONE
+    }
+
+    private val refreshHandler = Handler(Looper.getMainLooper())
+    private val refreshRunnable = object : Runnable {
+        override fun run() {
+            if (isFragmentVisible && binding.searchView.query.isNullOrEmpty()) { fetchAllCompanies() }
+            refreshHandler.postDelayed(this, 10000)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        isFragmentVisible = true
+        refreshHandler.post(refreshRunnable)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        isFragmentVisible = false
+        refreshHandler.removeCallbacks(refreshRunnable)
     }
 }

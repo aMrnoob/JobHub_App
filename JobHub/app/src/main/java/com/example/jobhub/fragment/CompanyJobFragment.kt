@@ -3,7 +3,6 @@ package com.example.jobhub.fragment
 import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,29 +12,28 @@ import com.bumptech.glide.Glide
 import com.example.jobhub.R
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
+import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.MainCompanyJobBinding
+import com.example.jobhub.dto.CompanyDTO
 import com.example.jobhub.dto.ItemJobDTO
-import com.example.jobhub.dto.toCompany
-import com.example.jobhub.entity.Job
 import com.example.jobhub.fragment.fragmentinterface.FragmentInterface
 import com.example.jobhub.service.CompanyService
 import com.google.gson.Gson
 
 class CompanyJobFragment : Fragment() {
 
-    private var _binding: MainCompanyJobBinding? = null
-    private val binding get() = _binding!!
+    private lateinit var sharedPrefs: SharedPrefsManager
+
     private var jobDTO: ItemJobDTO? = null
     private var jobRequirementsInterface: FragmentInterface? = null
-    private val companyService: CompanyService by lazy {
-        RetrofitClient.createRetrofit().create(CompanyService::class.java)
-    }
+    private var _binding: MainCompanyJobBinding? = null
+
+    private val binding get() = _binding!!
+    private val companyService: CompanyService by lazy { RetrofitClient.createRetrofit().create(CompanyService::class.java) }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        if (context is FragmentInterface) {
-            jobRequirementsInterface = context
-        }
+        if (context is FragmentInterface) { jobRequirementsInterface = context }
     }
 
     override fun onCreateView(
@@ -43,6 +41,7 @@ class CompanyJobFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = MainCompanyJobBinding.inflate(inflater, container, false)
+        sharedPrefs = SharedPrefsManager(requireContext())
 
         loadJobFromPrefs()
         displayJob()
@@ -54,10 +53,6 @@ class CompanyJobFragment : Fragment() {
         }
 
         return binding.root
-    }
-
-    fun enableEditing() {
-        setEditTextEnabled(true)
     }
 
     private fun displayJob() {
@@ -79,9 +74,7 @@ class CompanyJobFragment : Fragment() {
             binding.edtDescription.setOnClickListener {
                 showDescriptionDialog(binding.edtDescription.text.toString())
             }
-        } else {
-            binding.edtDescription.setOnClickListener(null)
-        }
+        } else { binding.edtDescription.setOnClickListener(null) }
 
         binding.btnUpdate.isEnabled = enabled
     }
@@ -110,31 +103,29 @@ class CompanyJobFragment : Fragment() {
     }
 
     private fun update() {
-        if (jobDTO == null) {
-            return
-        }
+        if (jobDTO == null) { return }
 
-        val updatedCompany = jobDTO!!.company.toCompany().copy(
-            companyName = binding.edtCompanyName.text.toString(),
-            description = binding.edtDescription.text.toString()
-        )
+        val companyDTO = CompanyDTO()
+        companyDTO.companyId = jobDTO!!.company.companyId
+        companyDTO.companyName = binding.edtCompanyName.text.toString()
+        companyDTO.description = binding.edtDescription.text.toString()
 
         ApiHelper().callApi(
             context = requireContext(),
-            call = companyService.updateCompany(updatedCompany),
+            call = companyService.updateCompany(companyDTO),
             onSuccess = {
                 jobDTO!!.company = jobDTO!!.company.copy(
-                    companyName = updatedCompany.companyName.toString(),
-                    description = updatedCompany.description.toString()
+                    companyName = companyDTO.companyName.toString(),
+                    description = companyDTO.description.toString()
                 )
-                saveJobToPrefs()
+                jobDTO?.let { sharedPrefs.saveCurrentJob(it) }
             }
         )
     }
 
-    private fun saveJobToPrefs() {
-        val sharedPreferences = requireContext().getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
-        val jobJson = Gson().toJson(jobDTO)
-        sharedPreferences.edit().putString("job", jobJson).apply()
+    fun enableEditing() {
+        _binding?.let {
+            setEditTextEnabled(true)
+        }
     }
 }

@@ -21,6 +21,10 @@ class SharedPrefsManager(context: Context) {
         EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
     )
 
+    var userId: Int?
+        get() = prefs.getInt("userId", -1).takeIf { it != -1 }
+        set(value) = prefs.edit().putInt("userId", value ?: -1).apply()
+
     var role: Role?
         get() = prefs.getString("role", null)?.let { Role.valueOf(it) }
         set(value) = prefs.edit().putString("role", value?.name).apply()

@@ -1,7 +1,10 @@
 package com.example.jobhub.entity
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import java.time.LocalDateTime
 
+@Parcelize
 data class Company(
     var companyId: Int? = null,
     var companyName: String? = null,
@@ -13,5 +16,5 @@ data class Company(
     var updatedAt: LocalDateTime? = null,
     var user: User? = null,
     var jobs: Set<Job>? = emptySet()
-)
+) : Parcelable
 

@@ -175,6 +175,7 @@ class LoginActivity : BaseActivity() {
             onSuccess = { loginResponse ->
                 loginResponse?.let {
                     sharedPrefs.authToken = it.token
+                    sharedPrefs.userId = it.userId
                     sharedPrefs.role = it.role
                     sharedPrefs.fullName = it.fullName
                     navigateToNextScreen(it.role)

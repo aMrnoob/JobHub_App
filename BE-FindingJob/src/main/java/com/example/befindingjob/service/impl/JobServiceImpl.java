@@ -76,6 +76,19 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    public ApiResponse<Void> deleteJob(int jobId) {
+        Optional<Job> jobOpt = jobRepository.findById(jobId);
+
+        if (jobOpt.isEmpty()) {
+            return new ApiResponse<>(false, "Job does not exist" + jobId, null);
+        }
+
+        jobRepository.deleteById(jobId);
+        return new ApiResponse<>(true, "Delete job successfully!", null);
+    }
+
+
+    @Override
     public ApiResponse<List<ItemJobDTO>> getAllJobsByUser(String token) {
         if (!jwtService.isValidToken(token)) {
             return new ApiResponse<>(false, "", null);

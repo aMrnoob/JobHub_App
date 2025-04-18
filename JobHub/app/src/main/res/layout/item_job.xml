@@ -152,7 +152,7 @@
             android:layout_marginEnd="40dp"
             android:orientation="horizontal"
             android:background="@drawable/border_btn"
-            android:backgroundTint="@color/red_500">
+            android:backgroundTint="@color/red_400">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -198,10 +198,7 @@
                 android:textStyle="bold"
                 android:textColor="@color/black"/>
         </LinearLayout>
-
-
     </LinearLayout>
-
 </LinearLayout>
 
 

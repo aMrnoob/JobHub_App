@@ -18,7 +18,7 @@ import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.MainApplicationJobSeekerBinding
 import com.example.jobhub.dto.ItemJobDTO
 import com.example.jobhub.dto.UserDTO
-import com.example.jobhub.entity.enumm.ActionType
+import com.example.jobhub.entity.enumm.JobAction
 import com.example.jobhub.entity.enumm.Role
 import com.example.jobhub.service.JobService
 import com.google.gson.Gson
@@ -67,17 +67,17 @@ class ApplicationJobSeekerFragment : Fragment() {
             filteredJobs,
             onActionClick = { selectedJob, action ->
                 when (action) {
-                    ActionType.CLICK -> {
+                    JobAction.CLICK -> {
                         val intent = Intent(requireContext(), VacancyActivity::class.java)
                         sharedPrefs.saveCurrentJob(selectedJob)
                         startActivity(intent)
                     }
 
-                    ActionType.BOOKMARK -> {
+                    JobAction.BOOKMARK -> {
 
                     }
 
-                    ActionType.APPLY -> {
+                    JobAction.APPLY -> {
 
                     } else -> {}
                 }
