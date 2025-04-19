@@ -21,154 +21,77 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class JobAdapter(
-    private val jobList: MutableList<ItemJobDTO>,
+    private val jobList: List<ItemJobDTO>,
     private val onActionClick: ((ItemJobDTO, JobAction) -> Unit)? = null
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+) : RecyclerView.Adapter<JobAdapter.JobViewHolder>() {
 
-    companion object {
-        private const val VIEW_TYPE_ITEM = 0
-        private const val VIEW_TYPE_LOADING = 1
-    }
-
-    private var isLoadingFooterVisible = false
-
-    inner class JobViewHolder(private val binding: ItemJobBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-
-        @SuppressLint("SetTextI18n", "NotifyDataSetChanged")
+    inner class JobViewHolder(private val binding: ItemJobBinding) : RecyclerView.ViewHolder(binding.root) {
+        @SuppressLint("SetTextI18n")
         fun bind(itemJobDTO: ItemJobDTO) {
-            Glide.with(binding.root.context)
-                .load(itemJobDTO.company.logoUrl)
-                .placeholder(R.drawable.error_image)
-                .error(R.drawable.error_image)
-                .into(binding.ivImgJob)
+            with(binding) {
+                Glide.with(root.context)
+                    .load(itemJobDTO.company.logoUrl)
+                    .placeholder(R.drawable.error_image)
+                    .error(R.drawable.error_image)
+                    .into(ivImgJob)
 
-            binding.tvTitle.text = itemJobDTO.title
-            binding.tvLocationJobType.text =
-                "${itemJobDTO.location} - ${formatJobType(itemJobDTO.jobType)}"
-            binding.tvSalary.text = itemJobDTO.salary
+                tvTitle.text = itemJobDTO.title
+                tvLocationJobType.text = "${itemJobDTO.location} - ${formatJobType(itemJobDTO.jobType)}"
+                tvSalary.text = itemJobDTO.salary
 
-            val outputFormatter = DateTimeFormatter.ofPattern("d/M/yyyy")
-            val expirationDateFormatted = itemJobDTO.expirationDate.format(outputFormatter) ?: "N/A"
+                val formattedDate = itemJobDTO.expirationDate.format(DateTimeFormatter.ofPattern("d/M/yyyy"))
+                tvPostExpirationDate.text = "Exp: $formattedDate"
 
-            binding.tvPostExpirationDate.text = "Exp: $expirationDateFormatted"
-
-            val currentDate = LocalDateTime.now()
-            val expirationDate = itemJobDTO.expirationDate
-
-            if (expirationDate.isBefore(currentDate)) {
-                binding.tvStatus.text = "Expired"
-                binding.tvStatus.setTextColor(
-                    ContextCompat.getColor(
-                        binding.tvStatus.context,
-                        R.color.red_700
-                    )
-                )
-                binding.tvStatus.backgroundTintList = ColorStateList.valueOf(
-                    ContextCompat.getColor(
-                        binding.tvStatus.context,
-                        R.color.red_300
-                    )
-                )
-            } else {
-                binding.tvStatus.text = "Active"
-                binding.tvStatus.setTextColor(
-                    ContextCompat.getColor(
-                        binding.tvStatus.context,
-                        R.color.green_500
-                    )
-                )
-                binding.tvStatus.backgroundTintList = ColorStateList.valueOf(
-                    ContextCompat.getColor(
-                        binding.tvStatus.context,
-                        R.color.green_200
-                    )
-                )
-            }
-
-            when (getUserRole(binding.root.context)) {
-                Role.JOB_SEEKER -> {
-                    binding.layoutApply.visibility = View.VISIBLE
-                    binding.layoutActions.visibility = View.GONE
+                val isExpired = itemJobDTO.expirationDate.isBefore(LocalDateTime.now())
+                tvStatus.text = if (isExpired) "Expired" else "Active"
+                val (textColor, bgColor) = if (isExpired) {
+                    R.color.red_700 to R.color.red_300
+                } else {
+                    R.color.green_500 to R.color.green_200
                 }
-                Role.EMPLOYER -> {
-                    binding.layoutApply.visibility = View.GONE
-                    binding.layoutActions.visibility = View.VISIBLE
+                tvStatus.setTextColor(ContextCompat.getColor(root.context, textColor))
+                tvStatus.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(root.context, bgColor))
+
+                when (getUserRole(root.context)) {
+                    Role.JOB_SEEKER -> {
+                        layoutApply.visibility = View.VISIBLE
+                        layoutActions.visibility = View.GONE
+                    }
+                    Role.EMPLOYER -> {
+                        layoutApply.visibility = View.GONE
+                        layoutActions.visibility = View.VISIBLE
+                    }
+                    else -> {
+                        layoutApply.visibility = View.GONE
+                        layoutActions.visibility = View.GONE
+                    }
                 }
-                else -> {
-                    binding.layoutApply.visibility = View.GONE
-                    binding.layoutActions.visibility = View.GONE
-                }
-            }
 
-            binding.root.setOnClickListener {
-                AnimationHelper.animateScale(it)
-                onActionClick?.let { it1 -> it1(itemJobDTO, JobAction.CLICK) }
+                root.setOnClickListener { handleAction(itemJobDTO, JobAction.CLICK) }
+                btnBookmark.setOnClickListener { handleAction(itemJobDTO, JobAction.BOOKMARK) }
+                btnApply.setOnClickListener { handleAction(itemJobDTO, JobAction.APPLY) }
+                btnEdit.setOnClickListener { handleAction(itemJobDTO, JobAction.EDIT) }
+                btnRemove.setOnClickListener { handleAction(itemJobDTO, JobAction.DELETE) }
             }
+        }
 
-            binding.btnBookmark.setOnClickListener {
-                AnimationHelper.animateScale(it)
-                onActionClick?.let { it1 -> it1(itemJobDTO, JobAction.BOOKMARK) }
-            }
-
-            binding.btnApply.setOnClickListener {
-                AnimationHelper.animateScale(it)
-                onActionClick?.let { it1 -> it1(itemJobDTO, JobAction.APPLY) }
-            }
-
-            binding.btnEdit.setOnClickListener {
-                AnimationHelper.animateScale(it)
-                onActionClick?.let { it1 -> it1(itemJobDTO, JobAction.EDIT) }
-            }
-
-            binding.btnRemove.setOnClickListener {
-                AnimationHelper.animateScale(it)
-                onActionClick?.let { it1 -> it1(itemJobDTO, JobAction.DELETE) }
-            }
+        private fun handleAction(item: ItemJobDTO, action: JobAction) {
+            AnimationHelper.animateScale(binding.root)
+            onActionClick?.invoke(item, action)
         }
     }
 
-    inner class LoadingViewHolder(view: View) : RecyclerView.ViewHolder(view)
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return if (viewType == VIEW_TYPE_LOADING) {
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_loading, parent, false)
-            LoadingViewHolder(view)
-        } else {
-            val binding = ItemJobBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-            JobViewHolder(binding)
-        }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): JobViewHolder {
+        val binding =
+            ItemJobBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return JobViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (holder is JobViewHolder) {
-            holder.bind(jobList[position])
-        }
+    override fun onBindViewHolder(holder: JobViewHolder, position: Int) {
+        holder.bind(jobList[position])
     }
 
-    override fun getItemViewType(position: Int): Int {
-        return if (isLoadingFooterVisible && position == itemCount - 1) {
-            VIEW_TYPE_LOADING
-        } else {
-            VIEW_TYPE_ITEM
-        }
-    }
-
-    override fun getItemCount(): Int = jobList.size + if (isLoadingFooterVisible) 1 else 0
-
-    fun showLoadingFooter() {
-        if (!isLoadingFooterVisible) {
-            isLoadingFooterVisible = true
-            notifyItemInserted(itemCount)
-        }
-    }
-
-    fun hideLoadingFooter() {
-        if (isLoadingFooterVisible) {
-            isLoadingFooterVisible = false
-            notifyItemRemoved(itemCount)
-        }
-    }
+    override fun getItemCount(): Int = jobList.size
 
     private fun formatJobType(jobType: JobType): String {
         return jobType.name.split("_")

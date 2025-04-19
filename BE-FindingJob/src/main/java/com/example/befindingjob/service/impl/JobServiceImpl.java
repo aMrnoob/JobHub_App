@@ -14,10 +14,9 @@ import com.example.befindingjob.repository.UserRepository;
 import com.example.befindingjob.service.JobService;
 import com.example.befindingjob.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import org.springframework.data.domain.Pageable;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -91,38 +90,36 @@ public class JobServiceImpl implements JobService {
 
 
     @Override
-    public ApiResponse<List<ItemJobDTO>> getAllJobsByUser(String token, int page) {
-        int size = 4;
-
-        if (!jwtService.isValidToken(token)) {
-            return new ApiResponse<>(false, "Invalid token", null);
-        }
+    public ApiResponse<List<ItemJobDTO>> getAllJobsByUser(String token) {
+        if (!jwtService.isValidToken(token)) {return new ApiResponse<>(false, "", null);}
 
         Integer userId = jwtService.extractUserId(token);
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) {
-            return new ApiResponse<>(false, "User not found", null);
+            return new ApiResponse<>(false, "", null);
         }
 
         User user = userOpt.get();
         Role role = user.getRole();
         List<ItemJobDTO> jobs;
 
-        Pageable pageable = PageRequest.of(page, size);
-
         if (role == Role.EMPLOYER) {
             jobs = user.getCompanies().stream()
-                    .flatMap(company -> jobRepository.findByCompany(company, pageable).stream())
+                    .flatMap(company -> jobRepository.findByCompany(company).stream())
                     .map(ItemJobDTO::new)
+                    .sorted(Comparator.comparing(ItemJobDTO::getExpirationDate))
                     .collect(Collectors.toList());
         } else if (role == Role.JOB_SEEKER) {
-            jobs = jobRepository.findAll(pageable).stream()
+            jobs = jobRepository.findAll().stream()
+                    .filter(job -> job.getExpirationDate().isAfter(LocalDateTime.now()))
                     .map(ItemJobDTO::new)
+                    .sorted(Comparator.comparing(ItemJobDTO::getExpirationDate))
                     .collect(Collectors.toList());
         } else {
-            return new ApiResponse<>(false, "User role not supported", null);
+            return new ApiResponse<>(false, "", null);
         }
 
         return new ApiResponse<>(true, "", jobs);
     }
+
 }

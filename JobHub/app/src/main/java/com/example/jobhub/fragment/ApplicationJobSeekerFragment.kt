@@ -1,23 +1,17 @@
 package com.example.jobhub.fragment
 
 import android.annotation.SuppressLint
-
 import android.content.Context
 import android.content.Intent
-
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
 import android.widget.SearchView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-
 import com.example.jobhub.activity.ApplyJobActivity
-import com.example.jobhub.activity.VacancyActivity
+import com.example.jobhub.activity.InforJobActivity
 import com.example.jobhub.adapter.JobAdapter
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
@@ -26,10 +20,8 @@ import com.example.jobhub.databinding.MainApplicationJobSeekerBinding
 import com.example.jobhub.dto.ItemJobDTO
 import com.example.jobhub.dto.UserDTO
 import com.example.jobhub.entity.enumm.JobAction
-import com.example.jobhub.entity.enumm.Role
 import com.example.jobhub.service.JobService
 import com.google.gson.Gson
-import java.time.LocalDateTime
 
 class ApplicationJobSeekerFragment : Fragment() {
 
@@ -77,9 +69,8 @@ class ApplicationJobSeekerFragment : Fragment() {
             onActionClick = { selectedJob, action ->
                 when (action) {
                     JobAction.CLICK -> {
-                        val intent = Intent(requireContext(), VacancyActivity::class.java)
                         sharedPrefs.saveCurrentJob(selectedJob)
-                        startActivity(intent)
+                        startActivity(Intent(requireContext(), InforJobActivity::class.java))
                     }
 
                     JobAction.BOOKMARK -> {
@@ -104,29 +95,22 @@ class ApplicationJobSeekerFragment : Fragment() {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private fun loadAppliedJobs(page: Int = 0) {
+    private fun loadAppliedJobs() {
         val token = sharedPrefs.authToken ?: return
-        val currentRole = sharedPrefs.role
 
         ApiHelper().callApi(
             context = requireContext(),
-            call = jobService.getAllJobsByUser("Bearer $token", page),
+            call = jobService.getAllJobsByUser("Bearer $token"),
             onSuccess = { response ->
                 originalJobs.clear()
-                val jobs = response?.let {
-                    if (currentRole == Role.JOB_SEEKER) {
-                        it.filter { job -> job.expirationDate.isAfter(LocalDateTime.now()) }
-                    } else {
-                        it
-                    }
-                } ?: emptyList()
-                originalJobs.addAll(jobs)
-
-                filteredJobs.clear()
-                filteredJobs.addAll(originalJobs)
+                response?.let { originalJobs.addAll(it) }
+                if (binding.searchView.query.isNullOrEmpty()) {
+                    filteredJobs.clear()
+                    filteredJobs.addAll(originalJobs)
+                }
 
                 jobAdapter.notifyDataSetChanged()
-            }
+            },
         )
     }
 

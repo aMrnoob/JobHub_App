@@ -4,12 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".activity.ApplyJobActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
+        android:layout_marginTop="30dp"
         android:background="@color/blue_500"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -106,7 +108,7 @@
                 android:id="@+id/tvApplicationDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="20dp"
                 android:text="Ngày ứng tuyển"
                 android:textColor="@color/black"
                 android:textSize="16sp"
@@ -132,7 +134,7 @@
                 android:id="@+id/tvCoverLetter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="20dp"
                 android:text="Thư xin việc"
                 android:textColor="@color/black"
                 android:textSize="16sp"
@@ -161,7 +163,7 @@
                 android:id="@+id/tvResume"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="20dp"
                 android:text="CV của bạn"
                 android:textColor="@color/black"
                 android:textSize="16sp"
@@ -204,7 +206,7 @@
                 android:id="@+id/tvStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="20dp"
                 android:text="Trạng thái"
                 android:textColor="@color/black"
                 android:textSize="16sp"
@@ -231,7 +233,7 @@
                 android:id="@+id/cbUseProfile"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="10dp"
                 android:checked="true"
                 android:text="Sử dụng thông tin từ hồ sơ của tôi"
                 app:layout_constraintTop_toBottomOf="@id/tvCurrentStatus"
@@ -242,13 +244,14 @@
                 android:id="@+id/btnSubmitApplication"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="12dp"
                 android:backgroundTint="@color/blue_500"
                 android:text="Gửi đơn ứng tuyển"
                 android:textColor="@color/white"
-                app:layout_constraintTop_toBottomOf="@id/cbUseProfile"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/cbUseProfile" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

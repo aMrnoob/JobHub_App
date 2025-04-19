@@ -32,7 +32,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-class ApplyJobActivity : AppCompatActivity() {
+class ApplyJobActivity : BaseActivity() {
 
     private lateinit var binding: MainDialogApplyBinding
     private var resumeUri: Uri? = null
