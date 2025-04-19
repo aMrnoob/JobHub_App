@@ -14,11 +14,14 @@ import com.example.befindingjob.repository.ResumeRepository;
 import com.example.befindingjob.repository.UserRepository;
 import com.example.befindingjob.service.ApplicationService;
 import com.example.befindingjob.service.JwtService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -52,12 +55,13 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Value("${upload.resume.dir}")
     private String resumeUploadPath;
 
+    private static final Logger logger = LoggerFactory.getLogger(ApplicationServiceImpl.class);
+
     @Override
     public ApiResponse<ApplicationDTO> applyForJob(String token, ApplicationDTO applicationDTO) {
         try {
             Integer userId = jwtService.extractUserId(token);
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+            User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
             if (!Objects.equals(applicationDTO.getUserDTO().getUserId(), userId)) {
                 return new ApiResponse<>(false, "You can only apply with your own account", null);
@@ -66,9 +70,9 @@ public class ApplicationServiceImpl implements ApplicationService {
             Job job = jobRepository.findById(applicationDTO.getJobDTO().getJobId())
                     .orElseThrow(() -> new RuntimeException("Job not found"));
 
-            Optional<Application> existingApplication = applicationRepository.findByUserAndJob(user, job);
+            Optional<Application> existingApplication = applicationRepository.findByUserIdAndJobId(userId, job.getJobId());
             if (existingApplication.isPresent()) {
-                return new ApiResponse<>(false, "You have already applied for this job", null);
+                        return new ApiResponse<>(false,"You have already applied for this job", null);
             }
 
             Application application = new Application();
@@ -76,7 +80,12 @@ public class ApplicationServiceImpl implements ApplicationService {
             application.setJob(job);
             application.setCoverLetter(applicationDTO.getCoverLetter());
             application.setStatus(Optional.ofNullable(applicationDTO.getStatus()).orElse(ApplicationStatus.APPLIED));
-            application.setApplicationDate(LocalDateTime.now());
+
+            LocalDateTime applicationDate = applicationDTO.getApplicationDate();
+            if (applicationDate == null) {
+                applicationDate = LocalDateTime.now();
+            }
+            application.setApplicationDate(applicationDate);
 
             Application saved = applicationRepository.save(application);
             return new ApiResponse<>(true, "Application submitted successfully", convertToDTO(saved));
@@ -88,26 +97,63 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public ApiResponse<String> uploadResume(String token, MultipartFile file) {
         try {
+            if (token == null) {
+                return new ApiResponse<>(false, "Token is null", null);
+            }
+
             if (!jwtService.isValidToken(token)) {
                 return new ApiResponse<>(false, "Invalid token", null);
             }
 
-            Path uploadPath = Paths.get(fileStorageProperties.getUploadDir());
+            if (file == null) {
+                return new ApiResponse<>(false, "No file provided", null);
+            }
+
+            String uploadDir = fileStorageProperties.getResumeUploadPath();
+
+            File dir = new File(uploadDir);
+            if (!dir.exists()) {
+                boolean created = dir.mkdirs();
+                if (!created) {
+                    throw new RuntimeException("Không thể tạo thư mục lưu resume: " + uploadDir);
+                }
+            }
+
+            Path uploadPath = Paths.get(uploadDir);
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
 
             String originalFilename = file.getOriginalFilename();
-            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            if (originalFilename == null) {
+                originalFilename = "unknown.pdf";
+            }
+
+
+            String extension = "";
+            int lastDotIndex = originalFilename.lastIndexOf(".");
+            if (lastDotIndex > 0) {
+                extension = originalFilename.substring(lastDotIndex);
+            } else {
+                extension = ".pdf";
+            }
+
             String filename = UUID.randomUUID() + extension;
 
             Path filePath = uploadPath.resolve(filename);
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-            String resumeUrl = "/uploads/resumes/" + filename;
+            long bytesCopied = Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+            logger.info("File saved successfully, bytes written: {}", bytesCopied);
+
+            String resumeUrl = resumeUploadPath + filename;
+
             return new ApiResponse<>(true, "Resume uploaded successfully", resumeUrl);
         } catch (IOException e) {
+            logger.error("IOException during file upload", e);
             return new ApiResponse<>(false, "Failed to upload resume: " + e.getMessage(), null);
+        } catch (Exception e) {
+            logger.error("Unexpected error during file upload", e);
+            return new ApiResponse<>(false, "Unexpected error: " + e.getMessage(), null);
         }
     }
 
@@ -124,17 +170,19 @@ public class ApplicationServiceImpl implements ApplicationService {
             Resume resume = new Resume();
             resume.setApplication(application);
             resume.setResumeUrl(resumeDTO.getResumeUrl());
-            resume.setCreatedAt(LocalDateTime.now());
-            resume.setUpdatedAt(LocalDateTime.now());
+
+            LocalDateTime now = LocalDateTime.now();
+            resume.setCreatedAt(now);
+            resume.setUpdatedAt(now);
 
             Resume saved = resumeRepository.save(resume);
+
             ResumeDTO response = new ResumeDTO(
                     saved.getResumeId(),
                     saved.getApplication().getApplicationId(),
                     saved.getResumeUrl(),
                     saved.getCreatedAt(),
-                    saved.getUpdatedAt()
-            );
+                    saved.getUpdatedAt());
 
             return new ApiResponse<>(true, "Resume saved successfully", response);
         } catch (Exception e) {

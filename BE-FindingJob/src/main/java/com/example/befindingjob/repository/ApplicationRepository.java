@@ -18,7 +18,9 @@ public interface ApplicationRepository extends JpaRepository<Application, Intege
 
     List<Application> findByJob(Job job);
 
-    Optional<Application> findByUserAndJob(User user, Job job);
+    @Query("SELECT a FROM Application a WHERE a.user.userId = :userId AND a.job.jobId = :jobId")
+    Optional<Application> findByUserIdAndJobId(@Param("userId") Integer userId, @Param("jobId") Integer jobId);
+
 
     @Query("SELECT a FROM Application a WHERE a.job.company.user.userId = :employerId")
     List<Application> findByEmployerId(@Param("employerId") Integer employerId);

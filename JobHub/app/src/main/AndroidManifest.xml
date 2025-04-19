@@ -67,6 +67,10 @@
             android:exported="true" />
 
         <activity
+            android:name=".activity.ApplyJobActivity"
+            android:exported="true" />
+
+        <activity
             android:name=".activity.Welcome"
             android:exported="true"
             android:theme="@style/Theme.JobHub">

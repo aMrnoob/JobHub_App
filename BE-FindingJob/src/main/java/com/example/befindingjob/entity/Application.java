@@ -11,6 +11,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "applications")
 @Getter
@@ -34,16 +36,13 @@ public class Application {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    private java.time.LocalDateTime applicationDate;
+    private LocalDateTime applicationDate;
 
     @Enumerated(EnumType.STRING)
     private ApplicationStatus status;
 
     @Column(columnDefinition = "TEXT")
     private String coverLetter;
-
-    @Column(name = "cv_url")
-    private String cvUrl;
 
     @JsonIgnore
     @OneToOne(mappedBy = "application", cascade = CascadeType.ALL, orphanRemoval = true)

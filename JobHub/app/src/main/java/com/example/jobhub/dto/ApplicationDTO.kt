@@ -1,7 +1,7 @@
 package com.example.jobhub.dto
 
 import com.example.jobhub.entity.enumm.ApplicationStatus
-import java.util.Date
+import java.time.LocalDateTime
 
 data class ApplicationDTO (
     val applicationId: Int? = null,
@@ -9,6 +9,5 @@ data class ApplicationDTO (
     val userDTO: UserDTO,
     val coverLetter: String,
     val status: ApplicationStatus = ApplicationStatus.APPLIED,
-    val applicationDate: Date? = null,
-    val cvUrl: String? = null
+    val applicationDate: LocalDateTime = LocalDateTime.now()
 )
