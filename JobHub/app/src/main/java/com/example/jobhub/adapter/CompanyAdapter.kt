@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.jobhub.R
+import com.example.jobhub.anim.AnimationHelper
 import com.example.jobhub.entity.Company
 import com.example.jobhub.entity.enumm.CompanyAction
 
@@ -42,6 +43,7 @@ class CompanyAdapter(
         holder.tvDescription.visibility = if (isExpanded) View.VISIBLE else View.GONE
 
         holder.itemView.setOnClickListener {
+            AnimationHelper.animateScale(it)
             val previousExpandedPosition = expandedPosition
 
             expandedPosition = if (isExpanded) {
@@ -54,10 +56,12 @@ class CompanyAdapter(
         }
 
         holder.btnEdit.setOnClickListener {
+            AnimationHelper.animateScale(it)
             onActionClick?.let { it1 -> it1(company, CompanyAction.EDIT) }
         }
 
         holder.btnRemove.setOnClickListener {
+            AnimationHelper.animateScale(it)
             onActionClick?.let { it1 -> it1(company, CompanyAction.DELETE) }
         }
     }

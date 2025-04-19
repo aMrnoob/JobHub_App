@@ -2,9 +2,10 @@ package com.example.jobhub.activity
 
 import android.content.Intent
 import android.os.Bundle
+import com.example.jobhub.anim.AnimationHelper
 import com.example.jobhub.databinding.WelcomeScreenBinding
 
-class Welcome : BaseActivity() {
+class WelcomeActivity : BaseActivity() {
 
     private lateinit var binding: WelcomeScreenBinding
 
@@ -15,13 +16,13 @@ class Welcome : BaseActivity() {
         setContentView(binding.root)
 
         binding.btnLogin.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
+            AnimationHelper.animateScale(it)
+            startActivity(Intent(this, LoginActivity::class.java))
         }
 
         binding.btnRegister.setOnClickListener {
-            val intent = Intent(this, SignUpActivity::class.java)
-            startActivity(intent)
+            AnimationHelper.animateScale(it)
+            startActivity(Intent(this, SignUpActivity::class.java))
         }
     }
 }

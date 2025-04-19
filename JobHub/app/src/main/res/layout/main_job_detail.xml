@@ -8,7 +8,7 @@
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -41,28 +41,7 @@
                 android:textColor="@color/black"
                 android:inputType="text" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="5dp"
-                android:text="Description*"
-                android:textColor="@color/gray_700"
-                android:textSize="20sp" />
 
-            <EditText
-                android:id="@+id/edtDescription"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:paddingTop="5dp"
-                android:background="@drawable/edittext_background"
-                android:hint="Description"
-                android:textColorHint="@color/gray_500"
-                android:textColor="@color/black"
-                android:minHeight="70dp"
-                android:gravity="top"
-                android:inputType="textMultiLine" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -76,16 +55,16 @@
             <EditText
                 android:id="@+id/edtRequirements"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="100dp"
                 android:layout_marginBottom="20dp"
                 android:paddingTop="5dp"
                 android:background="@drawable/edittext_background"
                 android:hint="Requirements"
                 android:textColorHint="@color/gray_500"
                 android:textColor="@color/black"
-                android:minHeight="70dp"
-                android:gravity="top"
-                android:inputType="textMultiLine" />
+                android:gravity="top|start"
+                android:inputType="textMultiLine"
+                android:scrollbars="vertical"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -120,16 +99,38 @@
             <EditText
                 android:id="@+id/edtLocation"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="100dp"
                 android:layout_marginBottom="20dp"
                 android:paddingTop="5dp"
                 android:background="@drawable/edittext_background"
                 android:hint="Work's address"
                 android:textColorHint="@color/gray_500"
                 android:textColor="@color/black"
-                android:inputType="text"
-                android:minHeight="70dp"
-                android:gravity="top"/>
+                android:inputType="textMultiLine"
+                android:gravity="top|start"
+                android:scrollbars="vertical"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginStart="5dp"
+                android:text="Description*"
+                android:textColor="@color/gray_700"
+                android:textSize="20sp" />
+
+            <EditText
+                android:id="@+id/edtDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:gravity="top|start"
+                android:minHeight="100dp"
+                android:paddingTop="5dp"
+                android:background="@drawable/edittext_background"
+                android:hint="Description"
+                android:textColorHint="@color/gray_500"
+                android:textColor="@color/black" />
 
             <Button
                 android:id="@+id/btnUpdate"

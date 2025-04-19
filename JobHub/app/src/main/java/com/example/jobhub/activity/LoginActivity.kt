@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import com.example.jobhub.R
+import com.example.jobhub.anim.AnimationHelper
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.ApiService
 import com.example.jobhub.config.RetrofitClient
@@ -55,9 +56,13 @@ class LoginActivity : BaseActivity() {
             binding.cbRememberPassword.isChecked = true
         }
 
-        binding.invisiblePwd.setOnClickListener { togglePasswordVisibility() }
+        binding.invisiblePwd.setOnClickListener {
+            AnimationHelper.animateScale(it)
+            togglePasswordVisibility()
+        }
 
         binding.btnGoogle.setOnClickListener {
+            AnimationHelper.animateScale(it)
             val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken("856354548077-e00ibmh0ojbv416s43qldd8ec0j4o43m.apps.googleusercontent.com") // Thay bằng Web Client ID
                 .requestEmail()
@@ -69,6 +74,7 @@ class LoginActivity : BaseActivity() {
         }
 
         binding.btnFacebook.setOnClickListener {
+            AnimationHelper.animateScale(it)
             FacebookSdk.fullyInitialize()
             callbackManager = CallbackManager.Factory.create()
 
@@ -86,9 +92,13 @@ class LoginActivity : BaseActivity() {
                 })
         }
 
-        binding.btnForgetPwd.setOnClickListener { startActivity(Intent(this, ForgetPwdActivity::class.java)) }
+        binding.btnForgetPwd.setOnClickListener {
+            AnimationHelper.animateScale(it)
+            startActivity(Intent(this, ForgetPwdActivity::class.java))
+        }
 
         binding.btnLogin.setOnClickListener {
+            AnimationHelper.animateScale(it)
             val email = binding.edtEmail.text.toString()
             val password = binding.edtPassword.text.toString()
 
@@ -108,7 +118,10 @@ class LoginActivity : BaseActivity() {
             }
         }
 
-        binding.btnRegister.setOnClickListener { startActivity(Intent(this, SignUpActivity::class.java)) }
+        binding.btnRegister.setOnClickListener {
+            AnimationHelper.animateScale(it)
+            startActivity(Intent(this, SignUpActivity::class.java))
+        }
     }
 
     private val signInLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->

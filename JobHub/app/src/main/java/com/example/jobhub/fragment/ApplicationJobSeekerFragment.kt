@@ -26,17 +26,16 @@ import java.time.LocalDateTime
 
 class ApplicationJobSeekerFragment : Fragment() {
 
-    private var _binding: MainApplicationJobSeekerBinding? = null
-    private val binding get() = _binding!!
     private lateinit var sharedPrefs: SharedPrefsManager
+    private lateinit var jobAdapter: JobAdapter
 
+    private var userDTO: UserDTO? = null
+    private var _binding: MainApplicationJobSeekerBinding? = null
+
+    private val binding get() = _binding!!
     private val jobService: JobService by lazy { RetrofitClient.createRetrofit().create(JobService::class.java) }
-
     private val originalJobs: MutableList<ItemJobDTO> = mutableListOf()
     private val filteredJobs: MutableList<ItemJobDTO> = mutableListOf()
-
-    private lateinit var jobAdapter: JobAdapter
-    private var userDTO: UserDTO? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -91,13 +90,13 @@ class ApplicationJobSeekerFragment : Fragment() {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private fun loadAppliedJobs() {
+    private fun loadAppliedJobs(page: Int = 0) {
         val token = sharedPrefs.authToken ?: return
         val currentRole = sharedPrefs.role
 
         ApiHelper().callApi(
             context = requireContext(),
-            call = jobService.getAllJobsByUser("Bearer $token"),
+            call = jobService.getAllJobsByUser("Bearer $token", page),
             onSuccess = { response ->
                 originalJobs.clear()
                 val jobs = response?.let {
@@ -113,7 +112,7 @@ class ApplicationJobSeekerFragment : Fragment() {
                 filteredJobs.addAll(originalJobs)
 
                 jobAdapter.notifyDataSetChanged()
-            },
+            }
         )
     }
 

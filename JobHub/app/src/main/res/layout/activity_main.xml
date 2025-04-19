@@ -30,7 +30,8 @@
             android:text="Home"
             android:textSize="15sp"
             android:gravity="center"
-            android:paddingTop="10dp"/>
+            android:paddingTop="10dp"
+            android:tint="@color/blue_500"/>
 
         <TextView
             android:id="@+id/tvApplication"
@@ -42,7 +43,8 @@
             android:text="Application"
             android:textSize="15sp"
             android:gravity="center"
-            android:paddingTop="10dp"/>
+            android:paddingTop="10dp"
+            android:tint="@color/blue_500"/>
 
         <TextView
             android:id="@+id/tvCompany"
@@ -54,7 +56,8 @@
             android:text="Company"
             android:textSize="15sp"
             android:gravity="center"
-            android:paddingTop="10dp" />
+            android:paddingTop="10dp"
+            android:tint="@color/blue_500"/>
 
         <TextView
             android:id="@+id/tvApply"
@@ -67,7 +70,8 @@
             android:textSize="15sp"
             android:gravity="center"
             android:paddingTop="10dp"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            android:tint="@color/blue_500"/>
 
         <TextView
             android:id="@+id/tvProfile"
@@ -78,6 +82,7 @@
             android:text="Profile"
             android:textSize="15sp"
             android:gravity="center"
-            android:paddingTop="10dp"/>
+            android:paddingTop="10dp"
+            android:tint="@color/blue_500"/>
     </LinearLayout>
 </LinearLayout>

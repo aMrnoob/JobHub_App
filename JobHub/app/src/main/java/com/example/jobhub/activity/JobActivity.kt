@@ -17,6 +17,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.jobhub.adapter.SkillAdapter
+import com.example.jobhub.anim.AnimationHelper
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.config.SharedPrefsManager
@@ -69,10 +70,12 @@ class JobActivity : BaseActivity() {
                 setContentView(bindingAboutJob.root)
 
                 bindingAboutJob.btnComeBack.setOnClickListener {
+                    AnimationHelper.animateScale(it)
                     finish()
                 }
 
                 bindingAboutJob.btnNext.setOnClickListener {
+                    AnimationHelper.animateScale(it)
                     val title = bindingAboutJob.edtTitle.text.toString().trim()
                     val description = bindingAboutJob.edtDescription.text.toString().trim()
                     val requirements = bindingAboutJob.edtRequirements.text.toString().trim()
@@ -107,6 +110,7 @@ class JobActivity : BaseActivity() {
                 setupDatePickers()
 
                 bindingDetailJob.btnComeBack.setOnClickListener {
+                    AnimationHelper.animateScale(it)
                     currentStep = 1
                     showStep(currentStep)
                 }
@@ -143,11 +147,13 @@ class JobActivity : BaseActivity() {
                 setupRecyclerView()
 
                 bindingRequirementJob.btnComeBack.setOnClickListener {
+                    AnimationHelper.animateScale(it)
                     currentStep = 2
                     showStep(currentStep)
                 }
 
                 bindingRequirementJob.btnComplete.setOnClickListener {
+                    AnimationHelper.animateScale(it)
                     jobDTO.requiredSkills = skillAdapter.getSkillsDTO().toSet()
 
                     if (jobDTO.requiredSkills.isEmpty()) {

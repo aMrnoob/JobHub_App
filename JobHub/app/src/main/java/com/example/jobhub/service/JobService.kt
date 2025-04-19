@@ -8,6 +8,7 @@ import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 interface JobService {
     @POST("api/job/create-job")
@@ -20,5 +21,6 @@ interface JobService {
     fun deleteJob(@Body jobId: Int): Call<ApiResponse<Void>>
 
     @POST("api/job/get-all-jobs-by-user")
-    fun getAllJobsByUser(@Header("token") token: String): Call<ApiResponse<List<ItemJobDTO>>>
+    fun getAllJobsByUser(@Header("token") token: String, @Query("page") page: Int
+    ): Call<ApiResponse<List<ItemJobDTO>>>
 }

@@ -16,9 +16,9 @@ import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.MainCompanyJobBinding
 import com.example.jobhub.dto.CompanyDTO
 import com.example.jobhub.dto.ItemJobDTO
+import com.example.jobhub.entity.enumm.Role
 import com.example.jobhub.fragment.fragmentinterface.FragmentInterface
 import com.example.jobhub.service.CompanyService
-import com.google.gson.Gson
 
 class CompanyJobFragment : Fragment() {
 
@@ -43,7 +43,11 @@ class CompanyJobFragment : Fragment() {
         _binding = MainCompanyJobBinding.inflate(inflater, container, false)
         sharedPrefs = SharedPrefsManager(requireContext())
 
-        loadJobFromPrefs()
+        val role = sharedPrefs.role
+        if(role == Role.JOB_SEEKER) { binding.btnUpdate.visibility = View.GONE }
+
+        jobDTO = sharedPrefs.getCurrentJob()
+
         displayJob()
         setEditTextEnabled(false)
 
@@ -91,15 +95,6 @@ class CompanyJobFragment : Fragment() {
         builder.setMessage(description)
         builder.setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
         builder.show()
-    }
-
-    private fun loadJobFromPrefs() {
-        val sharedPreferences = requireContext().getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
-        val jobJson = sharedPreferences.getString("job", null)
-
-        if (!jobJson.isNullOrEmpty()) {
-            jobDTO = Gson().fromJson(jobJson, ItemJobDTO::class.java)
-        }
     }
 
     private fun update() {

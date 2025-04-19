@@ -14,8 +14,10 @@ import com.example.befindingjob.repository.UserRepository;
 import com.example.befindingjob.service.JobService;
 import com.example.befindingjob.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import org.springframework.data.domain.Pageable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -89,28 +91,32 @@ public class JobServiceImpl implements JobService {
 
 
     @Override
-    public ApiResponse<List<ItemJobDTO>> getAllJobsByUser(String token) {
+    public ApiResponse<List<ItemJobDTO>> getAllJobsByUser(String token, int page) {
+        int size = 4;
+
         if (!jwtService.isValidToken(token)) {
-            return new ApiResponse<>(false, "", null);
+            return new ApiResponse<>(false, "Invalid token", null);
         }
 
         Integer userId = jwtService.extractUserId(token);
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) {
-            return new ApiResponse<>(false, "", null);
+            return new ApiResponse<>(false, "User not found", null);
         }
 
         User user = userOpt.get();
         Role role = user.getRole();
         List<ItemJobDTO> jobs;
 
+        Pageable pageable = PageRequest.of(page, size);
+
         if (role == Role.EMPLOYER) {
             jobs = user.getCompanies().stream()
-                    .flatMap(company -> jobRepository.findByCompany(company).stream())
+                    .flatMap(company -> jobRepository.findByCompany(company, pageable).stream())
                     .map(ItemJobDTO::new)
                     .collect(Collectors.toList());
         } else if (role == Role.JOB_SEEKER) {
-            jobs = jobRepository.findAll().stream()
+            jobs = jobRepository.findAll(pageable).stream()
                     .map(ItemJobDTO::new)
                     .collect(Collectors.toList());
         } else {

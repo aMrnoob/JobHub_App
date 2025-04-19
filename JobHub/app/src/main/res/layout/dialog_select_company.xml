@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginHorizontal="20dp"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginStart="5dp"
+            android:text="Select Company*"
+            android:textColor="@color/gray_700"
+            android:textSize="20sp" />
+
+        <Spinner
+            android:id="@+id/spinnerCompany"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="15dp"
+            android:theme="@style/SpinnerTextStyle"
+            android:popupBackground="@color/gray_100"
+            android:background="@drawable/edittext_background" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/btnNo"
+                android:layout_width="130dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="40dp"
+                android:text="Cancel"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:textAlignment="center"
+                android:gravity="center_vertical"
+                android:textColor="@color/black"
+                android:background="@drawable/border_btn"
+                android:backgroundTint="#99CCFF"
+                tools:ignore="RtlCompat" />
+
+            <TextView
+                android:id="@+id/btnYes"
+                android:layout_width="130dp"
+                android:layout_height="40dp"
+                android:text="Continue"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:textAlignment="center"
+                android:gravity="center_vertical"
+                android:textColor="@color/black"
+                android:background="@drawable/border_btn"
+                android:backgroundTint="#99CCFF"
+                tools:ignore="RtlCompat" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

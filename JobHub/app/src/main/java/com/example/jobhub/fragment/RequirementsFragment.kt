@@ -16,6 +16,7 @@ import com.example.jobhub.databinding.MainRequirementsBinding
 import com.example.jobhub.dto.ItemJobDTO
 import com.example.jobhub.dto.SkillDTO
 import com.example.jobhub.entity.Job
+import com.example.jobhub.entity.enumm.Role
 import com.example.jobhub.fragment.fragmentinterface.FragmentInterface
 import com.example.jobhub.service.SkillService
 
@@ -29,9 +30,7 @@ class RequirementsFragment : Fragment() {
     private var skillAdapter: SkillAdapter? = null
 
     private val binding get() = _binding ?: throw IllegalStateException("Binding is null")
-    private val skillService: SkillService by lazy {
-        RetrofitClient.createRetrofit().create(SkillService::class.java)
-    }
+    private val skillService: SkillService by lazy { RetrofitClient.createRetrofit().create(SkillService::class.java) }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,6 +39,11 @@ class RequirementsFragment : Fragment() {
         _binding = MainRequirementsBinding.inflate(inflater, container, false)
         sharedPrefs = SharedPrefsManager(requireContext())
 
+        val role = sharedPrefs.role
+        if(role == Role.JOB_SEEKER) {
+            binding.btnUpdate.visibility = View.GONE
+            binding.tvAddSkill.visibility = View.GONE
+        }
         itemJobDTO = sharedPrefs.getCurrentJob()
 
         setupRecyclerView()

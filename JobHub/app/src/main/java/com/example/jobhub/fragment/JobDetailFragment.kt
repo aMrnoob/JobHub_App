@@ -8,22 +8,24 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
+import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.MainJobDetailBinding
 import com.example.jobhub.dto.ItemJobDTO
 import com.example.jobhub.entity.Job
+import com.example.jobhub.entity.enumm.Role
 import com.example.jobhub.fragment.fragmentinterface.FragmentInterface
 import com.example.jobhub.service.JobService
-import com.google.gson.Gson
 
 class JobDetailFragment : Fragment() {
 
-    private var _binding: MainJobDetailBinding? = null
-    private val binding get() = _binding!!
+    private lateinit var sharedPrefs: SharedPrefsManager
+
     private var jobDTO: ItemJobDTO? = null
     private var jobDetailInterface: FragmentInterface? = null
-    private val jobService: JobService by lazy {
-        RetrofitClient.createRetrofit().create(JobService::class.java)
-    }
+    private var _binding: MainJobDetailBinding? = null
+
+    private val binding get() = _binding!!
+    private val jobService: JobService by lazy { RetrofitClient.createRetrofit().create(JobService::class.java) }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -37,13 +39,12 @@ class JobDetailFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = MainJobDetailBinding.inflate(inflater, container, false)
+        sharedPrefs = SharedPrefsManager(requireContext())
 
-        val sharedPreferences = requireContext().getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
-        val jobJson = sharedPreferences.getString("job", null)
+        val role = sharedPrefs.role
+        if(role == Role.JOB_SEEKER) { binding.btnUpdate.visibility = View.GONE }
 
-        if (!jobJson.isNullOrEmpty()) {
-            jobDTO = Gson().fromJson(jobJson, ItemJobDTO::class.java)
-        }
+        jobDTO = sharedPrefs.getCurrentJob()
 
         displayJob()
         setEditTextEnabled(false)
@@ -63,10 +64,6 @@ class JobDetailFragment : Fragment() {
             binding.edtSalary.setText(it.salary)
             binding.edtLocation.setText(it.location)
         }
-    }
-
-    fun enableEditing() {
-        setEditTextEnabled(true)
     }
 
     private fun setEditTextEnabled(enabled: Boolean) {
@@ -105,24 +102,12 @@ class JobDetailFragment : Fragment() {
                     salary = job.salary.toString()
                     location = job.location.toString()
                 }
-                saveJobToPrefs()
-                refreshJob()
+                sharedPrefs.saveCurrentJob(jobDTO!!)
+                jobDTO = sharedPrefs.getCurrentJob()
+                displayJob()
             }
         )
     }
 
-    private fun refreshJob() {
-        val sharedPreferences = requireContext().getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
-        val jobJson = sharedPreferences.getString("job", null)
-        if (!jobJson.isNullOrEmpty()) {
-            jobDTO = Gson().fromJson(jobJson, ItemJobDTO::class.java)
-            displayJob()
-        }
-    }
-
-    private fun saveJobToPrefs() {
-        val sharedPreferences = requireContext().getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
-        val jobJson = Gson().toJson(jobDTO)
-        sharedPreferences.edit().putString("job", jobJson).apply()
-    }
+    fun enableEditing() { setEditTextEnabled(true) }
 }

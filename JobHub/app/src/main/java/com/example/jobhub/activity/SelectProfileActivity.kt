@@ -14,6 +14,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
+import com.example.jobhub.anim.AnimationHelper
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.ActivityProfileBinding
@@ -84,11 +85,13 @@ class SelectProfileActivity : BaseActivity() {
         setContentView(binding.root)
 
         binding.tvFindingJob.setOnClickListener {
+            AnimationHelper.animateScale(it)
             role = Role.JOB_SEEKER
             handleClick(it, Role.JOB_SEEKER)
         }
 
         binding.tvFindingStaff.setOnClickListener {
+            AnimationHelper.animateScale(it)
             role = Role.EMPLOYER
             handleClick(it, Role.EMPLOYER)
         }

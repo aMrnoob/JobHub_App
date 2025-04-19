@@ -28,8 +28,13 @@ public class JobController {
     }
 
     @PostMapping("/delete-job")
-    public ApiResponse<Void> deleteJob(@RequestBody int jobId) {return jobService.deleteJob(jobId);}
+    public ApiResponse<Void> deleteJob(@RequestBody int jobId) {
+        return jobService.deleteJob(jobId);
+    }
 
     @PostMapping("/get-all-jobs-by-user")
-    public ApiResponse<List<ItemJobDTO>> getAllJobsByUser(@RequestHeader("token") String token) {return jobService.getAllJobsByUser(token);}
+    public ApiResponse<List<ItemJobDTO>> getAllJobsByUser(@RequestHeader("token") String token,
+        @RequestParam(defaultValue = "0") int page) {
+        return jobService.getAllJobsByUser(token, page);
+    }
 }

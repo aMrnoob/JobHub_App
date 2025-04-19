@@ -11,6 +11,7 @@ import android.util.Base64
 import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
+import com.example.jobhub.anim.AnimationHelper
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.config.SharedPrefsManager
@@ -57,6 +58,7 @@ class ProfileActivity : BaseActivity() {
         binding.edtDateOfBirth.setOnClickListener { showDatePicker() }
 
         binding.btnUpdateProfile.setOnClickListener {
+            AnimationHelper.animateScale(it)
             if (validateFields()) updateUserProfile()
         }
     }

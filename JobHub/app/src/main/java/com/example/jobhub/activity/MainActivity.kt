@@ -1,10 +1,13 @@
 package com.example.jobhub.activity
 
-import android.animation.ObjectAnimator
-import android.animation.PropertyValuesHolder
 import android.os.Bundle
 import android.view.View
+import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.viewpager2.widget.ViewPager2
+import com.example.jobhub.R
 import com.example.jobhub.adapter.FragmentPagerAdapter
+import com.example.jobhub.anim.AnimationHelper
 import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.ActivityMainBinding
 import com.example.jobhub.entity.enumm.Role
@@ -20,6 +23,7 @@ class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewPagerAdapter: FragmentPagerAdapter
     private lateinit var sharedPrefs: SharedPrefsManager
+    private lateinit var tabPositionMap: Map<TextView, Int>
 
     private var role: Role? = null
 
@@ -57,44 +61,69 @@ class MainActivity : BaseActivity() {
         binding.viewPager.isUserInputEnabled = true
 
         setupBottomNavigation()
+        initTabPositionMap()
         setupAnimation()
+
+        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                updateTabColorOnPageChange(position)
+            }
+        })
+    }
+
+    private fun updateTabColorOnPageChange(position: Int) {
+        val colorSelected = ContextCompat.getColor(this, R.color.blue_600)
+        val colorUnselected = ContextCompat.getColor(this, R.color.gray_500)
+
+        tabPositionMap.forEach { (tab, pos) ->
+            if (pos == position) {
+                updateTabColor(tab, colorSelected, colorUnselected)
+            }
+        }
     }
 
     private fun setupAnimation() {
-        binding.tvHome.setOnClickListener {
-            animateView(it)
-            binding.viewPager.currentItem = 0
-        }
-
-        binding.tvApplication.setOnClickListener {
-            animateView(it)
-            binding.viewPager.currentItem = 1
-        }
-
-        binding.tvApply.setOnClickListener {
-            animateView(it)
-            binding.viewPager.currentItem = 2
-        }
-
-        binding.tvCompany.setOnClickListener {
-            animateView(it)
-            binding.viewPager.currentItem = 2
-        }
-
-        binding.tvProfile.setOnClickListener {
-            animateView(it)
-            binding.viewPager.currentItem = 3
+        tabPositionMap.forEach { (tab, position) ->
+            tab.setOnClickListener {
+                AnimationHelper.animateScale(it)
+                binding.viewPager.currentItem = position
+            }
         }
     }
 
-    private fun animateView(view: View) {
-        ObjectAnimator.ofPropertyValuesHolder(
-            view,
-            PropertyValuesHolder.ofFloat(View.SCALE_X, 1f, 1.1f, 1f),
-            PropertyValuesHolder.ofFloat(View.SCALE_Y, 1f, 1.1f, 1f)
-        ).apply {
-            duration = 300
-            start()
+    private fun updateTabColor(view: View, colorSelected: Int, colorUnselected: Int) {
+        if (view is TextView) {
+            view.setTextColor(colorSelected)
+            changeIconColor(view, colorSelected)
+        }
+
+        val tabs = listOf(binding.tvHome, binding.tvApplication, binding.tvApply, binding.tvCompany, binding.tvProfile)
+        tabs.forEach {
+            if (it != view) {
+                it.setTextColor(colorUnselected)
+                changeIconColor(it, colorUnselected)
+            }
         }
     }
+
+    private fun initTabPositionMap() {
+        tabPositionMap = if (role == Role.EMPLOYER) {
+            mapOf(
+                binding.tvHome to 0,
+                binding.tvApplication to 1,
+                binding.tvCompany to 2,
+                binding.tvProfile to 3
+            )
+        } else {
+            mapOf(
+                binding.tvHome to 0,
+                binding.tvApplication to 1,
+                binding.tvApply to 2,
+                binding.tvProfile to 3
+            )
+        }
+    }
+
+    private fun changeIconColor(view: TextView, color: Int) { view.compoundDrawables[1]?.setTint(color) }
 }

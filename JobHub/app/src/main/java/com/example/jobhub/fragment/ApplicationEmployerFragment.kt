@@ -25,7 +25,9 @@ import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.MainApplicationEmployerBinding
 import com.example.jobhub.dto.ItemJobDTO
 import com.example.jobhub.entity.enumm.JobAction
+import com.example.jobhub.entity.enumm.Role
 import com.example.jobhub.service.JobService
+import java.time.LocalDateTime
 
 class ApplicationEmployerFragment : Fragment() {
 
@@ -36,6 +38,8 @@ class ApplicationEmployerFragment : Fragment() {
     private var allJobs: MutableList<ItemJobDTO> = mutableListOf()
     private var jobList: MutableList<ItemJobDTO> = mutableListOf()
     private var isFragmentVisible = false
+    private var isLoading = false
+    private var isLastPage = false
 
     private val binding get() = _binding!!
     private val jobService: JobService by lazy { RetrofitClient.createRetrofit().create(JobService::class.java) }
@@ -87,21 +91,41 @@ class ApplicationEmployerFragment : Fragment() {
         }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    private fun getAllJobs() {
+    private fun getAllJobs(page: Int = 0) {
+        if (isLoading || isLastPage) return
+
         val token = sharedPrefs.authToken ?: return
+        val currentRole = sharedPrefs.role
+        isLoading = true
+        jobAdapter.showLoadingFooter()
 
         ApiHelper().callApi(
             context = requireContext(),
-            call = jobService.getAllJobsByUser("Bearer $token"),
+            call = jobService.getAllJobsByUser("Bearer $token", page),
             onSuccess = { response ->
-                allJobs.clear()
-                response?.let { allJobs.addAll(it) }
-                if (binding.searchView.query.isNullOrEmpty()) {
-                    jobList.clear()
-                    jobList.addAll(allJobs)
-                }
-                jobAdapter.notifyDataSetChanged()
+                Handler(Looper.getMainLooper()).postDelayed({
+                    val jobs = response?.let {
+                        if (currentRole == Role.JOB_SEEKER) {
+                            it.filter { job -> job.expirationDate.isAfter(LocalDateTime.now()) }
+                        } else {
+                            it
+                        }
+                    } ?: emptyList()
+
+                    val sortedList = jobs.sortedByDescending { job -> job.jobId }
+                    if (sortedList.isEmpty()) {
+                        isLastPage = true
+                    } else {
+                        val prevSize = jobList.size
+                        allJobs.addAll(sortedList)
+                        jobList.addAll(sortedList)
+                        jobAdapter.notifyItemRangeInserted(prevSize, sortedList.size)
+                    }
+
+                    jobAdapter.hideLoadingFooter()
+                    jobAdapter.hideLoadingFooter()
+                    isLoading = false
+                }, 2000)
             }
         )
     }
@@ -177,7 +201,7 @@ class ApplicationEmployerFragment : Fragment() {
     private val refreshRunnable = object : Runnable {
         override fun run() {
             if (isFragmentVisible && binding.searchView.query.isNullOrEmpty()) { getAllJobs() }
-            refreshHandler.postDelayed(this, 10000)
+            refreshHandler.postDelayed(this, 60000)
         }
     }
 

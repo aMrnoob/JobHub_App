@@ -14,9 +14,11 @@ data class ItemJobDTO(
     @SerializedName("jobType") val jobType: JobType,
     @SerializedName("experienceRequired") val experienceRequired: String,
     @SerializedName("expirationDate")
-    val expirationDate: LocalDateTime,
+    var expirationDate: LocalDateTime,
     @SerializedName("company")
     var company: ItemCompanyDTO,
     @SerializedName("requiredSkills")
-    var requiredSkills: Set<SkillDTO>
+    var requiredSkills: Set<SkillDTO>,
+
+    @Transient var expirationDateStr: String? = null
 )

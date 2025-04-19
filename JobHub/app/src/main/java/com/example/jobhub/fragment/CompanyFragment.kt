@@ -93,8 +93,9 @@ class CompanyFragment : Fragment() {
             call = companyService.getAllCompaniesByUserId("Bearer $token"),
             onSuccess = { response ->
                 response?.let {
+                    val sortedList = it.sortedByDescending { company -> company.companyId }
                     allCompanies.clear()
-                    allCompanies.addAll(it)
+                    allCompanies.addAll(sortedList)
                 }
 
                 if (binding.searchView.query.isNullOrEmpty()) {
@@ -179,7 +180,7 @@ class CompanyFragment : Fragment() {
     private val refreshRunnable = object : Runnable {
         override fun run() {
             if (isFragmentVisible && binding.searchView.query.isNullOrEmpty()) { fetchAllCompanies() }
-            refreshHandler.postDelayed(this, 10000)
+            refreshHandler.postDelayed(this, 60000)
         }
     }
 

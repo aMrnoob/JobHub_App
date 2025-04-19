@@ -2,8 +2,8 @@ package com.example.jobhub.activity
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
+import com.example.jobhub.anim.AnimationHelper
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.config.SharedPrefsManager
@@ -62,7 +62,8 @@ class CompanyActivity : BaseActivity() {
                 website,
                 sharedPrefs.userId,
             )
-            Log.e("userId", sharedPrefs.userId.toString())
+
+            AnimationHelper.animateScale(it)
             if (company == null) {
                 addCompany(companyDTO)
             } else {
@@ -70,7 +71,10 @@ class CompanyActivity : BaseActivity() {
             }
         }
 
-        binding.btnComeBack.setOnClickListener { finish() }
+        binding.btnComeBack.setOnClickListener {
+            AnimationHelper.animateScale(it)
+            finish()
+        }
     }
 
     private fun addCompany(companyDTO: CompanyDTO) {

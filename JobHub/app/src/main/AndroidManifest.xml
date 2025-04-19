@@ -17,20 +17,24 @@
         android:theme="@style/Theme.JobHub"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <activity
+            android:name=".activity.InforJobActivity"
+            android:exported="false" />
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
-
         <meta-data
             android:name="com.facebook.sdk.ClientToken"
             android:value="@string/client_token" />
 
-        <activity android:name="com.facebook.FacebookActivity"
-            android:configChanges= "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="JobHub" />
 
-        <provider android:name="com.facebook.FacebookContentProvider"
+        <provider
+            android:name="com.facebook.FacebookContentProvider"
             android:authorities="com.facebook.app.FacebookContentProvider1591049248278162"
             android:exported="true" />
 
@@ -65,13 +69,13 @@
         <activity
             android:name=".activity.ProfileActivity"
             android:exported="true" />
-
         <activity
-            android:name=".activity.Welcome"
+            android:name=".activity.WelcomeActivity"
             android:exported="true"
             android:theme="@style/Theme.JobHub">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

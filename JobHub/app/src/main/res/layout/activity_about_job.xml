@@ -41,7 +41,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintHorizontal_bias="0.168"
-        app:layout_constraintVertical_bias="0.45"
+        app:layout_constraintVertical_bias="1"
         app:layout_constraintWidth_percent="0.8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -74,29 +74,6 @@
                 android:textColorHint="@color/gray_500"
                 android:textColor="@color/black"
                 android:inputType="text" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="5dp"
-                android:text="Description*"
-                android:textColor="@color/gray_700"
-                android:textSize="20sp" />
-
-            <EditText
-                android:id="@+id/edtDescription"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:paddingTop="5dp"
-                android:background="@drawable/edittext_background"
-                android:hint="Description"
-                android:textColorHint="@color/gray_500"
-                android:textColor="@color/black"
-                android:minHeight="70dp"
-                android:gravity="top"
-                android:inputType="textMultiLine" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -155,15 +132,38 @@
                 android:id="@+id/edtLocation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="35dp"
+                android:layout_marginBottom="20dp"
                 android:paddingTop="5dp"
                 android:background="@drawable/edittext_background"
                 android:hint="Work's address"
                 android:textColorHint="@color/gray_500"
                 android:textColor="@color/black"
                 android:inputType="text"
-                android:minHeight="70dp"
+                android:minHeight="100dp"
                 android:gravity="top"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginStart="5dp"
+                android:text="Description*"
+                android:textColor="@color/gray_700"
+                android:textSize="20sp" />
+
+            <EditText
+                android:id="@+id/edtDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="35dp"
+                android:paddingTop="5dp"
+                android:background="@drawable/edittext_background"
+                android:hint="Description"
+                android:textColorHint="@color/gray_500"
+                android:textColor="@color/black"
+                android:minHeight="100dp"
+                android:gravity="top"
+                android:inputType="textMultiLine" />
 
             <Button
                 android:id="@+id/btnNext"
@@ -174,6 +174,10 @@
                 android:text="Next"
                 android:textColor="@color/white"
                 android:textSize="24sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp" />
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

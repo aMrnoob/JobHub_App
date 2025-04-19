@@ -1,7 +1,5 @@
 package com.example.jobhub.fragment
 
-import android.animation.ObjectAnimator
-import android.animation.PropertyValuesHolder
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
@@ -17,8 +15,10 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.jobhub.R
+import com.example.jobhub.activity.InforJobActivity
 import com.example.jobhub.activity.VacancyActivity
 import com.example.jobhub.adapter.JobAdapter
+import com.example.jobhub.anim.AnimationHelper
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.config.SharedPrefsManager
@@ -98,7 +98,7 @@ class HomeFragment : Fragment() {
                 when (action) {
                     JobAction.CLICK -> {
                         if (currentRole == Role.JOB_SEEKER) {
-                            val intent = Intent(requireContext(), VacancyActivity::class.java)
+                            val intent = Intent(requireContext(), InforJobActivity::class.java)
                             sharedPrefs.saveCurrentJob(job)
                             startActivity(intent)
                         }
@@ -130,13 +130,14 @@ class HomeFragment : Fragment() {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private fun getAllJobs() {
+    private fun getAllJobs(page: Int = 0) {
         val token = sharedPrefs.authToken ?: return
         val currentRole = sharedPrefs.role
 
         ApiHelper().callApi(
             context = requireContext(),
-            call = jobService.getAllJobsByUser("Bearer $token"),
+            call = jobService.getAllJobsByUser("Bearer $token", page),
+            onStart = { jobAdapter.showLoadingFooter() },
             onSuccess = { response ->
                 val jobs = response?.let {
                     if (currentRole == Role.JOB_SEEKER) {
@@ -145,15 +146,16 @@ class HomeFragment : Fragment() {
                         it
                     }
                 } ?: emptyList()
-
+                val sortedList = jobs.sortedByDescending { job -> job.jobId }
                 allJobs.clear()
-                allJobs.addAll(jobs)
+                allJobs.addAll(sortedList)
                 if (binding.searchView.query.isNullOrEmpty()) {
                     jobList.clear()
                     jobList.addAll(allJobs)
                 }
                 jobAdapter.notifyDataSetChanged()
-            }
+            },
+            onComplete = { jobAdapter.hideLoadingFooter() }
         )
     }
 
@@ -179,22 +181,11 @@ class HomeFragment : Fragment() {
         alertDialog.show()
     }
 
-    private fun animateView(view: View) {
-        ObjectAnimator.ofPropertyValuesHolder(
-            view,
-            PropertyValuesHolder.ofFloat(View.SCALE_X, 1f, 1.1f, 1f),
-            PropertyValuesHolder.ofFloat(View.SCALE_Y, 1f, 1.1f, 1f)
-        ).apply {
-            duration = 300
-            start()
-        }
-    }
-
     private fun setupAnimation() {
         listOf(
             binding.ivNotification, binding.ivMenu,
             binding.tvTips, binding.tvViewMore1, binding.tvViewMore
-        ).forEach { it.setOnClickListener { animateView(it) } }
+        ).forEach { it.setOnClickListener { AnimationHelper.animateScale(it) } }
     }
 
     private fun setupCategorySelection() {
@@ -291,7 +282,7 @@ class HomeFragment : Fragment() {
     private val refreshRunnable = object : Runnable {
         override fun run() {
             if (isFragmentVisible && binding.searchView.query.isNullOrEmpty()) { getAllJobs() }
-            refreshHandler.postDelayed(this, 10000)
+            refreshHandler.postDelayed(this, 60000)
         }
     }
 

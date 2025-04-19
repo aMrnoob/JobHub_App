@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.EditText
 import android.widget.Toast
 import com.example.jobhub.R
+import com.example.jobhub.anim.AnimationHelper
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.ForgetPwdBinding
@@ -20,20 +21,18 @@ import com.example.jobhub.service.UserService
 
 class ForgetPwdActivity : BaseActivity() {
 
-    private var isPasswordVisible = false
-    private var isConfirmPasswordVisible = false
-    private var countDownTimer: CountDownTimer? = null
-
     private lateinit var bindingForgetPwd: ForgetPwdBinding
     private lateinit var bindingVerify: VerifyOtpBinding
     private lateinit var bindingNewPwd: ResetPasswordBinding
-
-    private var currentStep = 1
     private lateinit var userEmail: String
     private lateinit var otpCode: String
-    private val userService: UserService by lazy {
-        RetrofitClient.createRetrofit().create(UserService::class.java)
-    }
+
+    private var isPasswordVisible = false
+    private var isConfirmPasswordVisible = false
+    private var countDownTimer: CountDownTimer? = null
+    private var currentStep = 1
+
+    private val userService: UserService by lazy { RetrofitClient.createRetrofit().create(UserService::class.java) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +46,7 @@ class ForgetPwdActivity : BaseActivity() {
                 setContentView(bindingForgetPwd.root)
 
                 bindingForgetPwd.btnComeBack.setOnClickListener {
+                    AnimationHelper.animateScale(it)
                     startActivity(Intent(this, LoginActivity::class.java))
                 }
 
@@ -55,6 +55,7 @@ class ForgetPwdActivity : BaseActivity() {
                     if (userEmail.isEmpty()) {
                         Toast.makeText(this, "Please enter your email", Toast.LENGTH_SHORT).show()
                     } else {
+                        AnimationHelper.animateScale(it)
                         requestOtp(OtpRequest(userEmail))
                     }
                 }

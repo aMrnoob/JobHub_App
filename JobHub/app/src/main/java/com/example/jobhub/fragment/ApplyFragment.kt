@@ -27,9 +27,7 @@ class ApplyFragment : Fragment() {
     private var currentUser: UserDTO? = null
     private var applications = mutableListOf<ApplicationDTO>()
 
-    private val applicationService by lazy {
-        RetrofitClient.createRetrofit().create(ApplicationService::class.java)
-    }
+    private val applicationService by lazy { RetrofitClient.createRetrofit().create(ApplicationService::class.java) }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
