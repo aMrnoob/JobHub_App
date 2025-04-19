@@ -1,15 +1,22 @@
 package com.example.jobhub.fragment
 
 import android.annotation.SuppressLint
+
 import android.content.Context
 import android.content.Intent
+
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+
 import android.widget.SearchView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+
+import com.example.jobhub.activity.ApplyJobActivity
 import com.example.jobhub.activity.VacancyActivity
 import com.example.jobhub.adapter.JobAdapter
 import com.example.jobhub.config.ApiHelper
@@ -44,6 +51,9 @@ class ApplicationJobSeekerFragment : Fragment() {
         _binding = MainApplicationJobSeekerBinding.inflate(inflater, container, false)
         sharedPrefs = SharedPrefsManager(requireContext())
 
+        binding.root.isFocusableInTouchMode = true
+        binding.root.requestFocus()
+
         loadUserFromPrefs()
         setupRecyclerView()
         loadAppliedJobs()
@@ -73,12 +83,16 @@ class ApplicationJobSeekerFragment : Fragment() {
                     }
 
                     JobAction.BOOKMARK -> {
-
+                        // Bookmark logic
                     }
 
                     JobAction.APPLY -> {
+                        val intent = Intent(requireContext(), ApplyJobActivity::class.java)
+                        sharedPrefs.saveCurrentJob(selectedJob)
+                        startActivity(intent)
+                    }
 
-                    } else -> {}
+                    else -> {}
                 }
             }
         )

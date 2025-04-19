@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.jobhub.R
 import com.example.jobhub.activity.InforJobActivity
+import com.example.jobhub.activity.ApplyJobActivity
 import com.example.jobhub.activity.VacancyActivity
 import com.example.jobhub.adapter.JobAdapter
 import com.example.jobhub.anim.AnimationHelper
@@ -109,7 +110,9 @@ class HomeFragment : Fragment() {
                     }
 
                     JobAction.APPLY -> {
-
+                        val intent = Intent(requireContext(), ApplyJobActivity::class.java)
+                        sharedPrefs.saveCurrentJob(job)
+                        startActivity(intent)
                     }
 
                     JobAction.EDIT -> {

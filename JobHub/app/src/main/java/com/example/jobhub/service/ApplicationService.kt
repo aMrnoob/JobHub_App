@@ -22,12 +22,6 @@ interface ApplicationService {
         @Part file: MultipartBody.Part
     ): Call<ApiResponse<String>>
 
-    @POST("api/applications/resume")
-    fun saveResume(
-        @Header("token") token: String,
-        @Body resumeDTO: ResumeDTO
-    ): Call<ApiResponse<ResumeDTO>>
-
     @GET("api/applications/user/{userId}")
     fun getApplicationsByUserId(
         @Header("token") token: String,

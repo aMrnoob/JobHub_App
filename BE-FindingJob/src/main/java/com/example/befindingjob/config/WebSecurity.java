@@ -6,6 +6,8 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.nio.file.Paths;
+
 @Configuration
 public class WebSecurity {
     @Bean
@@ -21,8 +23,9 @@ public class WebSecurity {
 
             @Override
             public void addResourceHandlers(ResourceHandlerRegistry registry) {
+                String resumePath = Paths.get("./uploads/resumes/").toAbsolutePath().toUri().toString();
                 registry.addResourceHandler("/uploads/resumes/**")
-                        .addResourceLocations("file:./uploads/resumes/");
+                        .addResourceLocations(resumePath);
             }
         };
     }
