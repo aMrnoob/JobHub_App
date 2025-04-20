@@ -11,5 +11,5 @@ public interface JobService {
     ApiResponse<Void> createJob(JobDTO jobDTO);
     ApiResponse<Void> updateJob(Job job);
     ApiResponse<Void> deleteJob(int jobId);
-    ApiResponse<List<ItemJobDTO>> getAllJobsByUser(String token, int page);
+    ApiResponse<List<ItemJobDTO>> getAllJobsByUser(String token);
 }

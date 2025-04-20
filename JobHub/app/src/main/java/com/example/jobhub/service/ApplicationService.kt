@@ -2,6 +2,7 @@ package com.example.jobhub.service
 
 import com.example.jobhub.dto.ApplicationDTO
 import com.example.jobhub.dto.ResumeDTO
+import com.example.jobhub.dto.StatusApplicantDTO
 import com.example.jobhub.model.ApiResponse
 import okhttp3.MultipartBody
 import retrofit2.Call
@@ -81,4 +82,10 @@ interface ApplicationService {
         @Header("token") token: String,
         @Path("employerId") employerId: Int
     ): Call<ApiResponse<Map<String, Int>>>
+
+    @POST("api/applications/employer/update-status-applicant")
+    fun updateStatusApplication(
+        @Header("token") token: String,
+        @Body statusApplicantDTO: StatusApplicantDTO
+    ): Call<ApiResponse<Void>>
 }

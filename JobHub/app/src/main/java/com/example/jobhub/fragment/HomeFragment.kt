@@ -15,8 +15,8 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.jobhub.R
-import com.example.jobhub.activity.InforJobActivity
 import com.example.jobhub.activity.ApplyJobActivity
+import com.example.jobhub.activity.InforJobActivity
 import com.example.jobhub.activity.VacancyActivity
 import com.example.jobhub.adapter.JobAdapter
 import com.example.jobhub.anim.AnimationHelper
@@ -28,7 +28,6 @@ import com.example.jobhub.dto.ItemJobDTO
 import com.example.jobhub.entity.enumm.JobAction
 import com.example.jobhub.entity.enumm.Role
 import com.example.jobhub.service.JobService
-import java.time.LocalDateTime
 
 class HomeFragment : Fragment() {
     private lateinit var jobAdapter: JobAdapter
@@ -133,32 +132,21 @@ class HomeFragment : Fragment() {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private fun getAllJobs(page: Int = 0) {
+    private fun getAllJobs() {
         val token = sharedPrefs.authToken ?: return
-        val currentRole = sharedPrefs.role
 
         ApiHelper().callApi(
             context = requireContext(),
-            call = jobService.getAllJobsByUser("Bearer $token", page),
-            onStart = { jobAdapter.showLoadingFooter() },
+            call = jobService.getAllJobsByUser("Bearer $token"),
             onSuccess = { response ->
-                val jobs = response?.let {
-                    if (currentRole == Role.JOB_SEEKER) {
-                        it.filter { job -> job.expirationDate.isAfter(LocalDateTime.now()) }
-                    } else {
-                        it
-                    }
-                } ?: emptyList()
-                val sortedList = jobs.sortedByDescending { job -> job.jobId }
                 allJobs.clear()
-                allJobs.addAll(sortedList)
+                response?.let { allJobs.addAll(it) }
                 if (binding.searchView.query.isNullOrEmpty()) {
                     jobList.clear()
                     jobList.addAll(allJobs)
                 }
                 jobAdapter.notifyDataSetChanged()
-            },
-            onComplete = { jobAdapter.hideLoadingFooter() }
+            }
         )
     }
 

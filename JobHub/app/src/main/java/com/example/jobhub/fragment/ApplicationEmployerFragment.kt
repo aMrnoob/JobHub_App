@@ -1,7 +1,5 @@
 package com.example.jobhub.fragment
 
-import android.animation.ObjectAnimator
-import android.animation.PropertyValuesHolder
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
@@ -19,15 +17,14 @@ import com.example.jobhub.R
 import com.example.jobhub.activity.JobActivity
 import com.example.jobhub.activity.VacancyActivity
 import com.example.jobhub.adapter.JobAdapter
+import com.example.jobhub.anim.AnimationHelper
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.MainApplicationEmployerBinding
 import com.example.jobhub.dto.ItemJobDTO
 import com.example.jobhub.entity.enumm.JobAction
-import com.example.jobhub.entity.enumm.Role
 import com.example.jobhub.service.JobService
-import java.time.LocalDateTime
 
 class ApplicationEmployerFragment : Fragment() {
 
@@ -38,8 +35,6 @@ class ApplicationEmployerFragment : Fragment() {
     private var allJobs: MutableList<ItemJobDTO> = mutableListOf()
     private var jobList: MutableList<ItemJobDTO> = mutableListOf()
     private var isFragmentVisible = false
-    private var isLoading = false
-    private var isLastPage = false
 
     private val binding get() = _binding!!
     private val jobService: JobService by lazy { RetrofitClient.createRetrofit().create(JobService::class.java) }
@@ -49,6 +44,11 @@ class ApplicationEmployerFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = MainApplicationEmployerBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         sharedPrefs = SharedPrefsManager(requireContext())
         refreshHandler.post(refreshRunnable)
 
@@ -57,12 +57,10 @@ class ApplicationEmployerFragment : Fragment() {
         setupSearchView()
 
         binding.ivAddCompany.setOnClickListener {
-            animateView(it)
+            AnimationHelper.animateScale(it)
             val intent = Intent(requireContext(), JobActivity::class.java)
             startActivity(intent)
         }
-
-        return binding.root
     }
 
     private fun setupRecyclerView() {
@@ -71,16 +69,16 @@ class ApplicationEmployerFragment : Fragment() {
             onActionClick = { job, action ->
                 when (action) {
                     JobAction.CLICK -> {
-
+                        job.isExpanded = !job.isExpanded
+                        jobAdapter.notifyItemChanged(jobList.indexOf(job))
                     }
-
                     JobAction.EDIT -> {
                         val intent = Intent(requireContext(), VacancyActivity::class.java)
                         sharedPrefs.saveCurrentJob(job)
                         startActivity(intent)
                     }
-
-                    JobAction.DELETE -> { deleteJob(job.jobId) } else -> {}
+                    JobAction.DELETE -> { deleteJob(job.jobId) }
+                    else -> {}
                 }
             }
         )
@@ -91,41 +89,21 @@ class ApplicationEmployerFragment : Fragment() {
         }
     }
 
-    private fun getAllJobs(page: Int = 0) {
-        if (isLoading || isLastPage) return
-
+    @SuppressLint("NotifyDataSetChanged")
+    private fun getAllJobs() {
         val token = sharedPrefs.authToken ?: return
-        val currentRole = sharedPrefs.role
-        isLoading = true
-        jobAdapter.showLoadingFooter()
 
         ApiHelper().callApi(
             context = requireContext(),
-            call = jobService.getAllJobsByUser("Bearer $token", page),
+            call = jobService.getAllJobsByUser("Bearer $token"),
             onSuccess = { response ->
-                Handler(Looper.getMainLooper()).postDelayed({
-                    val jobs = response?.let {
-                        if (currentRole == Role.JOB_SEEKER) {
-                            it.filter { job -> job.expirationDate.isAfter(LocalDateTime.now()) }
-                        } else {
-                            it
-                        }
-                    } ?: emptyList()
-
-                    val sortedList = jobs.sortedByDescending { job -> job.jobId }
-                    if (sortedList.isEmpty()) {
-                        isLastPage = true
-                    } else {
-                        val prevSize = jobList.size
-                        allJobs.addAll(sortedList)
-                        jobList.addAll(sortedList)
-                        jobAdapter.notifyItemRangeInserted(prevSize, sortedList.size)
-                    }
-
-                    jobAdapter.hideLoadingFooter()
-                    jobAdapter.hideLoadingFooter()
-                    isLoading = false
-                }, 2000)
+                allJobs.clear()
+                response?.let { allJobs.addAll(it) }
+                if (binding.searchView.query.isNullOrEmpty()) {
+                    jobList.clear()
+                    jobList.addAll(allJobs)
+                }
+                jobAdapter.notifyDataSetChanged()
             }
         )
     }
@@ -144,23 +122,15 @@ class ApplicationEmployerFragment : Fragment() {
             ApiHelper().callApi(
                 context = requireContext(),
                 call = jobService.deleteJob(jobId),
-                onSuccess = { alertDialog.dismiss() }
+                onSuccess = {
+                    alertDialog.dismiss()
+                    getAllJobs()
+                }
             )
         }
 
         btnNo.setOnClickListener { alertDialog.dismiss() }
         alertDialog.show()
-    }
-
-    private fun animateView(view: View) {
-        ObjectAnimator.ofPropertyValuesHolder(
-            view,
-            PropertyValuesHolder.ofFloat(View.SCALE_X, 1f, 1.1f, 1f),
-            PropertyValuesHolder.ofFloat(View.SCALE_Y, 1f, 1.1f, 1f)
-        ).apply {
-            duration = 300
-            start()
-        }
     }
 
     private fun setupSearchView() {
@@ -200,7 +170,9 @@ class ApplicationEmployerFragment : Fragment() {
     private val refreshHandler = Handler(Looper.getMainLooper())
     private val refreshRunnable = object : Runnable {
         override fun run() {
-            if (isFragmentVisible && binding.searchView.query.isNullOrEmpty()) { getAllJobs() }
+            if (isFragmentVisible && binding.searchView.query.isNullOrEmpty()) {
+                getAllJobs()
+            }
             refreshHandler.postDelayed(this, 60000)
         }
     }
@@ -215,5 +187,10 @@ class ApplicationEmployerFragment : Fragment() {
         super.onPause()
         isFragmentVisible = false
         refreshHandler.removeCallbacks(refreshRunnable)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

@@ -29,6 +29,7 @@ public class ItemJobDTO {
     private LocalDateTime expirationDate;
     private ItemCompanyDTO company;
     private List<SkillDTO> requiredSkills;
+    private List<ApplicationDTO> applications;
 
     public ItemJobDTO(Job job) {
         this.jobId = job.getJobId();
@@ -44,5 +45,6 @@ public class ItemJobDTO {
         this.requiredSkills = job.getRequiredSkills().stream()
                 .map(SkillDTO::new)
                 .collect(Collectors.toList());
+        this.applications = job.getApplications().stream().map(ApplicationDTO::new).collect(Collectors.toList());
     }
 }

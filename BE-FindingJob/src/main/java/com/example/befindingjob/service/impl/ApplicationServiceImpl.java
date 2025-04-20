@@ -2,10 +2,16 @@ package com.example.befindingjob.service.impl;
 
 import com.example.befindingjob.config.FileStorageProperties;
 import com.example.befindingjob.dto.*;
-import com.example.befindingjob.entity.*;
+import com.example.befindingjob.entity.Application;
+import com.example.befindingjob.entity.Job;
+import com.example.befindingjob.entity.Resume;
+import com.example.befindingjob.entity.User;
 import com.example.befindingjob.entity.enumm.ApplicationStatus;
 import com.example.befindingjob.model.ApiResponse;
-import com.example.befindingjob.repository.*;
+import com.example.befindingjob.repository.ApplicationRepository;
+import com.example.befindingjob.repository.JobRepository;
+import com.example.befindingjob.repository.ResumeRepository;
+import com.example.befindingjob.repository.UserRepository;
 import com.example.befindingjob.service.ApplicationService;
 import com.example.befindingjob.service.JwtService;
 import org.slf4j.Logger;
@@ -44,9 +50,6 @@ public class ApplicationServiceImpl implements ApplicationService {
     private FileStorageProperties fileStorageProperties;
 
     @Autowired
-    private CompanyRepository companyRepository;
-
-    @Autowired
     private JwtService jwtService;
 
     @Value("${upload.resume.dir}")
@@ -69,7 +72,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
             Optional<Application> existingApplication = applicationRepository.findByUserIdAndJobId(userId, job.getJobId());
             if (existingApplication.isPresent()) {
-                        return new ApiResponse<>(false,"You have already applied for this job", null);
+                return new ApiResponse<>(false,"You have already applied for this job", null);
             }
 
             Application application = new Application();
@@ -157,6 +160,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public ApiResponse<ResumeDTO> createResume(String token, ResumeDTO resumeDTO) {
         try {
+
             if (!jwtService.isValidToken(token)) {
                 return new ApiResponse<>(false, "Invalid token", null);
             }
@@ -409,7 +413,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
             Map<String, Integer> stats = new HashMap<>();
             stats.put("APPLIED", countApplicationsByStatus(applications, ApplicationStatus.APPLIED));
-            stats.put("REVIEWED", countApplicationsByStatus(applications, ApplicationStatus.REVIEWED));
+            stats.put("INTERVIEW", countApplicationsByStatus(applications, ApplicationStatus.INTERVIEW));
             stats.put("ACCEPTED", countApplicationsByStatus(applications, ApplicationStatus.ACCEPTED));
             stats.put("REJECTED", countApplicationsByStatus(applications, ApplicationStatus.REJECTED));
 
@@ -434,7 +438,7 @@ public class ApplicationServiceImpl implements ApplicationService {
             if (employerJobs.isEmpty()) {
                 Map<String, Integer> emptyStats = new HashMap<>();
                 emptyStats.put("APPLIED", 0);
-                emptyStats.put("REVIEWED", 0);
+                emptyStats.put("INTERVIEW", 0);
                 emptyStats.put("ACCEPTED", 0);
                 emptyStats.put("REJECTED", 0);
                 return new ApiResponse<>(true, "No job postings found for this employer", emptyStats);
@@ -447,7 +451,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
             Map<String, Integer> stats = new HashMap<>();
             stats.put("APPLIED", countApplicationsByStatus(applications, ApplicationStatus.APPLIED));
-            stats.put("REVIEWED", countApplicationsByStatus(applications, ApplicationStatus.REVIEWED));
+            stats.put("INTERVIEW", countApplicationsByStatus(applications, ApplicationStatus.INTERVIEW));
             stats.put("ACCEPTED", countApplicationsByStatus(applications, ApplicationStatus.ACCEPTED));
             stats.put("REJECTED", countApplicationsByStatus(applications, ApplicationStatus.REJECTED));
 
@@ -458,47 +462,24 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public ApiResponse<List<ApplicationDTO>> getApplicationsByCompanyId(String token, Integer companyId) {
-        try {
-            if (!jwtService.isValidToken(token)) {
-                return new ApiResponse<>(false, "Invalid token", null);
-            }
+    public ApiResponse<Void> updateStatusApplication(String token, StatusApplicantDTO statusApplicantDTO) {
+        if (!jwtService.isValidToken(token)) { return new ApiResponse<>(false, "", null); }
 
-            Integer tokenUserId = jwtService.extractUserId(token);
-            User user = userRepository.findById(tokenUserId)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+        int applicationId = statusApplicantDTO.getApplicationId();
 
-            if (!user.getRole().equals("EMPLOYER")) {
-                return new ApiResponse<>(false, "Only employers can access this resource", null);
-            }
+        Optional<Application> optionalApplication = applicationRepository.findById(applicationId);
+        System.out.println(statusApplicantDTO.getStatus());
+        if (optionalApplication.isPresent()) {
+            Application application = optionalApplication.get();
+            application.setStatus(statusApplicantDTO.getStatus());
+            application.setCoverLetter(statusApplicantDTO.getMessage());
+            application.setInterviewDate(statusApplicantDTO.getInterviewDate());
 
-            Company company = companyRepository.findById(companyId)
-                    .orElseThrow(() -> new RuntimeException("Company not found"));
+            applicationRepository.save(application);
 
-            // Verify the user is associated with this company
-            if (!company.getUser().getUserId().equals(tokenUserId)) {
-                return new ApiResponse<>(false, "You can only access applications for your own company", null);
-            }
-
-            // Get all jobs for this company
-            List<Job> companyJobs = jobRepository.findByCompany(company);
-            if (companyJobs.isEmpty()) {
-                return new ApiResponse<>(true, "No job postings found for this company", new ArrayList<>());
-            }
-
-            // Get all applications for these jobs
-            List<Application> applications = new ArrayList<>();
-            for (Job job : companyJobs) {
-                applications.addAll(applicationRepository.findByJob(job));
-            }
-
-            List<ApplicationDTO> applicationDTOs = applications.stream()
-                    .map(this::convertToDTO)
-                    .collect(Collectors.toList());
-
-            return new ApiResponse<>(true, "Applications retrieved successfully", applicationDTOs);
-        } catch (Exception e) {
-            return new ApiResponse<>(false, "Failed to retrieve applications: " + e.getMessage(), null);
+            return new ApiResponse<>(true, "Application status updated successfully", null);
+        } else {
+            return new ApiResponse<>(false, "Application not found", null);
         }
     }
 
@@ -549,7 +530,8 @@ public class ApplicationServiceImpl implements ApplicationService {
                 job.getExperienceRequired(),
                 job.getExpirationDate(),
                 companyDTO,
-                job.getRequiredSkills().stream().map(SkillDTO::new).collect(Collectors.toList())
+                job.getRequiredSkills().stream().map(SkillDTO::new).collect(Collectors.toList()),
+                job.getApplications().stream().map(ApplicationDTO::new).collect(Collectors.toList())
         );
     }
 }

@@ -8,14 +8,16 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.example.jobhub.R
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.MainDialogApplyBinding
-import com.example.jobhub.dto.*
+import com.example.jobhub.dto.ApplicationDTO
+import com.example.jobhub.dto.ItemJobDTO
+import com.example.jobhub.dto.ResumeDTO
+import com.example.jobhub.dto.UserDTO
 import com.example.jobhub.entity.enumm.ApplicationStatus
 import com.example.jobhub.service.ApplicationService
 import com.example.jobhub.service.ResumeService
@@ -26,13 +28,12 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
-class ApplyJobActivity : AppCompatActivity() {
+class ApplyJobActivity : BaseActivity() {
 
     private lateinit var binding: MainDialogApplyBinding
     private var resumeUri: Uri? = null
@@ -230,6 +231,7 @@ class ApplyJobActivity : AppCompatActivity() {
             coverLetter = coverLetter,
             status = ApplicationStatus.APPLIED,
             applicationDate = LocalDateTime.now(),
+            resumeUrl = resumeUrl
         )
 
         ApiHelper().callApi(
@@ -237,24 +239,20 @@ class ApplyJobActivity : AppCompatActivity() {
             call = jobApplicationService.applyForJob("Bearer $token", applicationDTO),
             onSuccess = { submittedApp ->
                 if (submittedApp != null && submittedApp.applicationId != null) {
+                    Log.e("Debugab", resumeUrl)
                     createResumeEntry(token, submittedApp.applicationId, resumeUrl)
                 } else {
                     showToast("Nộp đơn thành công nhưng thiếu ID ứng dụng.")
                     binding.progressBar.visibility = View.GONE
                     finish()
                 }
-            },
-            onError = { error ->
-                val errorMsg = error ?: "Unknown error"
-                showToast("Nộp đơn thất bại: $errorMsg")
-                binding.progressBar.visibility = View.GONE
             }
         )
     }
 
     private fun createResumeEntry(token: String, applicationId: Int, resumeUrl: String) {
         val resumeDTO = ResumeDTO(
-            resumeId = null,
+            resumeId = 0,
             applicationId = applicationId,
             resumeUrl = resumeUrl,
             createdAt = LocalDateTime.now().withNano(0),

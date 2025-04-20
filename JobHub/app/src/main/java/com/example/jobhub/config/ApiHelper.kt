@@ -23,7 +23,7 @@ class ApiHelper {
                 onComplete?.invoke()
                 if (response.isSuccessful) {
                     val apiResponse = response.body()
-                    if (apiResponse?.isSuccess == true) {
+                    if (apiResponse?.success == true) {
                         if (!apiResponse.message.isNullOrBlank()) {
                             showToast(context, apiResponse.message)
                         }

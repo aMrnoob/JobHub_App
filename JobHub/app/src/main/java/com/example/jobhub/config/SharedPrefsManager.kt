@@ -3,6 +3,7 @@ package com.example.jobhub.config
 import android.content.Context
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.example.jobhub.dto.ApplicationDTO
 import com.example.jobhub.dto.ItemJobDTO
 import com.example.jobhub.entity.enumm.Role
 import com.google.gson.Gson
@@ -76,5 +77,24 @@ class SharedPrefsManager(context: Context) {
         return currentJob?.let {
             Gson().fromJson(it, ItemJobDTO::class.java)
         }
+    }
+
+    private var currentApplication: String?
+        get() = prefs.getString("application", null)
+        set(value) = prefs.edit().putString("application", value).apply()
+
+    fun saveCurrentApplication(application: ApplicationDTO) {
+        val json = Gson().toJson(application)
+        currentApplication = json
+    }
+
+    fun getCurrentApplication(): ApplicationDTO? {
+        return currentApplication?.let {
+            Gson().fromJson(it, ApplicationDTO::class.java)
+        }
+    }
+
+    fun clearCurrentApplication() {
+        prefs.edit().remove("application").apply()
     }
 }

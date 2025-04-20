@@ -1,10 +1,7 @@
 package com.example.befindingjob.entity;
 
 import com.example.befindingjob.entity.enumm.ApplicationStatus;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -36,6 +33,7 @@ public class Application {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime applicationDate;
 
     @Enumerated(EnumType.STRING)
@@ -47,4 +45,7 @@ public class Application {
     @JsonIgnore
     @OneToOne(mappedBy = "application", cascade = CascadeType.ALL, orphanRemoval = true)
     private Resume resume;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime interviewDate;
 }

@@ -17,8 +17,4 @@ public interface UserService {
     ApiResponse<UserDTO> getUser(String token);
     ApiResponse<UserDTO> deleteAccountUser(String token);
     ApiResponse<UserDTO> findByEmail(String email);
-    ApiResponse<User> createUser(User user);
-    ApiResponse<String> generateToken(User user);
-    ApiResponse<Boolean> verifyPassword(User user, String password);
-
 }

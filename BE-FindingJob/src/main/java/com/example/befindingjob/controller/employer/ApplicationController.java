@@ -2,6 +2,7 @@ package com.example.befindingjob.controller.employer;
 
 import com.example.befindingjob.dto.ApplicationDTO;
 import com.example.befindingjob.dto.ResumeDTO;
+import com.example.befindingjob.dto.StatusApplicantDTO;
 import com.example.befindingjob.model.ApiResponse;
 import com.example.befindingjob.service.ApplicationService;
 import lombok.RequiredArgsConstructor;
@@ -117,11 +118,10 @@ public class ApplicationController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/company/{companyId}")
-    public ResponseEntity<ApiResponse<List<ApplicationDTO>>> getApplicationsByCompanyId(
+    @PostMapping("/employer/update-status-applicant")
+    public ApiResponse<Void> updateStatusApplicant(
             @RequestHeader("token") String token,
-            @PathVariable Integer companyId) {
-        ApiResponse<List<ApplicationDTO>> response = applicationService.getApplicationsByCompanyId(token, companyId);
-        return ResponseEntity.ok(response);
+            @RequestBody StatusApplicantDTO statusApplicantDTO) {
+       return applicationService.updateStatusApplication(token, statusApplicantDTO);
     }
 }
