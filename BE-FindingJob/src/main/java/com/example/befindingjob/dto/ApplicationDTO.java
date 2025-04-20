@@ -36,6 +36,6 @@ public class ApplicationDTO {
         this.coverLetter = application.getCoverLetter();
         this.status = application.getStatus();
         this.applicationDate = application.getApplicationDate();
-        this.resumeUrl = application.getResume().getResumeUrl();
+        this.resumeUrl = application.getResume() != null ? application.getResume().getResumeUrl() : null;
     }
 }

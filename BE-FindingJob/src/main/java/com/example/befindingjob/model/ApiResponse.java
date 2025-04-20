@@ -1,29 +1,29 @@
 package com.example.befindingjob.model;
 
 public class ApiResponse<T> {
-    private boolean isSuccess;
+    private boolean success;
     private String message;
     private T data;
 
     public ApiResponse() {}
 
-    public ApiResponse(boolean isSuccess, String message) {
-        this.isSuccess = isSuccess;
+    public ApiResponse(boolean success, String message) {
+        this.success = success;
         this.message = message;
     }
 
-    public ApiResponse(boolean isSuccess, String message, T data) {
-        this.isSuccess = isSuccess;
+    public ApiResponse(boolean success, String message, T data) {
+        this.success = success;
         this.message = message;
         this.data = data;
     }
 
-    public boolean getIsSuccess() { // Đảm bảo tên đúng chuẩn getter
-        return isSuccess;
+    public boolean isSuccess() {
+        return success;
     }
 
-    public void setIsSuccess(boolean isSuccess) {
-        this.isSuccess = isSuccess;
+    public void setSuccess(boolean success) {
+        this.success = success;
     }
 
     public String getMessage() {

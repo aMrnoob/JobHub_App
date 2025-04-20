@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -230,7 +231,7 @@ class ApplyJobActivity : BaseActivity() {
             coverLetter = coverLetter,
             status = ApplicationStatus.APPLIED,
             applicationDate = LocalDateTime.now(),
-            resumeUrl = ""
+            resumeUrl = resumeUrl
         )
 
         ApiHelper().callApi(
@@ -238,24 +239,20 @@ class ApplyJobActivity : BaseActivity() {
             call = jobApplicationService.applyForJob("Bearer $token", applicationDTO),
             onSuccess = { submittedApp ->
                 if (submittedApp != null && submittedApp.applicationId != null) {
+                    Log.e("Debugab", resumeUrl)
                     createResumeEntry(token, submittedApp.applicationId, resumeUrl)
                 } else {
                     showToast("Nộp đơn thành công nhưng thiếu ID ứng dụng.")
                     binding.progressBar.visibility = View.GONE
                     finish()
                 }
-            },
-            onError = { error ->
-                val errorMsg = error ?: "Unknown error"
-                showToast("Nộp đơn thất bại: $errorMsg")
-                binding.progressBar.visibility = View.GONE
             }
         )
     }
 
     private fun createResumeEntry(token: String, applicationId: Int, resumeUrl: String) {
         val resumeDTO = ResumeDTO(
-            resumeId = null,
+            resumeId = 0,
             applicationId = applicationId,
             resumeUrl = resumeUrl,
             createdAt = LocalDateTime.now().withNano(0),

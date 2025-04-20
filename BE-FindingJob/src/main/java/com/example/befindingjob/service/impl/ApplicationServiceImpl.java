@@ -72,7 +72,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
             Optional<Application> existingApplication = applicationRepository.findByUserIdAndJobId(userId, job.getJobId());
             if (existingApplication.isPresent()) {
-                        return new ApiResponse<>(false,"You have already applied for this job", null);
+                return new ApiResponse<>(false,"You have already applied for this job", null);
             }
 
             Application application = new Application();
@@ -154,6 +154,40 @@ public class ApplicationServiceImpl implements ApplicationService {
         } catch (Exception e) {
             logger.error("Unexpected error during file upload", e);
             return new ApiResponse<>(false, "Unexpected error: " + e.getMessage(), null);
+        }
+    }
+
+    @Override
+    public ApiResponse<ResumeDTO> createResume(String token, ResumeDTO resumeDTO) {
+        try {
+
+            if (!jwtService.isValidToken(token)) {
+                return new ApiResponse<>(false, "Invalid token", null);
+            }
+
+            Application application = applicationRepository.findById(resumeDTO.getApplicationId())
+                    .orElseThrow(() -> new RuntimeException("Application not found"));
+
+            Resume resume = new Resume();
+            resume.setApplication(application);
+            resume.setResumeUrl(resumeDTO.getResumeUrl());
+
+            LocalDateTime now = LocalDateTime.now();
+            resume.setCreatedAt(now);
+            resume.setUpdatedAt(now);
+
+            Resume saved = resumeRepository.save(resume);
+
+            ResumeDTO response = new ResumeDTO(
+                    saved.getResumeId(),
+                    saved.getApplication().getApplicationId(),
+                    saved.getResumeUrl(),
+                    saved.getCreatedAt(),
+                    saved.getUpdatedAt());
+
+            return new ApiResponse<>(true, "Resume saved successfully", response);
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "Failed to save resume: " + e.getMessage(), null);
         }
     }
 

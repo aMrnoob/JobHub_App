@@ -38,6 +38,14 @@ public class ApplicationController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/resumes")
+    public ResponseEntity<ApiResponse<ResumeDTO>> createResume(
+            @RequestHeader("token") String token,
+            @RequestBody ResumeDTO resumeDTO) {
+        ApiResponse<ResumeDTO> response = applicationService.createResume(token, resumeDTO);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/user/{userId}")
     public ResponseEntity<ApiResponse<List<ApplicationDTO>>> getApplicationsByUserId(
             @RequestHeader("token") String token,

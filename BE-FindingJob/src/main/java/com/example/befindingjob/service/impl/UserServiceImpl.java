@@ -212,24 +212,4 @@ public class UserServiceImpl implements UserService {
         }
         return new ApiResponse<>(true, "");
     }
-
-    @Override
-    public ApiResponse<User> createUser(User user) {
-        try {
-            User savedUser = userRepository.save(user);
-            return new ApiResponse<>(true, "User created successfully", savedUser);
-        } catch (Exception e) {
-            return new ApiResponse<>(false, "Error creating user: " + e.getMessage(), null);
-        }
-    }
-
-    @Override
-    public ApiResponse<Boolean> verifyPassword(User user, String password) {
-        boolean isMatch = passwordEncoder.matches(password, user.getPassword());
-        if (isMatch) {
-            return new ApiResponse<>(true, "Password verified", true);
-        } else {
-            return new ApiResponse<>(false, "Invalid password", false);
-        }
-    }
 }
