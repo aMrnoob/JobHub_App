@@ -2,16 +2,10 @@ package com.example.befindingjob.service.impl;
 
 import com.example.befindingjob.config.FileStorageProperties;
 import com.example.befindingjob.dto.*;
-import com.example.befindingjob.entity.Application;
-import com.example.befindingjob.entity.Job;
-import com.example.befindingjob.entity.Resume;
-import com.example.befindingjob.entity.User;
+import com.example.befindingjob.entity.*;
 import com.example.befindingjob.entity.enumm.ApplicationStatus;
 import com.example.befindingjob.model.ApiResponse;
-import com.example.befindingjob.repository.ApplicationRepository;
-import com.example.befindingjob.repository.JobRepository;
-import com.example.befindingjob.repository.ResumeRepository;
-import com.example.befindingjob.repository.UserRepository;
+import com.example.befindingjob.repository.*;
 import com.example.befindingjob.service.ApplicationService;
 import com.example.befindingjob.service.JwtService;
 import org.slf4j.Logger;
@@ -48,6 +42,9 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Autowired
     private FileStorageProperties fileStorageProperties;
+
+    @Autowired
+    private CompanyRepository companyRepository;
 
     @Autowired
     private JwtService jwtService;
@@ -457,6 +454,51 @@ public class ApplicationServiceImpl implements ApplicationService {
             return new ApiResponse<>(true, "Employer application stats retrieved successfully", stats);
         } catch (Exception e) {
             return new ApiResponse<>(false, "Failed to retrieve employer application stats: " + e.getMessage(), null);
+        }
+    }
+
+    @Override
+    public ApiResponse<List<ApplicationDTO>> getApplicationsByCompanyId(String token, Integer companyId) {
+        try {
+            if (!jwtService.isValidToken(token)) {
+                return new ApiResponse<>(false, "Invalid token", null);
+            }
+
+            Integer tokenUserId = jwtService.extractUserId(token);
+            User user = userRepository.findById(tokenUserId)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            if (!user.getRole().equals("EMPLOYER")) {
+                return new ApiResponse<>(false, "Only employers can access this resource", null);
+            }
+
+            Company company = companyRepository.findById(companyId)
+                    .orElseThrow(() -> new RuntimeException("Company not found"));
+
+            // Verify the user is associated with this company
+            if (!company.getUser().getUserId().equals(tokenUserId)) {
+                return new ApiResponse<>(false, "You can only access applications for your own company", null);
+            }
+
+            // Get all jobs for this company
+            List<Job> companyJobs = jobRepository.findByCompany(company);
+            if (companyJobs.isEmpty()) {
+                return new ApiResponse<>(true, "No job postings found for this company", new ArrayList<>());
+            }
+
+            // Get all applications for these jobs
+            List<Application> applications = new ArrayList<>();
+            for (Job job : companyJobs) {
+                applications.addAll(applicationRepository.findByJob(job));
+            }
+
+            List<ApplicationDTO> applicationDTOs = applications.stream()
+                    .map(this::convertToDTO)
+                    .collect(Collectors.toList());
+
+            return new ApiResponse<>(true, "Applications retrieved successfully", applicationDTOs);
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "Failed to retrieve applications: " + e.getMessage(), null);
         }
     }
 

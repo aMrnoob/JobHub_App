@@ -74,7 +74,7 @@
             android:exported="true" />
 
         <activity
-            android:name=".activity.Welcome"
+            android:name=".activity.WelcomeActivity"
             android:exported="true"
             android:theme="@style/Theme.JobHub">
             <intent-filter>

@@ -63,5 +63,10 @@
     <color name="status_rejected">@color/red_400</color>
     <color name="status_reviewed">@color/blue_400</color>
 
+    <!-- Main text colors -->
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
 
+    <color name="background_light">#F5F5F5</color>
+    <color name="divider_color">#E0E0E0</color>
 </resources>

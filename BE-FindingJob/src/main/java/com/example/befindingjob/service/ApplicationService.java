@@ -21,6 +21,8 @@ public interface ApplicationService {
 
     ApiResponse<List<ApplicationDTO>> getApplicationsByJobId(String token, Integer jobId);
 
+    ApiResponse<List<ApplicationDTO>> getApplicationsByCompanyId(String token, Integer companyId);
+
     ApiResponse<ApplicationDTO> updateApplicationStatus(String token, ApplicationDTO applicationDTO);
 
     ApiResponse<ApplicationDTO> getApplicationById(String token, Integer applicationId);

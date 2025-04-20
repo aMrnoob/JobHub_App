@@ -14,9 +14,11 @@ import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.MainApplyBinding
 import com.example.jobhub.dto.ApplicationDTO
+import com.example.jobhub.dto.EmailRequestDTO
 import com.example.jobhub.dto.UserDTO
 import com.example.jobhub.entity.enumm.ApplicationStatus
 import com.example.jobhub.service.ApplicationService
+import com.example.jobhub.service.EmailService
 import com.google.gson.Gson
 
 class ApplyFragment : Fragment() {
@@ -27,7 +29,13 @@ class ApplyFragment : Fragment() {
     private var currentUser: UserDTO? = null
     private var applications = mutableListOf<ApplicationDTO>()
 
-    private val applicationService by lazy { RetrofitClient.createRetrofit().create(ApplicationService::class.java) }
+    private val applicationService by lazy {
+        RetrofitClient.createRetrofit().create(ApplicationService::class.java)
+    }
+
+    private val emailService by lazy {
+        RetrofitClient.createRetrofit().create(EmailService::class.java)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,7 +61,6 @@ class ApplyFragment : Fragment() {
         currentUser = Gson().fromJson(userJson, UserDTO::class.java)
         isEmployer = userRole == "EMPLOYER"
 
-        // Cập nhật tiêu đề
         binding.tvTitle.text = if (isEmployer) "Danh sách ứng viên" else "Công việc đã ứng tuyển"
     }
 
@@ -66,27 +73,33 @@ class ApplyFragment : Fragment() {
         binding.progressBar.visibility = View.VISIBLE
 
         val apiCall = if (isEmployer) {
-            applicationService.getApplicationsByEmployerId(token, currentUser?.userId?.toInt() ?: 0)
+            // Get applications for employer's company
+            applicationService.getApplicationsByCompanyId("Bearer $token", currentUser?.companyId ?: 0)
         } else {
-            applicationService.getApplicationsByUserId(token, currentUser?.userId?.toInt() ?: 0)
+            // Get seeker's applications
+            applicationService.getApplicationsByUserId("Bearer $token", currentUser?.userId ?: 0)
         }
 
         ApiHelper().callApi(
             context = requireContext(),
             call = apiCall,
-            onStart = { binding.progressBar.visibility = View.VISIBLE },
-            onComplete = { binding.progressBar.visibility = View.GONE },
             onSuccess = { result ->
+                binding.progressBar.visibility = View.GONE
                 if (result != null) {
                     applications.clear()
                     applications.addAll(result)
                     updateUI()
                 } else {
                     showToast("Không có dữ liệu ứng tuyển")
+                    binding.tvNoApplications.visibility = View.VISIBLE
+                    binding.recyclerApplications.visibility = View.GONE
                 }
             },
-            onError = {
-                showToast("Không thể tải danh sách ứng tuyển")
+            onError = { error ->
+                binding.progressBar.visibility = View.GONE
+                showToast("Không thể tải danh sách ứng tuyển: ${error ?: "Unknown error"}")
+                binding.tvNoApplications.visibility = View.VISIBLE
+                binding.recyclerApplications.visibility = View.GONE
             }
         )
     }
@@ -104,24 +117,28 @@ class ApplyFragment : Fragment() {
                     applications = applications,
                     onAccept = { application -> handleAcceptApplication(application) },
                     onReject = { application -> handleRejectApplication(application) },
-                    onViewDetails = { application ->
-                        // Xử lý khi employer muốn xem chi tiết ứng viên
-                        showToast("Xem chi tiết: ${application.userDTO?.fullName}")
-                        // Có thể mở dialog hoặc sang activity tại đây
-                    }
+                    onViewDetails = { application -> navigateToApplicationDetails(application) }
                 )
                 binding.recyclerApplications.adapter = employerAdapter
             } else {
                 val seekerAdapter = SeekerApplicationAdapter(
                     applications = applications,
-                    onAcceptClick = { /* Seeker không dùng */ },
-                    onRejectClick = { /* Seeker không dùng */ }
+                    onViewDetails = { application -> navigateToApplicationDetails(application) }
                 )
                 binding.recyclerApplications.adapter = seekerAdapter
             }
         }
     }
 
+    private fun navigateToApplicationDetails(application: ApplicationDTO) {
+        // Implementation for navigation to application details
+        // This would use the Navigation Component or Intent to navigate to details screen
+        showToast("Xem chi tiết ${if (isEmployer) application.userDTO?.fullName else application.jobDTO?.title}")
+
+        // Here you would implement the navigation logic:
+        // val action = ApplyFragmentDirections.actionApplyFragmentToApplicationDetailsFragment(application.applicationId)
+        // findNavController().navigate(action)
+    }
 
     private fun handleAcceptApplication(application: ApplicationDTO) {
         if (!isEmployer) return
@@ -131,21 +148,30 @@ class ApplyFragment : Fragment() {
 
         ApiHelper().callApi(
             context = requireContext(),
-            call = applicationService.updateApplicationStatus(token, updatedApplication),
+            call = applicationService.updateApplicationStatus("Bearer $token", updatedApplication),
             onStart = { binding.progressBar.visibility = View.VISIBLE },
             onComplete = { binding.progressBar.visibility = View.GONE },
             onSuccess = { result ->
                 if (result != null) {
+                    // Update local data
                     val index = applications.indexOfFirst { it.applicationId == application.applicationId }
                     if (index != -1) {
                         applications[index] = result
                         binding.recyclerApplications.adapter?.notifyItemChanged(index)
                     }
                     showToast("Đã chấp nhận ứng viên")
+
+                    // Send email notification to the seeker
+                    sendApplicationStatusEmail(
+                        application,
+                        true,
+                        "Chúc mừng! Đơn ứng tuyển của bạn đã được chấp nhận",
+                        createAcceptanceEmailBody(application)
+                    )
                 }
             },
-            onError = {
-                showToast("Không thể cập nhật trạng thái")
+            onError = { error ->
+                showToast("Không thể cập nhật trạng thái: ${error ?: "Unknown error"}")
             }
         )
     }
@@ -158,23 +184,103 @@ class ApplyFragment : Fragment() {
 
         ApiHelper().callApi(
             context = requireContext(),
-            call = applicationService.updateApplicationStatus(token, updatedApplication),
+            call = applicationService.updateApplicationStatus("Bearer $token", updatedApplication),
             onStart = { binding.progressBar.visibility = View.VISIBLE },
             onComplete = { binding.progressBar.visibility = View.GONE },
             onSuccess = { result ->
                 if (result != null) {
+                    // Update local data
                     val index = applications.indexOfFirst { it.applicationId == application.applicationId }
                     if (index != -1) {
                         applications[index] = result
                         binding.recyclerApplications.adapter?.notifyItemChanged(index)
                     }
                     showToast("Đã từ chối ứng viên")
+
+                    // Send email notification to the seeker
+                    sendApplicationStatusEmail(
+                        application,
+                        false,
+                        "Thông báo về đơn ứng tuyển của bạn",
+                        createRejectionEmailBody(application)
+                    )
                 }
             },
-            onError = {
-                showToast("Không thể cập nhật trạng thái")
+            onError = { error ->
+                showToast("Không thể cập nhật trạng thái: ${error ?: "Unknown error"}")
             }
         )
+    }
+
+    private fun sendApplicationStatusEmail(
+        application: ApplicationDTO,
+        isAccepted: Boolean,
+        subject: String,
+        body: String
+    ) {
+        val token = getAuthToken() ?: return
+        val recipientEmail = application.userDTO?.email ?: return
+
+        val emailRequest = EmailRequestDTO(
+            recipient = recipientEmail,
+            subject = subject,
+            body = body,
+            isHtml = true
+        )
+
+        ApiHelper().callApi(
+            context = requireContext(),
+            call = emailService.sendEmail("Bearer $token", emailRequest),
+            onSuccess = { success ->
+                if (success == true) {
+                    val status = if (isAccepted) "chấp nhận" else "từ chối"
+                    showToast("Đã gửi email $status đến ứng viên")
+                }
+            },
+            onError = { error ->
+                showToast("Không thể gửi email: ${error ?: "Unknown error"}")
+            }
+        )
+    }
+
+    private fun createAcceptanceEmailBody(application: ApplicationDTO): String {
+        val jobTitle = application.jobDTO?.title ?: "vị trí công việc"
+        val companyName = application.jobDTO?.company?.companyName ?: "công ty"
+        val userName = application.userDTO?.fullName ?: "Ứng viên"
+
+        return """
+            <html>
+            <body>
+                <h2>Xin chào $userName,</h2>
+                <p>Chúc mừng! Đơn ứng tuyển của bạn cho vị trí <b>$jobTitle</b> tại <b>$companyName</b> đã được <span style="color: green; font-weight: bold;">CHẤP NHẬN</span>.</p>
+                <p>Chúng tôi rất ấn tượng với hồ sơ của bạn và muốn mời bạn tiếp tục vào vòng phỏng vấn tiếp theo.</p>
+                <p>Nhân viên tuyển dụng sẽ liên hệ với bạn trong thời gian sớm nhất để thảo luận về các bước tiếp theo.</p>
+                <br>
+                <p>Trân trọng,</p>
+                <p>Đội ngũ tuyển dụng $companyName</p>
+            </body>
+            </html>
+        """.trimIndent()
+    }
+
+    private fun createRejectionEmailBody(application: ApplicationDTO): String {
+        val jobTitle = application.jobDTO?.title ?: "vị trí công việc"
+        val companyName = application.jobDTO?.company?.companyName ?: "công ty"
+        val userName = application.userDTO?.fullName ?: "Ứng viên"
+
+        return """
+            <html>
+            <body>
+                <h2>Xin chào $userName,</h2>
+                <p>Cảm ơn bạn đã quan tâm và nộp đơn ứng tuyển cho vị trí <b>$jobTitle</b> tại <b>$companyName</b>.</p>
+                <p>Sau quá trình xem xét kỹ lưỡng, chúng tôi rất tiếc phải thông báo rằng hồ sơ của bạn chưa phù hợp với yêu cầu của vị trí này tại thời điểm hiện tại.</p>
+                <p>Chúng tôi khuyến khích bạn tiếp tục theo dõi các cơ hội việc làm khác tại công ty của chúng tôi trong tương lai.</p>
+                <br>
+                <p>Trân trọng,</p>
+                <p>Đội ngũ tuyển dụng $companyName</p>
+            </body>
+            </html>
+        """.trimIndent()
     }
 
     private fun getAuthToken(): String? {

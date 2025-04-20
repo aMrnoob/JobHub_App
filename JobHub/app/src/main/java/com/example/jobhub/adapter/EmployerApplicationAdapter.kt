@@ -10,7 +10,6 @@ import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.ItemJobAppliedBinding
 import com.example.jobhub.dto.ApplicationDTO
-import com.example.jobhub.dto.ResumeDTO
 import com.example.jobhub.entity.enumm.ApplicationStatus
 import com.example.jobhub.service.ResumeService
 import java.text.SimpleDateFormat
@@ -41,13 +40,13 @@ class EmployerApplicationAdapter(
         val dateFormat = SimpleDateFormat("d/M/yyyy", Locale.getDefault())
         val applyDate = application.applicationDate?.let { dateFormat.format(it) } ?: "N/A"
 
-        holder.binding.tvUsername.text = user.fullName
-        holder.binding.tvApplicationDate.text = "Apply Date: $applyDate"
-        holder.binding.tvCoverLetter.text = application.coverLetter
+        holder.binding.tvUsername.text = user?.fullName ?: "Không xác định"
+        holder.binding.tvApplicationDate.text = "Ngày nộp: $applyDate"
+        holder.binding.tvCoverLetter.text = application.coverLetter ?: "Không có thư xin việc"
 
-        // Get resume info for this application
         loadResumeInfo(application.applicationId, holder)
 
+        // Set status text and color
         holder.binding.tvStatus.text = when (application.status) {
             ApplicationStatus.APPLIED -> "Đã nộp"
             ApplicationStatus.ACCEPTED -> "Đã chấp nhận"
@@ -65,7 +64,7 @@ class EmployerApplicationAdapter(
         )
 
         Glide.with(holder.itemView.context)
-            .load(user.imageUrl)
+            .load(user?.imageUrl)
             .placeholder(R.drawable.simple_border)
             .into(holder.binding.ivAvatar)
 
@@ -94,7 +93,8 @@ class EmployerApplicationAdapter(
                 if (resume != null && resume.resumeUrl != null) {
                     holder.binding.tvCvAttached.text = "CV: Có đính kèm"
                     holder.binding.tvCvAttached.setOnClickListener {
-                        // Handle CV click - maybe open PDF viewer
+                        // Handle CV click - would open PDF viewer
+                        // This could be implemented with an interface callback to the fragment
                     }
                 } else {
                     holder.binding.tvCvAttached.text = "Không có CV"

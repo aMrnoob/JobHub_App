@@ -28,6 +28,12 @@ interface ApplicationService {
         @Path("userId") userId: Int
     ): Call<ApiResponse<List<ApplicationDTO>>>
 
+    @GET("applications/company/{companyId}")
+    fun getApplicationsByCompanyId(
+        @Header("Authorization") token: String,
+        @Path("companyId") companyId: Int
+    ): Call<ApiResponse<List<ApplicationDTO>>>
+
     @GET("api/applications/employer/{employerId}")
     fun getApplicationsByEmployerId(
         @Header("token") token: String,

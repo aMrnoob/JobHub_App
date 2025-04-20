@@ -116,4 +116,12 @@ public class ApplicationController {
         ApiResponse<Map<String, Integer>> response = applicationService.getEmployerApplicationStats(token, employerId);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/company/{companyId}")
+    public ResponseEntity<ApiResponse<List<ApplicationDTO>>> getApplicationsByCompanyId(
+            @RequestHeader("token") String token,
+            @PathVariable Integer companyId) {
+        ApiResponse<List<ApplicationDTO>> response = applicationService.getApplicationsByCompanyId(token, companyId);
+        return ResponseEntity.ok(response);
+    }
 }
