@@ -40,7 +40,7 @@ class SeekerApplicationAdapter(
             ApplicationStatus.APPLIED -> "Đã nộp"
             ApplicationStatus.ACCEPTED -> "Đã chấp nhận"
             ApplicationStatus.REJECTED -> "Đã từ chối"
-            ApplicationStatus.REVIEWED -> "Đang xem"
+            ApplicationStatus.INTERVIEW -> "Đang xem"
         }
 
         holder.binding.tvStatus.setBackgroundResource(
@@ -48,7 +48,7 @@ class SeekerApplicationAdapter(
                 ApplicationStatus.APPLIED -> R.drawable.bg_status_applied
                 ApplicationStatus.ACCEPTED -> R.drawable.bg_status_accepted
                 ApplicationStatus.REJECTED -> R.drawable.bg_status_rejected
-                ApplicationStatus.REVIEWED -> R.drawable.bg_status_reviewed
+                ApplicationStatus.INTERVIEW -> R.drawable.bg_status_interview
             }
         )
 

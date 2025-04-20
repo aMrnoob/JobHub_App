@@ -224,16 +224,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ApiResponse<String> generateToken(User user) {
-        try {
-            String token = jwtService.generateToken(user.getUserId(), user.getFullname());
-            return new ApiResponse<>(true, "Token generated successfully", token);
-        } catch (Exception e) {
-            return new ApiResponse<>(false, "Error generating token", null);
-        }
-    }
-
-    @Override
     public ApiResponse<Boolean> verifyPassword(User user, String password) {
         boolean isMatch = passwordEncoder.matches(password, user.getPassword());
         if (isMatch) {

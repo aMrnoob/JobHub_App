@@ -7,7 +7,9 @@ data class ApplicationDTO (
     val applicationId: Int? = null,
     val jobDTO: ItemJobDTO,
     val userDTO: UserDTO,
-    val coverLetter: String,
-    val status: ApplicationStatus = ApplicationStatus.APPLIED,
-    val applicationDate: LocalDateTime = LocalDateTime.now()
+    var coverLetter: String,
+    val resumeUrl: String,
+    var status: ApplicationStatus = ApplicationStatus.APPLIED,
+    val applicationDate: LocalDateTime = LocalDateTime.now(),
+    var interviewDate: LocalDateTime? = LocalDateTime.now()
 )

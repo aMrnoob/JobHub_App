@@ -13,7 +13,6 @@ import android.widget.SearchView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.jobhub.R
 import com.example.jobhub.activity.JobActivity
 import com.example.jobhub.activity.VacancyActivity
@@ -25,9 +24,7 @@ import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.MainApplicationEmployerBinding
 import com.example.jobhub.dto.ItemJobDTO
 import com.example.jobhub.entity.enumm.JobAction
-import com.example.jobhub.entity.enumm.Role
 import com.example.jobhub.service.JobService
-import java.time.LocalDateTime
 
 class ApplicationEmployerFragment : Fragment() {
 
@@ -72,7 +69,8 @@ class ApplicationEmployerFragment : Fragment() {
             onActionClick = { job, action ->
                 when (action) {
                     JobAction.CLICK -> {
-
+                        job.isExpanded = !job.isExpanded
+                        jobAdapter.notifyItemChanged(jobList.indexOf(job))
                     }
                     JobAction.EDIT -> {
                         val intent = Intent(requireContext(), VacancyActivity::class.java)

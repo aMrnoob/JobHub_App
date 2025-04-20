@@ -5,6 +5,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28"/>
 
     <application
         android:allowBackup="true"
@@ -33,12 +35,15 @@
         <provider
             android:name="com.facebook.FacebookContentProvider"
             android:authorities="com.facebook.app.FacebookContentProvider1591049248278162"
-            android:exported="true" />
+            android:exported="false" />
+
+        <activity
+            android:name=".activity.ApplicantActivity"
+            android:exported="false" />
 
         <activity
             android:name=".activity.InforJobActivity"
             android:exported="false" />
-
         <activity
             android:name=".activity.VacancyActivity"
             android:exported="false" />
@@ -73,7 +78,6 @@
         <activity
             android:name=".activity.ApplyJobActivity"
             android:exported="true" />
-
         <activity
             android:name=".activity.WelcomeActivity"
             android:exported="true"

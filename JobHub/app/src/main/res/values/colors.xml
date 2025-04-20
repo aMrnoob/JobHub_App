@@ -61,7 +61,7 @@
     <color name="status_applied">#FFA726</color>
     <color name="status_accepted">@color/green_400</color>
     <color name="status_rejected">@color/red_400</color>
-    <color name="status_reviewed">@color/blue_400</color>
+    <color name="status_interview">@color/blue_400</color>
 
 
 </resources>

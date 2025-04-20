@@ -7,8 +7,7 @@
     android:orientation="vertical"
     android:layout_marginStart="10dp"
     android:layout_marginEnd="10dp"
-    android:layout_marginBottom="15dp"
-    android:elevation="10dp">
+    android:layout_marginBottom="15dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -169,7 +168,7 @@
                 android:layout_marginStart="10dp"
                 android:text="Remove"
                 android:textSize="16sp"
-                android:textStyle="bold"
+
                 android:textColor="@color/black"/>
         </LinearLayout>
 
@@ -196,10 +195,15 @@
                 android:layout_marginStart="10dp"
                 android:text="Edit"
                 android:textSize="16sp"
-                android:textStyle="bold"
                 android:textColor="@color/black"/>
         </LinearLayout>
     </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvResumes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"/>
 </LinearLayout>
 
 

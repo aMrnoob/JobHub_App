@@ -158,39 +158,6 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public ApiResponse<ResumeDTO> createResume(String token, ResumeDTO resumeDTO) {
-        try {
-            if (!jwtService.isValidToken(token)) {
-                return new ApiResponse<>(false, "Invalid token", null);
-            }
-
-            Application application = applicationRepository.findById(resumeDTO.getApplicationId())
-                    .orElseThrow(() -> new RuntimeException("Application not found"));
-
-            Resume resume = new Resume();
-            resume.setApplication(application);
-            resume.setResumeUrl(resumeDTO.getResumeUrl());
-
-            LocalDateTime now = LocalDateTime.now();
-            resume.setCreatedAt(now);
-            resume.setUpdatedAt(now);
-
-            Resume saved = resumeRepository.save(resume);
-
-            ResumeDTO response = new ResumeDTO(
-                    saved.getResumeId(),
-                    saved.getApplication().getApplicationId(),
-                    saved.getResumeUrl(),
-                    saved.getCreatedAt(),
-                    saved.getUpdatedAt());
-
-            return new ApiResponse<>(true, "Resume saved successfully", response);
-        } catch (Exception e) {
-            return new ApiResponse<>(false, "Failed to save resume: " + e.getMessage(), null);
-        }
-    }
-
-    @Override
     public ApiResponse<List<ApplicationDTO>> getApplicationsByUserId(String token, Integer userId) {
         try {
             Integer tokenUserId = jwtService.extractUserId(token);
@@ -412,7 +379,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
             Map<String, Integer> stats = new HashMap<>();
             stats.put("APPLIED", countApplicationsByStatus(applications, ApplicationStatus.APPLIED));
-            stats.put("REVIEWED", countApplicationsByStatus(applications, ApplicationStatus.REVIEWED));
+            stats.put("INTERVIEW", countApplicationsByStatus(applications, ApplicationStatus.INTERVIEW));
             stats.put("ACCEPTED", countApplicationsByStatus(applications, ApplicationStatus.ACCEPTED));
             stats.put("REJECTED", countApplicationsByStatus(applications, ApplicationStatus.REJECTED));
 
@@ -437,7 +404,7 @@ public class ApplicationServiceImpl implements ApplicationService {
             if (employerJobs.isEmpty()) {
                 Map<String, Integer> emptyStats = new HashMap<>();
                 emptyStats.put("APPLIED", 0);
-                emptyStats.put("REVIEWED", 0);
+                emptyStats.put("INTERVIEW", 0);
                 emptyStats.put("ACCEPTED", 0);
                 emptyStats.put("REJECTED", 0);
                 return new ApiResponse<>(true, "No job postings found for this employer", emptyStats);
@@ -450,13 +417,35 @@ public class ApplicationServiceImpl implements ApplicationService {
 
             Map<String, Integer> stats = new HashMap<>();
             stats.put("APPLIED", countApplicationsByStatus(applications, ApplicationStatus.APPLIED));
-            stats.put("REVIEWED", countApplicationsByStatus(applications, ApplicationStatus.REVIEWED));
+            stats.put("INTERVIEW", countApplicationsByStatus(applications, ApplicationStatus.INTERVIEW));
             stats.put("ACCEPTED", countApplicationsByStatus(applications, ApplicationStatus.ACCEPTED));
             stats.put("REJECTED", countApplicationsByStatus(applications, ApplicationStatus.REJECTED));
 
             return new ApiResponse<>(true, "Employer application stats retrieved successfully", stats);
         } catch (Exception e) {
             return new ApiResponse<>(false, "Failed to retrieve employer application stats: " + e.getMessage(), null);
+        }
+    }
+
+    @Override
+    public ApiResponse<Void> updateStatusApplication(String token, StatusApplicantDTO statusApplicantDTO) {
+        if (!jwtService.isValidToken(token)) { return new ApiResponse<>(false, "", null); }
+
+        int applicationId = statusApplicantDTO.getApplicationId();
+
+        Optional<Application> optionalApplication = applicationRepository.findById(applicationId);
+        System.out.println(statusApplicantDTO.getStatus());
+        if (optionalApplication.isPresent()) {
+            Application application = optionalApplication.get();
+            application.setStatus(statusApplicantDTO.getStatus());
+            application.setCoverLetter(statusApplicantDTO.getMessage());
+            application.setInterviewDate(statusApplicantDTO.getInterviewDate());
+
+            applicationRepository.save(application);
+
+            return new ApiResponse<>(true, "Application status updated successfully", null);
+        } else {
+            return new ApiResponse<>(false, "Application not found", null);
         }
     }
 
@@ -507,7 +496,8 @@ public class ApplicationServiceImpl implements ApplicationService {
                 job.getExperienceRequired(),
                 job.getExpirationDate(),
                 companyDTO,
-                job.getRequiredSkills().stream().map(SkillDTO::new).collect(Collectors.toList())
+                job.getRequiredSkills().stream().map(SkillDTO::new).collect(Collectors.toList()),
+                job.getApplications().stream().map(ApplicationDTO::new).collect(Collectors.toList())
         );
     }
 }

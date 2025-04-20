@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -41,7 +42,7 @@ public class JobDTO {
         this.expirationDate = (itemJobDTO.getExpirationDate() != null) ? itemJobDTO.getExpirationDate().toString() : null;
         this.companyName = (itemJobDTO.getCompany() != null) ? itemJobDTO.getCompany().getCompanyName() : null;
         this.requiredSkills = itemJobDTO.getRequiredSkills() != null
-                ? itemJobDTO.getRequiredSkills().stream().collect(Collectors.toSet())
+                ? new HashSet<>(itemJobDTO.getRequiredSkills())
                 : null;
     }
 }

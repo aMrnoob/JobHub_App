@@ -2,6 +2,7 @@ package com.example.befindingjob.controller.employer;
 
 import com.example.befindingjob.dto.ApplicationDTO;
 import com.example.befindingjob.dto.ResumeDTO;
+import com.example.befindingjob.dto.StatusApplicantDTO;
 import com.example.befindingjob.model.ApiResponse;
 import com.example.befindingjob.service.ApplicationService;
 import lombok.RequiredArgsConstructor;
@@ -34,14 +35,6 @@ public class ApplicationController {
             @RequestHeader("token") String token,
             @RequestParam("file") MultipartFile file) {
         ApiResponse<String> response = applicationService.uploadResume(token, file);
-        return ResponseEntity.ok(response);
-    }
-
-    @PostMapping("/resumes")
-    public ResponseEntity<ApiResponse<ResumeDTO>> createResume(
-            @RequestHeader("token") String token,
-            @RequestBody ResumeDTO resumeDTO) {
-        ApiResponse<ResumeDTO> response = applicationService.createResume(token, resumeDTO);
         return ResponseEntity.ok(response);
     }
 
@@ -115,5 +108,12 @@ public class ApplicationController {
             @PathVariable Integer employerId) {
         ApiResponse<Map<String, Integer>> response = applicationService.getEmployerApplicationStats(token, employerId);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/employer/update-status-applicant")
+    public ApiResponse<Void> updateStatusApplicant(
+            @RequestHeader("token") String token,
+            @RequestBody StatusApplicantDTO statusApplicantDTO) {
+       return applicationService.updateStatusApplication(token, statusApplicantDTO);
     }
 }

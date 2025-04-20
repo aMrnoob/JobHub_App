@@ -4,18 +4,19 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.example.jobhub.R
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.MainDialogApplyBinding
-import com.example.jobhub.dto.*
+import com.example.jobhub.dto.ApplicationDTO
+import com.example.jobhub.dto.ItemJobDTO
+import com.example.jobhub.dto.ResumeDTO
+import com.example.jobhub.dto.UserDTO
 import com.example.jobhub.entity.enumm.ApplicationStatus
 import com.example.jobhub.service.ApplicationService
 import com.example.jobhub.service.ResumeService
@@ -26,11 +27,10 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 class ApplyJobActivity : BaseActivity() {
 
@@ -230,6 +230,7 @@ class ApplyJobActivity : BaseActivity() {
             coverLetter = coverLetter,
             status = ApplicationStatus.APPLIED,
             applicationDate = LocalDateTime.now(),
+            resumeUrl = ""
         )
 
         ApiHelper().callApi(

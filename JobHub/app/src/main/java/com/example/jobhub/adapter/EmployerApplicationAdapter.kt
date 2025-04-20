@@ -52,7 +52,7 @@ class EmployerApplicationAdapter(
             ApplicationStatus.APPLIED -> "Đã nộp"
             ApplicationStatus.ACCEPTED -> "Đã chấp nhận"
             ApplicationStatus.REJECTED -> "Đã từ chối"
-            ApplicationStatus.REVIEWED -> "Đang xem"
+            ApplicationStatus.INTERVIEW -> "Đang xem"
         }
 
         holder.binding.tvStatus.setTextColor(
@@ -60,7 +60,7 @@ class EmployerApplicationAdapter(
                 ApplicationStatus.APPLIED -> holder.itemView.context.getColor(R.color.status_applied)
                 ApplicationStatus.ACCEPTED -> holder.itemView.context.getColor(R.color.status_accepted)
                 ApplicationStatus.REJECTED -> holder.itemView.context.getColor(R.color.status_rejected)
-                ApplicationStatus.REVIEWED -> holder.itemView.context.getColor(R.color.status_reviewed)
+                ApplicationStatus.INTERVIEW -> holder.itemView.context.getColor(R.color.status_interview)
             }
         )
 
@@ -70,7 +70,7 @@ class EmployerApplicationAdapter(
             .into(holder.binding.ivAvatar)
 
         val isPending = application.status == ApplicationStatus.APPLIED ||
-                application.status == ApplicationStatus.REVIEWED
+                application.status == ApplicationStatus.INTERVIEW
 
         holder.binding.layoutEmployerButtons.visibility = if (isPending) View.VISIBLE else View.GONE
 

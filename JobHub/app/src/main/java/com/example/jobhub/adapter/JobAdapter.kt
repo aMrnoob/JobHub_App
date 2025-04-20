@@ -1,19 +1,27 @@
 package com.example.jobhub.adapter
 
 import android.annotation.SuppressLint
+import android.app.DownloadManager
 import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
+import android.net.Uri
+import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.jobhub.R
+import com.example.jobhub.activity.ApplicantActivity
 import com.example.jobhub.anim.AnimationHelper
 import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.ItemJobBinding
 import com.example.jobhub.dto.ItemJobDTO
+import com.example.jobhub.entity.enumm.ApplicationAction
 import com.example.jobhub.entity.enumm.JobAction
 import com.example.jobhub.entity.enumm.JobType
 import com.example.jobhub.entity.enumm.Role
@@ -67,6 +75,31 @@ class JobAdapter(
                     }
                 }
 
+                rvResumes.visibility = if (itemJobDTO.isExpanded) View.VISIBLE else View.GONE
+
+                rvResumes.apply {
+                    layoutManager = LinearLayoutManager(root.context)
+                    adapter = ApplicationAdapter(
+                        itemJobDTO.applications,
+                        onActionClick = { application, action ->
+                            when (action) {
+                                ApplicationAction.DOWNLOAD_CV -> {
+                                    val resumeUrl = application.resumeUrl
+                                    if (resumeUrl.isNotEmpty()) {
+                                        val fullUrl = "https://yourdomain.com$resumeUrl"
+                                        val fileName = "cv_${application.userDTO.fullName}.pdf"
+                                        downloadFile(context, fullUrl, fileName)
+                                    }
+                                }
+                                ApplicationAction.SEE_RESUME -> {
+                                    SharedPrefsManager(context).saveCurrentApplication(application)
+                                    context.startActivity(Intent(context, ApplicantActivity::class.java))
+                                }
+                            }
+                        }
+                    )
+                }
+
                 root.setOnClickListener { handleAction(itemJobDTO, JobAction.CLICK) }
                 btnBookmark.setOnClickListener { handleAction(itemJobDTO, JobAction.BOOKMARK) }
                 btnApply.setOnClickListener { handleAction(itemJobDTO, JobAction.APPLY) }
@@ -102,4 +135,25 @@ class JobAdapter(
         val sharedPrefs = SharedPrefsManager(context)
         return sharedPrefs.role
     }
+
+    private fun downloadFile(context: Context, url: String, fileName: String) {
+        try {
+            val request = DownloadManager.Request(Uri.parse(url)).apply {
+                setTitle("Đang tải xuống $fileName")
+                setDescription("CV đang được lưu vào thư mục Tải xuống")
+                setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
+                setAllowedOverMetered(true)
+                setAllowedOverRoaming(true)
+            }
+
+            val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            downloadManager.enqueue(request)
+            Toast.makeText(context, "Đang tải xuống CV...", Toast.LENGTH_SHORT).show()
+
+        } catch (e: Exception) {
+            Toast.makeText(context, "Tải xuống thất bại: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+
 }
