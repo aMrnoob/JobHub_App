@@ -10,7 +10,6 @@ import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.databinding.ItemJobAppliedBinding
 import com.example.jobhub.dto.ApplicationDTO
-import com.example.jobhub.dto.ResumeDTO
 import com.example.jobhub.entity.enumm.ApplicationStatus
 import com.example.jobhub.service.ResumeService
 import java.text.SimpleDateFormat

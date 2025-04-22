@@ -259,7 +259,7 @@ class HomeFragment : Fragment() {
     }
 
     private val categoryKeywords: Map<String, List<String>> = mapOf(
-        "Software Development" to listOf("Developer", "Software Engineer", "Programmer", "Backend Developer", "Frontend Developer", "Full-stack Developer", "C++ Developer", "Java Developer", "Python Developer"),
+        "Software Development" to listOf("Developer", "Software", "Programmer", "Backend", "Frontend", "Full-stack", "C++", "Java", "Python"),
         "Data Science" to listOf("Data Scientist", "Data Analyst", "Big Data", "Data Visualization", "Data Modeling", "SQL", "Predictive Modeling", "Statistical Analysis", "Data Mining"),
         "Machine Learning" to listOf("Machine Learning Engineer", "ML Engineer", "AI Engineer", "Deep Learning", "Neural Networks", "Natural Language Processing", "Reinforcement Learning", "Computer Vision", "Algorithm Developer"),
         "Web Development" to listOf("Web Developer", "Frontend Developer", "Backend Developer", "React Developer", "Angular Developer", "JavaScript Developer", "HTML", "CSS", "Node.js", "PHP Developer"),

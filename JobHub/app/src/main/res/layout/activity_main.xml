@@ -14,6 +14,11 @@
         android:layout_weight="1"
         android:orientation="horizontal" />
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/gray_400"/>
+
     <LinearLayout
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
@@ -29,6 +34,7 @@
             android:drawableTop="@drawable/icon_home"
             android:text="Home"
             android:textSize="15sp"
+            android:textStyle="bold"
             android:gravity="center"
             android:paddingTop="10dp"
             android:tint="@color/blue_500"/>
@@ -42,6 +48,7 @@
             android:drawableTop="@drawable/icon_menu"
             android:text="Application"
             android:textSize="15sp"
+            android:textStyle="bold"
             android:gravity="center"
             android:paddingTop="10dp"
             android:tint="@color/blue_500"/>
@@ -55,6 +62,7 @@
             android:drawableTop="@drawable/icon_company"
             android:text="Company"
             android:textSize="15sp"
+            android:textStyle="bold"
             android:gravity="center"
             android:paddingTop="10dp"
             android:tint="@color/blue_500"/>
@@ -68,6 +76,7 @@
             android:drawableTop="@drawable/icon_apply"
             android:text="Apply"
             android:textSize="15sp"
+            android:textStyle="bold"
             android:gravity="center"
             android:paddingTop="10dp"
             android:visibility="gone"
@@ -81,6 +90,7 @@
             android:drawableTop="@drawable/icon_profile"
             android:text="Profile"
             android:textSize="15sp"
+            android:textStyle="bold"
             android:gravity="center"
             android:paddingTop="10dp"
             android:tint="@color/blue_500"/>
