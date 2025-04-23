@@ -11,11 +11,11 @@
         android:id="@+id/toolbar"
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
-        android:layout_marginTop="30dp"
-        android:background="@color/blue_500"
-        app:layout_constraintTop_toTopOf="parent"
+        android:background="@color/blue_700"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/tvToolbarTitle"
@@ -33,7 +33,7 @@
             android:layout_height="24dp"
             android:layout_gravity="start"
             android:layout_marginStart="16dp"
-            android:src="@drawable/comeback_icon" />
+            android:src="@drawable/icon_back" />
     </androidx.appcompat.widget.Toolbar>
 
     <ScrollView
@@ -93,14 +93,6 @@
                         android:textColor="@color/gray_700"
                         android:textSize="14sp" />
 
-<!--                    <TextView-->
-<!--                        android:id="@+id/tvLocationJobType"-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:layout_marginTop="4dp"-->
-<!--                        android:text="Địa điểm - Loại công việc"-->
-<!--                        android:textColor="@color/gray_700"-->
-<!--                        android:textSize="12sp" />-->
                 </LinearLayout>
             </LinearLayout>
 
@@ -196,7 +188,7 @@
                     android:id="@+id/btnChooseResume"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
-                    android:backgroundTint="@color/blue_500"
+                    android:backgroundTint="@color/blue_700"
                     android:text="Chọn file"
                     android:textColor="@color/white"
                     android:textSize="12sp" />
@@ -245,7 +237,7 @@
                 android:layout_width="0dp"
                 android:layout_height="50dp"
                 android:layout_marginTop="12dp"
-                android:backgroundTint="@color/blue_500"
+                android:backgroundTint="@color/blue_700"
                 android:text="Gửi đơn ứng tuyển"
                 android:textColor="@color/white"
                 app:layout_constraintEnd_toEndOf="parent"

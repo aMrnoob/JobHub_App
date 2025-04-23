@@ -1,107 +1,125 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardApplication"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardElevation="4dp"
-    app:cardCornerRadius="8dp">
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="4dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:padding="12dp">
 
         <ImageView
-            android:id="@+id/ivAvatar"
+            android:id="@+id/ivCompanyLogo"
             android:layout_width="64dp"
             android:layout_height="64dp"
-            android:layout_marginEnd="12dp"
+            android:padding="4dp"
+            android:background="@drawable/rounded_image_bg"
             android:scaleType="centerCrop"
-            android:src="@drawable/icon_profile" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/ic_company_placeholder" />
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/tvJobTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:layout_marginStart="12dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/text_primary"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/tvStatus"
+            app:layout_constraintStart_toEndOf="@id/ivCompanyLogo"
+            app:layout_constraintTop_toTopOf="@id/ivCompanyLogo"
+            tools:text="Senior Android Developer" />
 
-            <TextView
-                android:id="@+id/tvUsername"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="USERNAME"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+        <TextView
+            android:id="@+id/tvCompanyName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/ivCompanyLogo"
+            app:layout_constraintTop_toBottomOf="@id/tvJobTitle"
+            tools:text="Google Inc." />
 
-            <TextView
-                android:id="@+id/tvApplicationDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Apply Date: 11/04/2025"
-                android:textSize="12sp" />
+        <TextView
+            android:id="@+id/tvCvStatus"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/ivCompanyLogo"
+            app:layout_constraintTop_toBottomOf="@id/tvCompanyName"
+            tools:text="Đã nộp CV" />
 
-            <TextView
-                android:id="@+id/tvCoverLetter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:ellipsize="end"
-                android:maxLines="2"
-                android:text="Cover_Letter"
-                android:textSize="14sp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/tvCvAttached"
-                    android:layout_width="50dp"
-                    android:layout_height="46dp"
-                    android:drawableStart="@drawable/icon_document"
-                    android:drawablePadding="4dp"
-                    android:text="CV"
-                    android:textColor="@color/purple_500"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/tvStatus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:text="REVIEWED"
-                    android:textColor="@android:color/holo_blue_dark"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/layoutEmployerButtons"
+        <TextView
+            android:id="@+id/tvStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:background="@drawable/bg_status_applied"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="2dp"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Đã nộp" />
 
-            <Button
-                android:id="@+id/btnAccept"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Chấp nhận"
-                android:textSize="12sp" />
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="12dp"
+            android:background="@color/divider_color"
+            app:layout_constraintTop_toBottomOf="@id/ivCompanyLogo" />
 
-            <Button
-                android:id="@+id/btnReject"
-                android:layout_width="107dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Từ chối"
-                android:textSize="12sp" />
-        </LinearLayout>
-    </LinearLayout>
+        <TextView
+            android:id="@+id/tvApplicationDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:drawableStart="@drawable/ic_calendar"
+            android:drawablePadding="4dp"
+            android:gravity="center_vertical"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider"
+            tools:text="Ngày nộp: 12/04/2023" />
+
+        <TextView
+            android:id="@+id/tvCoverLetter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvApplicationDate"
+            tools:text="Thư xin việc: Tôi rất mong muốn được làm việc ở công ty của bạn..." />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

@@ -10,12 +10,12 @@
         android:id="@+id/btnPenguin"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="24dp"
+        android:background="@null"
         android:scaleType="fitXY"
         android:src="@drawable/icon_penguin"
-        android:background="@null"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.047"
+        app:layout_constraintHorizontal_bias="0.044"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -23,13 +23,13 @@
         android:id="@+id/tvSelectJob"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:text="Profile"
+        android:layout_marginTop="32dp"
+        android:text="Your Profile"
         android:textColor="@color/black"
-        android:textSize="28sp"
+        android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.05"
+        app:layout_constraintHorizontal_bias="0.06"
         app:layout_constraintStart_toEndOf="@+id/btnPenguin"
         app:layout_constraintTop_toTopOf="parent" />
 
