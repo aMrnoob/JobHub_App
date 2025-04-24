@@ -8,6 +8,7 @@ import com.example.befindingjob.entity.User;
 import com.example.befindingjob.entity.enumm.Role;
 import com.example.befindingjob.mapper.JobMapper;
 import com.example.befindingjob.model.ApiResponse;
+import com.example.befindingjob.repository.ApplicationRepository;
 import com.example.befindingjob.repository.CompanyRepository;
 import com.example.befindingjob.repository.JobRepository;
 import com.example.befindingjob.repository.UserRepository;
@@ -28,6 +29,9 @@ public class JobServiceImpl implements JobService {
 
     @Autowired
     private CompanyRepository companyRepository;
+
+    @Autowired
+    private ApplicationRepository applicationRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -91,7 +95,9 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public ApiResponse<List<ItemJobDTO>> getAllJobsByUser(String token) {
-        if (!jwtService.isValidToken(token)) {return new ApiResponse<>(false, "", null);}
+        if (!jwtService.isValidToken(token)) {
+            return new ApiResponse<>(false, "", null);
+        }
 
         Integer userId = jwtService.extractUserId(token);
         Optional<User> userOpt = userRepository.findById(userId);
@@ -112,6 +118,8 @@ public class JobServiceImpl implements JobService {
         } else if (role == Role.JOB_SEEKER) {
             jobs = jobRepository.findAll().stream()
                     .filter(job -> job.getExpirationDate().isAfter(LocalDateTime.now()))
+                    .filter(job -> !userRepository.isBookmarked(userId, job.getJobId()))
+                    .filter(job -> !applicationRepository.existsByUserIdAndJobId(userId, job.getJobId()))
                     .map(ItemJobDTO::new)
                     .sorted(Comparator.comparing(ItemJobDTO::getExpirationDate))
                     .collect(Collectors.toList());
@@ -120,5 +128,28 @@ public class JobServiceImpl implements JobService {
         }
 
         return new ApiResponse<>(true, "", jobs);
+    }
+
+    @Override
+    public ApiResponse<List<ItemJobDTO>> getBookmarkedJobsByUser(String token) {
+        if (!jwtService.isValidToken(token)) {
+            return new ApiResponse<>(false, "", null);
+        }
+
+        Integer userId = jwtService.extractUserId(token);
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) {
+            return new ApiResponse<>(false, "", null);
+        }
+
+        User user = userOpt.get();
+        Set<Job> bookmarkedJobs = user.getBookmarkedJobs();
+
+        List<ItemJobDTO> jobDTOs = bookmarkedJobs.stream()
+                .map(ItemJobDTO::new)
+                .sorted(Comparator.comparing(ItemJobDTO::getExpirationDate))
+                .collect(Collectors.toList());
+
+        return new ApiResponse<>(true, "", jobDTOs);
     }
 }

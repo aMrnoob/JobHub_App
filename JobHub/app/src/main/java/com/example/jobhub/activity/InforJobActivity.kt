@@ -1,6 +1,7 @@
 package com.example.jobhub.activity
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import androidx.core.content.ContextCompat
@@ -8,12 +9,16 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.jobhub.R
 import com.example.jobhub.adapter.FragmentPagerAdapter
 import com.example.jobhub.anim.AnimationHelper
+import com.example.jobhub.config.ApiHelper
+import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.ActivityInforJobBinding
+import com.example.jobhub.dto.BookmarkRequest
 import com.example.jobhub.dto.ItemJobDTO
 import com.example.jobhub.entity.enumm.JobType
 import com.example.jobhub.fragment.InfoCompanyFragment
 import com.example.jobhub.fragment.InfoJobFragment
+import com.example.jobhub.service.BookmarkService
 import java.util.Locale
 
 class InforJobActivity : BaseActivity() {
@@ -24,6 +29,8 @@ class InforJobActivity : BaseActivity() {
 
     private var jobDTO: ItemJobDTO? = null
 
+    private val bookmarkService: BookmarkService by lazy { RetrofitClient.createRetrofit().create(
+        BookmarkService::class.java) }
     private val fragments = listOf(
         InfoJobFragment(),
         InfoCompanyFragment()
@@ -49,10 +56,16 @@ class InforJobActivity : BaseActivity() {
 
         binding.ivBookMark.setOnClickListener {
             AnimationHelper.animateScale(it)
+            val userId = sharedPrefs.userId
+            val jobId = jobDTO?.jobId
+            bookMark(BookmarkRequest(userId, jobId))
         }
 
         binding.tvApply.setOnClickListener {
             AnimationHelper.animateScale(it)
+            val intent = Intent(this, ApplyJobActivity::class.java)
+            jobDTO?.let { it1 -> sharedPrefs.saveCurrentJob(it1) }
+            startActivity(intent)
         }
 
         setupViewPager()
@@ -95,6 +108,14 @@ class InforJobActivity : BaseActivity() {
                 binding.vUnderlineJob.setBackgroundColor(defaultUnderline)
             }
         }
+    }
+
+    private fun bookMark(bookmarkRequest: BookmarkRequest) {
+        ApiHelper().callApi(
+            context = this,
+            call = bookmarkService.bookMark(bookmarkRequest),
+            onSuccess = { }
+        )
     }
 
     private fun JobType.toFriendlyString(): String {

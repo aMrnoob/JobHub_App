@@ -32,4 +32,8 @@ public interface ApplicationRepository extends JpaRepository<Application, Intege
 
     @Query("SELECT COUNT(a) FROM Application a WHERE a.job.company.user.userId = :employerId AND a.status = :status")
     Long countByEmployerIdAndStatus(@Param("employerId") Integer employerId, @Param("status") ApplicationStatus status);
+
+    @Query("SELECT CASE WHEN COUNT(a) > 0 THEN TRUE ELSE FALSE END " +
+            "FROM Application a WHERE a.user.userId = :userId AND a.job.jobId = :jobId")
+    boolean existsByUserIdAndJobId(@Param("userId") Integer userId, @Param("jobId") Integer jobId);
 }

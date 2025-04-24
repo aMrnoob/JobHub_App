@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#FFFFE0">
+    android:background="@color/white">
 
     <ImageView
         android:id="@+id/btnComeBack"
@@ -184,7 +184,7 @@
     <LinearLayout
         android:id="@+id/llMenu"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="50dp"
         android:layout_marginHorizontal="40dp"
         android:layout_marginBottom="60dp"
         app:layout_constraintTop_toBottomOf="@+id/viewPager"
@@ -196,18 +196,20 @@
         <ImageView
             android:id="@+id/ivBookMark"
             android:layout_width="30dp"
-            android:layout_height="40dp"
+            android:layout_height="50dp"
             android:layout_weight="1"
             android:layout_marginEnd="10dp"
+            android:scaleType="fitXY"
             android:background="@drawable/otp_box"
-            android:backgroundTint="#CDCDB4"
-            android:src="@drawable/icon_bookmark"/>
+            android:backgroundTint="@color/gray_100"
+            android:src="@drawable/icon_tag"/>
 
         <TextView
             android:id="@+id/tvApply"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
             android:layout_weight="5"
             android:text="Apply Now"
             android:textAlignment="center"
@@ -218,5 +220,4 @@
             android:backgroundTint="#FF9966"
             tools:ignore="RtlCompat" />
     </LinearLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

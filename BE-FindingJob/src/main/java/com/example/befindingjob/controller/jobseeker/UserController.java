@@ -16,9 +16,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private JwtService jwtService;
-
     @PostMapping("/update-user")
     public ResponseEntity<ApiResponse<Void>> updateUser(@RequestBody UserDTO userDTO) {
         ApiResponse<Void> response = userService.updateUser(userDTO);
