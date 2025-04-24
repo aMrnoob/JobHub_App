@@ -1,6 +1,5 @@
 package com.example.jobhub.fragment
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -17,15 +16,12 @@ import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.MainApplyBinding
 import com.example.jobhub.dto.ApplicationDTO
-import com.example.jobhub.dto.UserDTO
 import com.example.jobhub.service.ApplicationService
 import com.example.jobhub.service.ResumeService
-import com.google.gson.Gson
 
 class ApplyFragment: Fragment() {
     private var _binding: MainApplyBinding? = null
     private val binding get() = _binding!!
-    private var currentUser: UserDTO? = null
     private var applications = mutableListOf<ApplicationDTO>()
     private lateinit var sharedPrefs: SharedPrefsManager
 
@@ -44,20 +40,11 @@ class ApplyFragment: Fragment() {
     ): View {
         _binding = MainApplyBinding.inflate(inflater, container, false)
         sharedPrefs = SharedPrefsManager(requireContext())
-        loadUserData()
         setupRecyclerView()
         setupSwipeRefresh()
         loadApplications()
         setupEmptyStateButton()
         return binding.root
-    }
-
-    private fun loadUserData() {
-        val json = activity?.getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
-            ?.getString("currentUser", null)
-        if (!json.isNullOrEmpty()) {
-            currentUser = Gson().fromJson(json, UserDTO::class.java)
-        }
     }
 
     private fun setupRecyclerView() {
@@ -83,21 +70,10 @@ class ApplyFragment: Fragment() {
     }
 
     private fun loadApplications() {
-        val token = getAuthToken()
-        if (token == null) {
-            return
-        }
-
-        if (currentUser == null) {
-            showToast("")
-            showEmptyState()
-            return
-        }
-
-        val userId = currentUser?.userId ?: 0
+        val token = sharedPrefs.authToken ?: return
+        val userId = sharedPrefs.userId ?: 0
 
         if (userId == 0) {
-            showToast("")
             showEmptyState()
             return
         }
@@ -113,7 +89,7 @@ class ApplyFragment: Fragment() {
                 binding.progressBar.visibility = View.GONE
                 binding.swipeRefreshLayout.isRefreshing = false
 
-                if (result != null && result.isNotEmpty()) {
+                if (!result.isNullOrEmpty()) {
                     applications.clear()
                     applications.addAll(result)
                     updateUI()
@@ -125,7 +101,7 @@ class ApplyFragment: Fragment() {
             onError = { error ->
                 binding.progressBar.visibility = View.GONE
                 binding.swipeRefreshLayout.isRefreshing = false
-                showToast("Không thể tải danh sách ứng tuyển: ${error ?: "Unknown error"}")
+                showToast("Can not load application list: ${error ?: "Unknown error"}")
                 showEmptyState()
             }
         )
@@ -197,12 +173,8 @@ class ApplyFragment: Fragment() {
             }
             startActivity(intent)
         } else {
-            showToast("Không thể tìm thấy thông tin ứng tuyển")
+            showToast("Can not find any application!")
         }
-    }
-
-    private fun getAuthToken(): String? {
-        return sharedPrefs.authToken
     }
 
     private fun showToast(message: String) {

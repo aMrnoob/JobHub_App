@@ -47,27 +47,24 @@ public class ApplicationController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<ApiResponse<List<ApplicationDTO>>> getApplicationsByUserId(
+    public ApiResponse<List<ApplicationDTO>> getApplicationsByUserId(
             @RequestHeader("token") String token,
             @PathVariable Integer userId) {
-        ApiResponse<List<ApplicationDTO>> response = applicationService.getApplicationsByUserId(token, userId);
-        return ResponseEntity.ok(response);
+        return applicationService.getApplicationsByUserId(token, userId);
     }
 
     @GetMapping("/employer/{employerId}")
-    public ResponseEntity<ApiResponse<List<ApplicationDTO>>> getApplicationsByEmployerId(
+    public ApiResponse<List<ApplicationDTO>> getApplicationsByEmployerId(
             @RequestHeader("token") String token,
             @PathVariable Integer employerId) {
-        ApiResponse<List<ApplicationDTO>> response = applicationService.getApplicationsByEmployerId(token, employerId);
-        return ResponseEntity.ok(response);
+        return applicationService.getApplicationsByEmployerId(token, employerId);
     }
 
     @GetMapping("/job/{jobId}")
-    public ResponseEntity<ApiResponse<List<ApplicationDTO>>> getApplicationsByJobId(
+    public ApiResponse<List<ApplicationDTO>> getApplicationsByJobId(
             @RequestHeader("token") String token,
             @PathVariable Integer jobId) {
-        ApiResponse<List<ApplicationDTO>> response = applicationService.getApplicationsByJobId(token, jobId);
-        return ResponseEntity.ok(response);
+        return applicationService.getApplicationsByJobId(token, jobId);
     }
 
     @PutMapping("/status")

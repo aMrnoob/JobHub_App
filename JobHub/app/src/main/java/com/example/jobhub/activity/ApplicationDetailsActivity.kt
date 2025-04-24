@@ -1,10 +1,9 @@
 package com.example.jobhub.activity
 
+import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.example.jobhub.R
@@ -20,19 +19,14 @@ import com.example.jobhub.utils.ResumeViewerUtils
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
 
-class ApplicationDetailsActivity : AppCompatActivity() {
+class ApplicationDetailsActivity : BaseActivity() {
     private lateinit var binding: ActivityApplicationDetailsBinding
     private lateinit var sharedPrefs: SharedPrefsManager
     private var applicationId: Int = 0
     private var resumeUrl: String? = null
 
-    private val applicationService by lazy {
-        RetrofitClient.createRetrofit().create(ApplicationService::class.java)
-    }
-
-    private val resumeService by lazy {
-        RetrofitClient.createRetrofit().create(ResumeService::class.java)
-    }
+    private val applicationService by lazy { RetrofitClient.createRetrofit().create(ApplicationService::class.java) }
+    private val resumeService by lazy { RetrofitClient.createRetrofit().create(ResumeService::class.java) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +38,7 @@ class ApplicationDetailsActivity : AppCompatActivity() {
         applicationId = intent.getIntExtra("applicationId", 0)
 
         if (applicationId == 0) {
-            showToast("Không thể tìm thấy thông tin ứng tuyển")
+            showToast("Can not find application information")
             finish()
             return
         }
@@ -62,7 +56,7 @@ class ApplicationDetailsActivity : AppCompatActivity() {
     private fun loadApplicationDetails() {
         val token = sharedPrefs.authToken
         if (token == null) {
-            showToast("Phiên đăng nhập hết hạn")
+            showToast("Session expired")
             finish()
             return
         }
@@ -79,23 +73,24 @@ class ApplicationDetailsActivity : AppCompatActivity() {
                     displayApplicationDetails(application)
                     fetchResumeURL(token, application)
                 } else {
-                    showToast("Không tìm thấy thông tin ứng tuyển")
+                    showToast("Can not found application")
                     finish()
                 }
             },
             onError = { error ->
                 binding.progressBar.visibility = View.GONE
-                showToast("Không thể tải thông tin ứng tuyển: ${error ?: "Lỗi không xác định"}")
+                showToast("Can not load application detail: ${error ?: "Unknown error"}")
                 finish()
             }
         )
     }
 
+    @SuppressLint("SetTextI18n")
     private fun fetchResumeURL(token: String, application: ApplicationDTO) {
         val appId = application.applicationId ?: return
 
         binding.progressBarResume.visibility = View.VISIBLE
-        binding.tvResumeUrl.text = "Đang tải thông tin CV..."
+        binding.tvResumeUrl.text = "Loading CV information..."
         binding.btnViewResume.visibility = View.GONE
 
         ApiHelper().callApi(
@@ -113,13 +108,13 @@ class ApplicationDetailsActivity : AppCompatActivity() {
                         openResume(resumeUrl!!)
                     }
                 } else {
-                    binding.tvResumeUrl.text = "Chưa tải lên CV"
+                    binding.tvResumeUrl.text = "CV has not been uploaded yet"
                     binding.btnViewResume.visibility = View.GONE
                 }
             },
-            onError = { error ->
+            onError = {
                 binding.progressBarResume.visibility = View.GONE
-                binding.tvResumeUrl.text = "Không thể tải thông tin CV"
+                binding.tvResumeUrl.text = "Can not load CV information"
                 binding.btnViewResume.visibility = View.GONE
             }
         )
@@ -144,7 +139,7 @@ class ApplicationDetailsActivity : AppCompatActivity() {
             try {
                 ResumeViewerUtils.downloadAndOpenResume(this@ApplicationDetailsActivity, fullUrl)
             } catch (e: Exception) {
-                showToast("Không thể mở CV: ${e.message}")
+                showToast("Can not open CV: ${e.message}")
             } finally {
                 binding.progressBarResume.visibility = View.GONE
                 binding.btnViewResume.isEnabled = true
@@ -152,27 +147,28 @@ class ApplicationDetailsActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun displayApplicationDetails(application: ApplicationDTO) {
         binding.contentLayout.visibility = View.VISIBLE
 
         val job = application.jobDTO
-        val company = job?.company
+        val company = job.company
 
-        binding.tvJobTitle.text = job?.title ?: "Không có tiêu đề"
-        binding.tvCompanyName.text = company?.companyName ?: "Công ty không xác định"
-        binding.tvJobLocation.text = job?.location ?: "Không có địa chỉ"
-        binding.tvJobSalary.text = job?.salary ?: "Thương lượng"
+        binding.tvJobTitle.text = job.title
+        binding.tvCompanyName.text = company.companyName
+        binding.tvJobLocation.text = job.location
+        binding.tvJobSalary.text = job.salary
 
         Glide.with(this)
-            .load(company?.logoUrl)
+            .load(company.logoUrl)
             .placeholder(R.drawable.ic_company_placeholder)
             .into(binding.ivCompanyLogo)
 
         val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
-        val applicationDate = application.applicationDate?.format(formatter) ?: "N/A"
-        binding.tvApplicationDate.text = "Ngày nộp: $applicationDate"
+        val applicationDate = application.applicationDate.format(formatter) ?: "N/A"
+        binding.tvApplicationDate.text = "Submited date: $applicationDate"
 
-        if (!application.coverLetter.isNullOrEmpty()) {
+        if (application.coverLetter.isNotEmpty()) {
             binding.tvCoverLetter.text = application.coverLetter
             binding.cvCoverLetter.visibility = View.VISIBLE
         } else {
@@ -180,11 +176,10 @@ class ApplicationDetailsActivity : AppCompatActivity() {
         }
 
         val statusText = when (application.status) {
-            ApplicationStatus.APPLIED -> "Đã nộp"
-            ApplicationStatus.ACCEPTED -> "Đã chấp nhận"
-            ApplicationStatus.REJECTED -> "Đã từ chối"
-            ApplicationStatus.INTERVIEW -> "Phỏng vấn"
-            else -> "Đã nộp"
+            ApplicationStatus.APPLIED -> "Submited"
+            ApplicationStatus.ACCEPTED -> "Accepted"
+            ApplicationStatus.REJECTED -> "Rejected"
+            ApplicationStatus.INTERVIEW -> "Interview"
         }
         binding.tvStatus.text = statusText
 
@@ -194,11 +189,10 @@ class ApplicationDetailsActivity : AppCompatActivity() {
                 ApplicationStatus.ACCEPTED -> R.drawable.bg_status_accepted
                 ApplicationStatus.REJECTED -> R.drawable.bg_status_rejected
                 ApplicationStatus.INTERVIEW -> R.drawable.bg_status_interview
-                else -> R.drawable.bg_status_applied
             }
         )
 
-        binding.tvJobDescription.text = job?.description ?: "Không có mô tả công việc"
+        binding.tvJobDescription.text = job.description
     }
 
     private fun showToast(message: String) {
