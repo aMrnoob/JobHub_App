@@ -78,6 +78,7 @@ class LoginActivity : BaseActivity() {
             FacebookSdk.fullyInitialize()
             callbackManager = CallbackManager.Factory.create()
 
+            LoginManager.getInstance().logOut()
             LoginManager.getInstance().logInWithReadPermissions(this, emptyList())
             LoginManager.getInstance().registerCallback(callbackManager,
                 object : FacebookCallback<LoginResult> {
