@@ -121,5 +121,4 @@ public class JobServiceImpl implements JobService {
 
         return new ApiResponse<>(true, "", jobs);
     }
-
 }

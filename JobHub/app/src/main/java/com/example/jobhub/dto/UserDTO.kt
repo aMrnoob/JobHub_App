@@ -13,5 +13,6 @@ data class UserDTO (
     var phone: String? = null,
     var imageUrl: String? = null,
     val createdAt: String = "",
+    val companyId: Int? = null,
     val updatedAt: String = ""
 )

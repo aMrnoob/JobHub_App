@@ -14,6 +14,7 @@ import com.example.befindingjob.repository.ResumeRepository;
 import com.example.befindingjob.repository.UserRepository;
 import com.example.befindingjob.service.ApplicationService;
 import com.example.befindingjob.service.JwtService;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -194,21 +195,32 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public ApiResponse<List<ApplicationDTO>> getApplicationsByUserId(String token, Integer userId) {
         try {
+            logger.info("Validating token: {}", token);
             Integer tokenUserId = jwtService.extractUserId(token);
+            logger.debug("Token userId: {}, Requested userId: {}", tokenUserId, userId);
+            
             if (!Objects.equals(tokenUserId, userId)) {
-                return new ApiResponse<>(false, "You can only access your own applications", null);
+                logger.info("Requested userId doesn't match token. Using userId from token instead.");
+                userId = tokenUserId;
             }
 
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             List<Application> applications = applicationRepository.findByUser(user);
+            logger.info("Found {} applications for userId {}", applications.size(), userId);
+
             List<ApplicationDTO> applicationDTOs = applications.stream()
                     .map(this::convertToDTO)
                     .collect(Collectors.toList());
 
-            return new ApiResponse<>(true, "Applications retrieved successfully", applicationDTOs);
+            return new ApiResponse< >(true, "Applications retrieved successfully", applicationDTOs);
+
+        } catch (ExpiredJwtException e) {
+            logger.error("JWT expired when retrieving applications: {}", e.getMessage());
+            return new ApiResponse<>(false, "Token has expired, please login again", null);
         } catch (Exception e) {
+            logger.error("Exception while retrieving applications", e);
             return new ApiResponse<>(false, "Failed to retrieve applications: " + e.getMessage(), null);
         }
     }
@@ -274,6 +286,11 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
+    public ApiResponse<List<ApplicationDTO>> getApplicationsByCompanyId(String token, Integer companyId) {
+        return null;
+    }
+
+    @Override
     public ApiResponse<ApplicationDTO> updateApplicationStatus(String token, ApplicationDTO applicationDTO) {
         try {
             Integer tokenUserId = jwtService.extractUserId(token);
@@ -314,14 +331,6 @@ public class ApplicationServiceImpl implements ApplicationService {
 
             Application application = applicationRepository.findById(applicationId)
                     .orElseThrow(() -> new RuntimeException("Application not found"));
-
-            if (!user.getRole().equals("EMPLOYER") && !application.getUser().getUserId().equals(tokenUserId)) {
-                return new ApiResponse<>(false, "You can only access your own applications or applications for your job listings", null);
-            }
-
-            if (user.getRole().equals("EMPLOYER") && !application.getJob().getCompany().getUser().getUserId().equals(tokenUserId)) {
-                return new ApiResponse<>(false, "You can only access applications for your own job listings", null);
-            }
 
             ApplicationDTO responseDTO = convertToDTO(application);
             return new ApiResponse<>(true, "Application retrieved successfully", responseDTO);

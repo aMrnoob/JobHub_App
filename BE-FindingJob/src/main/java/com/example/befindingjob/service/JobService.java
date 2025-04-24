@@ -4,6 +4,7 @@ import com.example.befindingjob.dto.ItemJobDTO;
 import com.example.befindingjob.dto.JobDTO;
 import com.example.befindingjob.entity.Job;
 import com.example.befindingjob.model.ApiResponse;
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.List;
 

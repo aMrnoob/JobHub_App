@@ -66,7 +66,6 @@ class ApplyJobActivity : BaseActivity() {
         binding = MainDialogApplyBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Initialize SharedPrefsManager
         sharedPrefs = SharedPrefsManager(this)
 
         loadUserAndJob()
@@ -112,7 +111,7 @@ class ApplyJobActivity : BaseActivity() {
     }
 
     private fun setupUI() {
-        binding.ivBack.setOnClickListener { onBackPressed() }
+        binding.ivBack.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         binding.btnChooseResume.setOnClickListener {
             val intent = Intent(Intent.ACTION_GET_CONTENT).apply { type = "application/pdf" }
@@ -135,7 +134,6 @@ class ApplyJobActivity : BaseActivity() {
 
         binding.progressBar.visibility = View.VISIBLE
 
-        // Call an API to check if user has already applied for this job
         ApiHelper().callApi(
             context = this,
             call = jobApplicationService.getApplicationsByUserId("Bearer $token", userId),
@@ -239,7 +237,6 @@ class ApplyJobActivity : BaseActivity() {
             call = jobApplicationService.applyForJob("Bearer $token", applicationDTO),
             onSuccess = { submittedApp ->
                 if (submittedApp != null && submittedApp.applicationId != null) {
-                    Log.e("Debugab", resumeUrl)
                     createResumeEntry(token, submittedApp.applicationId, resumeUrl)
                 } else {
                     showToast("Nộp đơn thành công nhưng thiếu ID ứng dụng.")

@@ -40,13 +40,10 @@ class EmployerApplicationAdapter(
         val dateFormat = SimpleDateFormat("d/M/yyyy", Locale.getDefault())
         val applyDate = application.applicationDate?.let { dateFormat.format(it) } ?: "N/A"
 
-        holder.binding.tvUsername.text = user.fullName
-        holder.binding.tvApplicationDate.text = "Apply Date: $applyDate"
-        holder.binding.tvCoverLetter.text = application.coverLetter
+        holder.binding.tvApplicationDate.text = "Ngày nộp: $applyDate"
+        holder.binding.tvCoverLetter.text = application.coverLetter ?: "Không có thư xin việc"
 
-        // Get resume info for this application
-        loadResumeInfo(application.applicationId, holder)
-
+        // Set status text and color
         holder.binding.tvStatus.text = when (application.status) {
             ApplicationStatus.APPLIED -> "Đã nộp"
             ApplicationStatus.ACCEPTED -> "Đã chấp nhận"
@@ -64,46 +61,17 @@ class EmployerApplicationAdapter(
         )
 
         Glide.with(holder.itemView.context)
-            .load(user.imageUrl)
+            .load(user?.imageUrl)
             .placeholder(R.drawable.simple_border)
-            .into(holder.binding.ivAvatar)
+            .into(holder.binding.ivCompanyLogo)
 
         val isPending = application.status == ApplicationStatus.APPLIED ||
                 application.status == ApplicationStatus.INTERVIEW
 
-        holder.binding.layoutEmployerButtons.visibility = if (isPending) View.VISIBLE else View.GONE
 
-        holder.binding.btnAccept.setOnClickListener { onAccept(application) }
-        holder.binding.btnReject.setOnClickListener { onReject(application) }
         holder.itemView.setOnClickListener { onViewDetails(application) }
     }
 
-    private fun loadResumeInfo(applicationId: Int?, holder: ApplicationViewHolder) {
-        if (applicationId == null) {
-            holder.binding.tvCvAttached.text = "Không có CV"
-            return
-        }
-
-        val token = getAuthToken(holder.itemView.context) ?: return
-
-        ApiHelper().callApi(
-            context = holder.itemView.context,
-            call = resumeService.getResumeByApplicationId("Bearer $token", applicationId),
-            onSuccess = { resume ->
-                if (resume != null && resume.resumeUrl != null) {
-                    holder.binding.tvCvAttached.text = "CV: Có đính kèm"
-                    holder.binding.tvCvAttached.setOnClickListener {
-                        // Handle CV click - maybe open PDF viewer
-                    }
-                } else {
-                    holder.binding.tvCvAttached.text = "Không có CV"
-                }
-            },
-            onError = {
-                holder.binding.tvCvAttached.text = "Không có CV"
-            }
-        )
-    }
 
     private fun getAuthToken(context: android.content.Context): String? {
         return context.getSharedPreferences("JobHubPrefs", android.content.Context.MODE_PRIVATE)
