@@ -5,8 +5,9 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="28"/>
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
     <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
 
     <application
@@ -20,6 +21,9 @@
         android:theme="@style/Theme.JobHub"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <activity
+            android:name=".activity.BookmarkActivity"
+            android:exported="false" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -51,7 +55,6 @@
         <activity
             android:name=".activity.ApplicantActivity"
             android:exported="false" />
-
         <activity
             android:name=".activity.InforJobActivity"
             android:exported="false" />
@@ -89,16 +92,13 @@
         <activity
             android:name=".activity.ApplyJobActivity"
             android:exported="true" />
-
         <activity
             android:name=".activity.CVViewerActivity"
             android:exported="true"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
-
         <activity
             android:name=".activity.ApplicationDetailsActivity"
             android:exported="true" />
-
         <activity
             android:name=".activity.WelcomeActivity"
             android:exported="true"

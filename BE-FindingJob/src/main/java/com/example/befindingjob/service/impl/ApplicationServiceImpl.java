@@ -214,7 +214,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                     .map(this::convertToDTO)
                     .collect(Collectors.toList());
 
-            return new ApiResponse< >(true, "Applications retrieved successfully", applicationDTOs);
+            return new ApiResponse< >(true, "", applicationDTOs);
 
         } catch (ExpiredJwtException e) {
             logger.error("JWT expired when retrieving applications: {}", e.getMessage());
@@ -250,7 +250,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                     .map(this::convertToDTO)
                     .collect(Collectors.toList());
 
-            return new ApiResponse<>(true, "Applications retrieved successfully", applicationDTOs);
+            return new ApiResponse<>(true, "", applicationDTOs);
         } catch (Exception e) {
             return new ApiResponse<>(false, "Failed to retrieve applications: " + e.getMessage(), null);
         }
@@ -263,23 +263,15 @@ public class ApplicationServiceImpl implements ApplicationService {
                 return new ApiResponse<>(false, "Invalid token", null);
             }
 
-            Integer tokenUserId = jwtService.extractUserId(token);
-            User user = userRepository.findById(tokenUserId)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
-
             Job job = jobRepository.findById(jobId)
                     .orElseThrow(() -> new RuntimeException("Job not found"));
-
-            if (!user.getRole().equals("EMPLOYER") || !job.getCompany().getUser().getUserId().equals(tokenUserId)) {
-                return new ApiResponse<>(false, "You can only access applications for your own job listings", null);
-            }
 
             List<Application> applications = applicationRepository.findByJob(job);
             List<ApplicationDTO> applicationDTOs = applications.stream()
                     .map(this::convertToDTO)
                     .collect(Collectors.toList());
 
-            return new ApiResponse<>(true, "Applications retrieved successfully", applicationDTOs);
+            return new ApiResponse<>(true, "", applicationDTOs);
         } catch (Exception e) {
             return new ApiResponse<>(false, "Failed to retrieve applications: " + e.getMessage(), null);
         }
@@ -333,7 +325,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                     .orElseThrow(() -> new RuntimeException("Application not found"));
 
             ApplicationDTO responseDTO = convertToDTO(application);
-            return new ApiResponse<>(true, "Application retrieved successfully", responseDTO);
+            return new ApiResponse<>(true, "", responseDTO);
         } catch (Exception e) {
             return new ApiResponse<>(false, "Failed to retrieve application: " + e.getMessage(), null);
         }
@@ -376,7 +368,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                     resume.getUpdatedAt()
             );
 
-            return new ApiResponse<>(true, "Resume retrieved successfully", resumeDTO);
+            return new ApiResponse<>(true, "", resumeDTO);
         } catch (Exception e) {
             return new ApiResponse<>(false, "Failed to retrieve resume: " + e.getMessage(), null);
         }
@@ -401,7 +393,7 @@ public class ApplicationServiceImpl implements ApplicationService {
             }
 
             applicationRepository.delete(application);
-            return new ApiResponse<>(true, "Application deleted successfully", true);
+            return new ApiResponse<>(true, "", true);
         } catch (Exception e) {
             return new ApiResponse<>(false, "Failed to delete application: " + e.getMessage(), null);
         }
@@ -477,7 +469,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         int applicationId = statusApplicantDTO.getApplicationId();
 
         Optional<Application> optionalApplication = applicationRepository.findById(applicationId);
-        System.out.println(statusApplicantDTO.getStatus());
+
         if (optionalApplication.isPresent()) {
             Application application = optionalApplication.get();
             application.setStatus(statusApplicantDTO.getStatus());
@@ -501,7 +493,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     private ApplicationDTO convertToDTO(Application application) {
         return new ApplicationDTO(
                 application.getApplicationId(),
-                convertJobToDTO(application.getJob()),
+                application.getJob(),
                 convertUserToDTO(application.getUser()),
                 application.getCoverLetter(),
                 application.getStatus(),

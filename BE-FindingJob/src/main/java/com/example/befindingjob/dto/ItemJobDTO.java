@@ -31,6 +31,9 @@ public class ItemJobDTO {
     private List<SkillDTO> requiredSkills;
     private List<ApplicationDTO> applications;
 
+    public ItemJobDTO() {
+    }
+
     public ItemJobDTO(Job job) {
         this.jobId = job.getJobId();
         this.title = job.getTitle();
@@ -46,5 +49,30 @@ public class ItemJobDTO {
                 .map(SkillDTO::new)
                 .collect(Collectors.toList());
         this.applications = job.getApplications().stream().map(ApplicationDTO::new).collect(Collectors.toList());
+    }
+
+    public static ItemJobDTO convertFromJob(Job job, boolean includeApplications) {
+        ItemJobDTO dto = new ItemJobDTO();
+        dto.jobId = job.getJobId();
+        dto.title = job.getTitle();
+        dto.description = job.getDescription();
+        dto.requirements = job.getRequirements();
+        dto.salary = job.getSalary();
+        dto.location = job.getLocation();
+        dto.jobType = job.getJobType();
+        dto.experienceRequired = job.getExperienceRequired();
+        dto.expirationDate = job.getExpirationDate();
+        dto.company = new ItemCompanyDTO(job.getCompany());
+        dto.requiredSkills = job.getRequiredSkills().stream()
+                .map(SkillDTO::new)
+                .collect(Collectors.toList());
+
+        if (includeApplications) {
+            dto.applications = job.getApplications().stream()
+                    .map(app -> new ApplicationDTO(app, false))
+                    .collect(Collectors.toList());
+        }
+
+        return dto;
     }
 }

@@ -168,7 +168,6 @@
                 android:layout_marginStart="10dp"
                 android:text="Remove"
                 android:textSize="16sp"
-
                 android:textColor="@color/black"/>
         </LinearLayout>
 

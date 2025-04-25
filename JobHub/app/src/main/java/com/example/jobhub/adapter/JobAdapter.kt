@@ -155,5 +155,4 @@ class JobAdapter(
             Toast.makeText(context, "Tải xuống thất bại: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
-
 }

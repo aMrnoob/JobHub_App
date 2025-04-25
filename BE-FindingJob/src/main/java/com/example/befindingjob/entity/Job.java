@@ -63,5 +63,9 @@ public class Job {
     @JsonIgnore
     @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Application> applications = new HashSet<>();
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "bookmarkedJobs")
+    private Set<User> usersBookmarked = new HashSet<>();
 }
 

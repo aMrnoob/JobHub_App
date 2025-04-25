@@ -1,10 +1,14 @@
 package com.example.befindingjob.mapper;
 
 import com.example.befindingjob.dto.JobDTO;
+import com.example.befindingjob.dto.SkillDTO;
 import com.example.befindingjob.entity.Job;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
+
+import java.util.HashSet;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface JobMapper {

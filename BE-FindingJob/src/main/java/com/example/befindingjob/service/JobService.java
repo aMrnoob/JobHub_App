@@ -13,4 +13,5 @@ public interface JobService {
     ApiResponse<Void> updateJob(Job job);
     ApiResponse<Void> deleteJob(int jobId);
     ApiResponse<List<ItemJobDTO>> getAllJobsByUser(String token);
+    ApiResponse<List<ItemJobDTO>> getBookmarkedJobsByUser(String token);
 }
