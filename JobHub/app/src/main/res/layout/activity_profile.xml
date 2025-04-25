@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/white"
+    android:background="#FFFAF0"
     android:fitsSystemWindows="true">
 
     <ImageView
@@ -38,7 +38,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:background="@drawable/simple_border"
         android:elevation="5dp"
         app:layout_constraintVertical_bias="0.15"
         app:layout_constraintWidth_percent="0.8"
@@ -66,8 +65,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Upload Photo Profile"
-            android:textSize="20sp"
+            android:text="Upload Photo"
+            android:textSize="15sp"
             android:textColor="@color/gray_600" />
     </LinearLayout>
 
@@ -89,7 +88,8 @@
         android:id="@+id/edtFullName"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:background="@drawable/edittext_background"
+        android:paddingStart="15dp"
+        android:background="@drawable/bg_edittext"
         android:hint="Full name"
         android:textColorHint="@color/gray_500"
         android:textColor="@color/black"
@@ -119,7 +119,8 @@
         android:id="@+id/edtEmail"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:background="@drawable/edittext_background"
+        android:paddingStart="15dp"
+        android:background="@drawable/bg_edittext"
         android:hint="Email"
         android:textColorHint="@color/gray_500"
         android:textColor="@color/black"
@@ -148,7 +149,8 @@
         android:id="@+id/edtDateOfBirth"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:background="@drawable/edittext_background"
+        android:paddingStart="15dp"
+        android:background="@drawable/bg_edittext"
         android:hint="Date of birth"
         android:textColorHint="@color/gray_500"
         android:textColor="@color/black"
@@ -179,7 +181,8 @@
         android:id="@+id/edtPhone"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:background="@drawable/edittext_background"
+        android:paddingStart="15dp"
+        android:background="@drawable/bg_edittext"
         android:hint="Phone number"
         android:textColorHint="@color/gray_500"
         android:textColor="@color/black"
@@ -209,7 +212,8 @@
         android:id="@+id/edtAddress"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:background="@drawable/edittext_background"
+        android:paddingStart="15dp"
+        android:background="@drawable/bg_edittext"
         android:hint="Address"
         android:textColorHint="@color/gray_500"
         android:textColor="@color/black"

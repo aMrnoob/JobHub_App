@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="#FFFAF0"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
@@ -64,7 +64,8 @@
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_marginBottom="20dp"
-            android:background="@drawable/edittext_background"
+            android:paddingStart="15dp"
+            android:background="@drawable/bg_edittext"
             android:hint="Posting date"
             android:textColorHint="@color/gray_500"
             android:textColor="@color/black"
@@ -85,7 +86,8 @@
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_marginBottom="20dp"
-            android:background="@drawable/edittext_background"
+            android:paddingStart="15dp"
+            android:background="@drawable/bg_edittext"
             android:hint="Expiration date"
             android:textColorHint="@color/gray_500"
             android:textColor="@color/black"
@@ -108,7 +110,8 @@
             android:layout_marginBottom="15dp"
             android:theme="@style/SpinnerTextStyle"
             android:popupBackground="@color/gray_100"
-            android:background="@drawable/edittext_background"
+            android:paddingStart="15dp"
+            android:background="@drawable/bg_edittext"
             android:entries="@array/experience_options" />
 
         <TextView
@@ -127,7 +130,8 @@
             android:layout_marginBottom="15dp"
             android:theme="@style/SpinnerTextStyle"
             android:popupBackground="@color/gray_100"
-            android:background="@drawable/edittext_background" />
+            android:paddingStart="15dp"
+            android:background="@drawable/bg_edittext" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -145,7 +149,8 @@
             android:layout_marginBottom="40dp"
             android:theme="@style/SpinnerTextStyle"
             android:popupBackground="@color/gray_100"
-            android:background="@drawable/edittext_background"
+            android:paddingStart="15dp"
+            android:background="@drawable/bg_edittext"
             android:entries="@array/job_type" />
 
         <Button

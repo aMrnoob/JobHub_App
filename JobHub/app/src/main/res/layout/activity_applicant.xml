@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="#FFFAF0">
 
     <ImageButton
         android:id="@+id/btnComeBack"
@@ -160,14 +160,15 @@
                 <TextView
                     android:id="@+id/tvSelectedStatus"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
+                    android:layout_height="40dp"
                     android:layout_marginHorizontal="20dp"
+                    android:backgroundTint="#E8E8E8"
                     android:gravity="center_vertical"
                     android:paddingStart="10dp"
                     android:text="Schedule to Interview"
                     android:textColor="@color/gray_700"
                     android:textSize="18sp"
-                    android:textStyle="bold"
+
                     android:background="@drawable/border_select_profile"
                     android:drawablePadding="10dp" />
 
@@ -189,29 +190,27 @@
                     <EditText
                         android:id="@+id/edtDate"
                         android:layout_width="0dp"
-                        android:layout_height="50dp"
+                        android:layout_height="40dp"
                         android:layout_weight="1"
                         android:layout_marginEnd="10dp"
                         android:paddingStart="10dp"
                         android:hint="Date"
                         android:inputType="date"
                         android:textColor="@color/gray_700"
-                        android:textStyle="bold"
                         android:focusable="false"
                         android:clickable="true"
                         android:textColorHint="@color/gray_700"
-                        android:background="@drawable/border_select_profile"/>
+                        android:background="@drawable/border_select_profile" />
 
                     <EditText
                         android:id="@+id/edtHour"
                         android:layout_width="0dp"
-                        android:layout_height="50dp"
+                        android:layout_height="40dp"
                         android:layout_weight="1"
                         android:paddingStart="10dp"
                         android:hint="Hour"
                         android:inputType="time"
                         android:textColor="@color/gray_700"
-                        android:textStyle="bold"
                         android:focusable="false"
                         android:clickable="true"
                         android:textColorHint="@color/gray_700"
@@ -240,10 +239,10 @@
                     android:text="Message"
                     android:gravity="top"
                     android:textSize="16sp"
-                    android:textStyle="bold"
                     android:minLines="6"
                     android:textColor="@color/gray_600"
-                    android:background="@drawable/item_company"/>
+                    android:background="@drawable/bg_edittext"
+                    android:backgroundTint="#FFEBCD"/>
             </LinearLayout>
 
             <Button
@@ -251,8 +250,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
                 android:layout_marginTop="40dp"
-                android:layout_marginHorizontal="20dp"
-                android:backgroundTint="@color/blue_600"
+                android:layout_marginHorizontal="50dp"
+                android:backgroundTint="@color/green_600"
                 android:layout_marginBottom="5dp"
                 android:text="Send to Applicant"
                 android:textColor="@color/white"
