@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginStart="10dp"
+    android:layout_marginBottom="10dp"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="40dp"
+        android:layout_marginStart="5dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
+            android:layout_marginStart="20dp"
+            android:text="Expertise"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvSoftwareDev"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:text="Software Dev"
+                android:textColor="@drawable/text_select"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:paddingVertical="8dp"
+                android:paddingHorizontal="10dp"
+                android:background="@drawable/background_select"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/tvDataScience"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:text="Data Science"
+                android:textColor="@drawable/text_select"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:paddingVertical="8dp"
+                android:paddingHorizontal="10dp"
+                android:background="@drawable/background_select"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/tvWebDevelopment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:text="Web Develop"
+                android:textColor="@drawable/text_select"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:paddingVertical="8dp"
+                android:paddingHorizontal="13dp"
+                android:background="@drawable/background_select"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvMachineLearning"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:text="Machine Learning"
+                android:textColor="@drawable/text_select"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:paddingVertical="8dp"
+                android:paddingHorizontal="10dp"
+                android:background="@drawable/background_select"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/tvCybersecurity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:text="Cybersecurity"
+                android:textColor="@drawable/text_select"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:paddingVertical="8dp"
+                android:paddingHorizontal="13dp"
+                android:background="@drawable/background_select"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/tvMore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:text="More..."
+                android:textColor="@drawable/text_select"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:paddingVertical="8dp"
+                android:paddingHorizontal="13dp"
+                android:background="@drawable/background_select"
+                android:gravity="center" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:background="@color/gray_400"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="40dp"
+            android:text="Job Type"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvFullTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="20dp"
+                android:text="Full Time"
+                android:textColor="@drawable/text_select"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:paddingVertical="8dp"
+                android:paddingHorizontal="13dp"
+                android:background="@drawable/background_select"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/tvPartTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
+                android:text="Part Time"
+                android:textColor="@drawable/text_select"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:paddingVertical="8dp"
+                android:paddingHorizontal="13dp"
+                android:background="@drawable/background_select"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/tvInternship"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Intern Ship"
+                android:textColor="@drawable/text_select"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:paddingVertical="8dp"
+                android:paddingHorizontal="13dp"
+                android:background="@drawable/background_select"
+                android:gravity="center" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvContract"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="30dp"
+            android:text="Contract"
+            android:textColor="@drawable/text_select"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:paddingVertical="8dp"
+            android:paddingHorizontal="13dp"
+            android:background="@drawable/background_select"
+            android:gravity="center" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:background="@color/gray_400"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginStart="40dp"
+            android:text="Salary"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvSalary1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:paddingHorizontal="13dp"
+                android:layout_marginEnd="20dp"
+                android:text="$1000-"
+                android:textColor="@drawable/text_select"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:paddingVertical="8dp"
+                android:background="@drawable/background_select"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/tvSalary2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="13dp"
+                android:layout_marginEnd="20dp"
+                android:text="$2000-"
+                android:textColor="@drawable/text_select"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:paddingVertical="8dp"
+                android:background="@drawable/background_select"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/tvSalary3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="13dp"
+                android:layout_marginEnd="20dp"
+                android:text="$5000-"
+                android:textColor="@drawable/text_select"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:paddingVertical="8dp"
+                android:background="@drawable/background_select"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/tvSalary4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="13dp"
+                android:text="$5000+"
+                android:textColor="@drawable/text_select"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:paddingVertical="8dp"
+                android:background="@drawable/background_select"
+                android:gravity="center" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@color/gray_400"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginStart="40dp"
+            android:text="Location"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvLocation1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="13dp"
+                android:layout_marginEnd="20dp"
+                android:text="Viet Nam"
+                android:textColor="@drawable/text_select"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:paddingVertical="8dp"
+                android:background="@drawable/background_select"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/tvLocation2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="13dp"
+                android:layout_marginEnd="20dp"
+                android:text="United States"
+                android:textColor="@drawable/text_select"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:paddingVertical="8dp"
+                android:background="@drawable/background_select"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/tvLocation3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="13dp"
+                android:layout_marginEnd="20dp"
+                android:text="Singapore"
+                android:textColor="@drawable/text_select"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:paddingVertical="8dp"
+                android:background="@drawable/background_select"
+                android:gravity="center" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvLocation4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="13dp"
+                android:layout_marginEnd="20dp"
+                android:text="Japan"
+                android:textColor="@drawable/text_select"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:paddingVertical="8dp"
+                android:background="@drawable/background_select"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/tvLocation5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="13dp"
+                android:layout_marginEnd="20dp"
+                android:text="Canada"
+                android:textColor="@drawable/text_select"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:paddingVertical="8dp"
+                android:background="@drawable/background_select"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/tvLocation6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="13dp"
+                android:layout_marginEnd="20dp"
+                android:text="France"
+                android:textColor="@drawable/text_select"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:paddingVertical="8dp"
+                android:background="@drawable/background_select"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/tvLocation7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="13dp"
+                android:layout_marginEnd="20dp"
+                android:text="Australia"
+                android:textColor="@drawable/text_select"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:paddingVertical="8dp"
+                android:background="@drawable/background_select"
+                android:gravity="center" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnApply"
+            android:layout_width="200dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="40dp"
+            android:layout_gravity="center_horizontal"
+            android:backgroundTint="@color/green_500"
+            android:text="Apply"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
+    </LinearLayout>
+</LinearLayout>
