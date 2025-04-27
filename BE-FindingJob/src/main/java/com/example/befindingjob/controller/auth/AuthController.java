@@ -6,6 +6,7 @@ import com.example.befindingjob.entity.User;
 import com.example.befindingjob.entity.enumm.Role;
 import com.example.befindingjob.model.ApiResponse;
 import com.example.befindingjob.repository.UserRepository;
+import com.example.befindingjob.service.JwtService;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -21,8 +22,6 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -33,6 +32,9 @@ public class AuthController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private JwtService jwtService;
+
     @PostMapping("/google")
     public ResponseEntity<ApiResponse<LoginResponse>> googleLogin(@RequestBody TokenRequest tokenRequest) {
         try {
@@ -42,7 +44,7 @@ public class AuthController {
 
             GoogleIdToken idToken = verifier.verify(tokenRequest.getIdToken());
             if (idToken == null) {
-                return ResponseEntity.status(401).body(new ApiResponse<>(false, "Invalid token", null));
+                return ResponseEntity.status(401).body(new ApiResponse<>(false, "Invalid Token", null));
             }
 
             GoogleIdToken.Payload payload = idToken.getPayload();
@@ -50,17 +52,30 @@ public class AuthController {
             String name = (String) payload.get("name");
 
             Optional<User> existingUser = userRepository.findByEmail(email);
-            User user = existingUser.orElseGet(() -> createNewUser(email, name));
+            User user;
 
-            if (user.getFullname() == null && name != null) {
-                user.setFullname(name);
-                userRepository.save(user);
+            if (existingUser.isPresent()) {
+                user = existingUser.get();
+                if (user.getFullname() == null && name != null) {
+                    user.setFullname(name);
+                    userRepository.save(user);
+                }
+            } else {
+                user = createNewUser(email, name);
             }
 
-            return ResponseEntity.ok(new ApiResponse<>(true, "Login successful"));
+            String jwtToken = jwtService.generateToken(user.getUserId(), user.getFullname());
+
+            LoginResponse response = new LoginResponse();
+            response.setToken(jwtToken);
+            response.setUserId(user.getUserId());
+            response.setRole(user.getRole());
+            response.setFullName(user.getFullname());
+
+            return ResponseEntity.ok(new ApiResponse<>(true, "Login successfully", response));
 
         } catch (GeneralSecurityException | IOException e) {
-            System.err.println("Lỗi xác thực Google: " + e.getMessage());
+            System.err.println("Authentication error Google: " + e.getMessage());
             return ResponseEntity.status(500).body(new ApiResponse<>(false, "Authentication failed: " + e.getMessage(), null));
         }
     }

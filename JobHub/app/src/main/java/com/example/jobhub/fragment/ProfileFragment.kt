@@ -185,7 +185,11 @@ class ProfileFragment : Fragment() {
         ApiHelper().callApi(
             context = requireContext(),
             call = userService.deleteAccount("Bearer $token"),
-            onSuccess = {}
+            onSuccess = {
+                val intent = Intent(requireContext(), LoginActivity::class.java)
+                startActivity(intent)
+                requireActivity().finish()
+            }
         )
     }
 

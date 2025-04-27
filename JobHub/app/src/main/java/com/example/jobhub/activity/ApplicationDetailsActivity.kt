@@ -1,6 +1,7 @@
 package com.example.jobhub.activity
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -44,6 +45,7 @@ class ApplicationDetailsActivity : BaseActivity() {
         }
 
         setupToolbar()
+        setupDeleteButton()
         loadApplicationDetails()
     }
 
@@ -51,6 +53,51 @@ class ApplicationDetailsActivity : BaseActivity() {
         binding.ivBack.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
+    }
+
+    private fun setupDeleteButton() {
+        binding.btnDeleteApplication.setOnClickListener {
+            showDeleteConfirmationDialog()
+        }
+    }
+
+    private fun showDeleteConfirmationDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Xác nhận xóa")
+            .setMessage("Bạn có chắc chắn muốn xóa đơn ứng tuyển này không? Hành động này không thể hoàn tác.")
+            .setPositiveButton("Xóa") { _, _ ->
+                deleteApplication()
+            }
+            .setNegativeButton("Hủy", null)
+            .show()
+    }
+
+    private fun deleteApplication() {
+        val token = sharedPrefs.authToken
+        if (token == null) {
+            showToast("Phiên đăng nhập đã hết hạn")
+            finish()
+            return
+        }
+
+        binding.progressBar.visibility = View.VISIBLE
+        binding.contentLayout.visibility = View.GONE
+
+        ApiHelper().callApi(
+            context = this,
+            call = applicationService.deleteApplication("Bearer $token", applicationId),
+            onSuccess = {
+                binding.progressBar.visibility = View.GONE
+                showToast("Đã xóa đơn ứng tuyển thành công")
+                setResult(RESULT_OK)
+                finish()
+            },
+            onError = { error ->
+                binding.progressBar.visibility = View.GONE
+                binding.contentLayout.visibility = View.VISIBLE
+                showToast("Không thể xóa đơn ứng tuyển: ${error ?: "Lỗi không xác định"}")
+            }
+        )
     }
 
     private fun loadApplicationDetails() {

@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.jobhub.activity.ApplicationDetailsActivity
 import com.example.jobhub.adapter.SeekerApplicationAdapter
@@ -31,6 +32,14 @@ class ApplyFragment: Fragment() {
 
     private val resumeService by lazy {
         RetrofitClient.createRetrofit().create(ResumeService::class.java)
+    }
+
+    private val applicationDetailsLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) {
+            loadApplications()
+        }
     }
 
     override fun onCreateView(
@@ -63,7 +72,7 @@ class ApplyFragment: Fragment() {
                 if (activity is OnFragmentInteractionListener) {
                     (activity as OnFragmentInteractionListener).onNavigateToJobSearch()
                 } else {
-                    showToast("")
+                    showToast("Unable to navigate to job search page")
                 }
             }
         }
@@ -101,7 +110,7 @@ class ApplyFragment: Fragment() {
             onError = { error ->
                 binding.progressBar.visibility = View.GONE
                 binding.swipeRefreshLayout.isRefreshing = false
-                showToast("Can not load application list: ${error ?: "Unknown error"}")
+                showToast("Unable to load application list: ${error ?: "Unknown error"}")
                 showEmptyState()
             }
         )
@@ -127,7 +136,7 @@ class ApplyFragment: Fragment() {
                     updateApplicationInAdapter(updatedApplication)
                 },
                 onError = { error ->
-                    Log.e("ApplyFragment", "Error fetching resume for application $applicationId: $error")
+                    Log.e("ApplyFragment", "Error uploading CV for application $applicationId: $error")
                 }
             )
         }
@@ -171,9 +180,9 @@ class ApplyFragment: Fragment() {
             val intent = Intent(requireContext(), ApplicationDetailsActivity::class.java).apply {
                 putExtra("applicationId", applicationId)
             }
-            startActivity(intent)
+            applicationDetailsLauncher.launch(intent)
         } else {
-            showToast("Can not find any application!")
+            showToast("Application information not found!")
         }
     }
 

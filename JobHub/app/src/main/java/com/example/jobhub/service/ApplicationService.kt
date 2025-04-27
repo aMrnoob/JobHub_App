@@ -29,7 +29,7 @@ interface ApplicationService {
         @Path("userId") userId: Int
     ): Call<ApiResponse<List<ApplicationDTO>>>
 
-    @GET("applications/company/{companyId}")
+    @GET("api/applications/company/{companyId}")
     fun getApplicationsByCompanyId(
         @Header("Authorization") token: String,
         @Path("companyId") companyId: Int
