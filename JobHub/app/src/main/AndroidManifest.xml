@@ -93,10 +93,6 @@
             android:name=".activity.ApplyJobActivity"
             android:exported="true" />
         <activity
-            android:name=".activity.CVViewerActivity"
-            android:exported="true"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
-        <activity
             android:name=".activity.ApplicationDetailsActivity"
             android:exported="true" />
         <activity

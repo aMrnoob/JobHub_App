@@ -110,9 +110,7 @@ class ProfileActivity : BaseActivity() {
         ApiHelper().callApi(
             context = this,
             call = userService.updateUser(user),
-            onSuccess = {
-
-            }
+            onSuccess = { finish() }
         )
     }
 

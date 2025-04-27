@@ -9,7 +9,6 @@ import android.text.Editable
 import android.util.Base64
 import android.util.Log
 import android.widget.ArrayAdapter
-import android.widget.ListView
 import com.example.jobhub.R
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
@@ -19,7 +18,6 @@ import com.example.jobhub.dto.ApplicationDTO
 import com.example.jobhub.dto.StatusApplicantDTO
 import com.example.jobhub.entity.enumm.ApplicationStatus
 import com.example.jobhub.service.ApplicationService
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
@@ -53,7 +51,7 @@ class ApplicantActivity : BaseActivity() {
         }
 
         binding.btnSendMessage.setOnClickListener {
-            val selectedStatusText = binding.tvSelectedStatus.text.toString()
+            val selectedStatusText = binding.actvStatus.text.toString()
             val status = mapStatusFromText(selectedStatusText)
             val message = binding.edtMessage.text.toString()
             Log.e("statusav", status.toString())
@@ -91,26 +89,15 @@ class ApplicantActivity : BaseActivity() {
         binding.edtMessage.text = Editable.Factory.getInstance().newEditable(applicationDTO?.coverLetter?.substringAfterLast("^^")?.trim())
     }
 
-    @SuppressLint("InflateParams")
     private fun setUpSpinner() {
         val statusList = listOf("Schedule to Interview", "Accept Application", "Reject Application")
-        val dialogView = layoutInflater.inflate(R.layout.dialog_select_status, null)
-        val listView = dialogView.findViewById<ListView>(R.id.listStatus)
-        val dialog = BottomSheetDialog(this)
-        dialog.setContentView(dialogView)
 
-        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, statusList)
-        listView.adapter = adapter
+        val adapter = ArrayAdapter(this, R.layout.item_dropdown_status, statusList)
+        binding.actvStatus.setAdapter(adapter)
 
-        listView.setOnItemClickListener { _, _, position, _ ->
+        binding.actvStatus.setOnItemClickListener { _, _, position, _ ->
             val selectedStatus = statusList[position]
-            binding.tvSelectedStatus.text = selectedStatus
-            binding.edtMessage.setText("")
-            dialog.dismiss()
-        }
-
-        binding.tvSelectedStatus.setOnClickListener {
-            dialog.show()
+            binding.actvStatus.setText(selectedStatus, false)
         }
     }
 

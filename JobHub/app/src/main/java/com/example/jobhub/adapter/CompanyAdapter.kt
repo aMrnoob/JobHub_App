@@ -55,10 +55,7 @@ class CompanyAdapter(
             onActionClick?.let { it1 -> it1(company, CompanyAction.CLICK) }
         }
 
-        holder.btnEdit.setOnClickListener {
-            AnimationHelper.animateScale(it)
-            onActionClick?.let { it1 -> it1(company, CompanyAction.EDIT) }
-        }
+        holder.btnEdit.setOnClickListener { onActionClick?.let { it1 -> it1(company, CompanyAction.EDIT) } }
 
         holder.btnRemove.setOnClickListener {
             AnimationHelper.animateScale(it)

@@ -26,7 +26,6 @@ import com.example.jobhub.entity.Company
 import com.example.jobhub.entity.enumm.CompanyAction
 import com.example.jobhub.service.CompanyService
 
-
 class CompanyFragment : Fragment() {
 
     private lateinit var companyAdapter: CompanyAdapter

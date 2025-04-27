@@ -73,14 +73,14 @@ class HomeFragment : Fragment() {
         }
 
         binding.tvViewMore.setOnClickListener {
-            val url = "http://192.168.1.15:8080/api/admin/tips"
+            val url = "http://192.168.83.233:8080/api/admin/tips"
             val intent = Intent(Intent.ACTION_VIEW)
             intent.data = Uri.parse(url)
             startActivity(intent)
         }
 
         binding.btnReadMore.setOnClickListener {
-            val url = "http://192.168.1.15:8080/api/admin/tips"
+            val url = "http://192.168.83.233:8080/api/admin/tips"
             val intent = Intent(Intent.ACTION_VIEW)
             intent.data = Uri.parse(url)
             startActivity(intent)

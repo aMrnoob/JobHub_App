@@ -4,6 +4,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +15,7 @@ import android.widget.SearchView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.jobhub.R
 import com.example.jobhub.activity.ApplyJobActivity
 import com.example.jobhub.activity.BookmarkActivity
@@ -41,6 +45,9 @@ class ApplicationJobSeekerFragment : Fragment() {
     private var selectedJobType: JobType? = null
     private var selectedSalaryCondition: ((String) -> Boolean)? = null
     private var selectedLocation: String? = null
+    private var isFragmentVisible = false
+    private var currentIndex = 0
+    private var complete = false
 
     private val binding get() = _binding!!
     private val jobService: JobService by lazy { RetrofitClient.createRetrofit().create(JobService::class.java) }
@@ -59,6 +66,7 @@ class ApplicationJobSeekerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         sharedPrefs = SharedPrefsManager(requireContext())
+        refreshHandler.post(refreshRunnable)
 
         binding.ivMenu.setOnClickListener { showFilterLayout() }
         binding.root.isFocusableInTouchMode = true
@@ -97,12 +105,9 @@ class ApplicationJobSeekerFragment : Fragment() {
                     }
 
                     JobAction.APPLY -> {
-                        val intent = Intent(requireContext(), ApplyJobActivity::class.java)
                         sharedPrefs.saveCurrentJob(selectedJob)
-                        startActivity(intent)
-                    }
-
-                    else -> {}
+                        startActivity(Intent(requireContext(), ApplyJobActivity::class.java))
+                    } else -> {}
                 }
             }
         )
@@ -111,6 +116,16 @@ class ApplicationJobSeekerFragment : Fragment() {
             adapter = jobAdapter
             layoutManager = LinearLayoutManager(requireContext())
         }
+
+        binding.rvApplications.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val layoutManager = recyclerView.layoutManager as? LinearLayoutManager ?: return
+                val totalItemCount = layoutManager.itemCount
+                val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
+                if (lastVisibleItemPosition >= totalItemCount - 1) { loadAppliedJobs() }
+            }
+        })
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -123,14 +138,36 @@ class ApplicationJobSeekerFragment : Fragment() {
             onSuccess = { response ->
                 originalJobs.clear()
                 response?.let { originalJobs.addAll(it) }
-                if (binding.searchView.query.isNullOrEmpty()) {
+
+                if(!complete) { loadMoreJobs() }
+                if (binding.searchView.query.isNullOrEmpty() && complete) {
                     filteredJobs.clear()
                     filteredJobs.addAll(originalJobs)
                 }
-
-                jobAdapter.notifyDataSetChanged()
             },
         )
+    }
+
+    private fun loadMoreJobs() {
+        if (currentIndex >= originalJobs.size) {
+            complete = true
+            return
+        }
+        Log.e("currentIndex", currentIndex.toString())
+        binding.progressBar.visibility = View.VISIBLE
+        Handler(Looper.getMainLooper()).postDelayed({
+            val nextIndex = minOf(currentIndex + 2, originalJobs.size)
+            val newJobs = originalJobs.subList(currentIndex, nextIndex)
+            val existingIds = filteredJobs.map { it.jobId }.toSet()
+
+            val jobsToAdd = newJobs.filter { it.jobId !in existingIds }
+
+            filteredJobs.addAll(jobsToAdd)
+            jobAdapter.notifyItemRangeInserted(filteredJobs.size - jobsToAdd.size, jobsToAdd.size)
+
+            currentIndex = nextIndex
+            binding.progressBar.visibility = View.GONE
+        }, 1000)
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -295,5 +332,32 @@ class ApplicationJobSeekerFragment : Fragment() {
         val salaryRange = salaryStr.split("-")
         val salary = salaryRange[0].filter { it.isDigit() }.toIntOrNull() ?: 0
         return salary
+    }
+
+    private val refreshHandler = Handler(Looper.getMainLooper())
+    private val refreshRunnable = object : Runnable {
+        override fun run() {
+            if (isFragmentVisible && binding.searchView.query.isNullOrEmpty()) {
+                loadAppliedJobs()
+            }
+            refreshHandler.postDelayed(this, 60000)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        isFragmentVisible = true
+        refreshHandler.post(refreshRunnable)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        isFragmentVisible = false
+        refreshHandler.removeCallbacks(refreshRunnable)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

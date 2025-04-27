@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.jobhub.R
 import com.example.jobhub.activity.ApplicantActivity
-import com.example.jobhub.anim.AnimationHelper
 import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.ItemJobBinding
 import com.example.jobhub.dto.ItemJobDTO
@@ -109,7 +108,7 @@ class JobAdapter(
         }
 
         private fun handleAction(item: ItemJobDTO, action: JobAction) {
-            AnimationHelper.animateScale(binding.root)
+            //AnimationHelper.animateScale(binding.root)
             onActionClick?.invoke(item, action)
         }
     }

@@ -50,6 +50,8 @@ class LoginActivity : BaseActivity() {
         setContentView(binding.root)
         sharedPrefs = SharedPrefsManager(this)
 
+        callbackManager = CallbackManager.Factory.create()
+
         if (sharedPrefs.isRemembered) {
             binding.edtEmail.setText(sharedPrefs.email)
             binding.edtPassword.setText(sharedPrefs.password)
@@ -76,7 +78,6 @@ class LoginActivity : BaseActivity() {
         binding.btnFacebook.setOnClickListener {
             AnimationHelper.animateScale(it)
             FacebookSdk.fullyInitialize()
-            callbackManager = CallbackManager.Factory.create()
 
             LoginManager.getInstance().logOut()
             LoginManager.getInstance().logInWithReadPermissions(this, emptyList())

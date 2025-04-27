@@ -14,6 +14,7 @@ import android.widget.SearchView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.jobhub.R
 import com.example.jobhub.activity.JobActivity
 import com.example.jobhub.activity.VacancyActivity
@@ -42,7 +43,8 @@ class ApplicationEmployerFragment : Fragment() {
     private var selectedJobType: JobType? = null
     private var selectedSalaryCondition: ((String) -> Boolean)? = null
     private var selectedLocation: String? = null
-
+    private var currentIndex = 0
+    private var complete = false
 
     private val binding get() = _binding!!
     private val jobService: JobService by lazy { RetrofitClient.createRetrofit().create(JobService::class.java) }
@@ -61,7 +63,6 @@ class ApplicationEmployerFragment : Fragment() {
         refreshHandler.post(refreshRunnable)
 
         setupRecyclerView()
-        getAllJobs()
         setupSearchView()
         setupFilter()
 
@@ -97,6 +98,16 @@ class ApplicationEmployerFragment : Fragment() {
             adapter = jobAdapter
             layoutManager = LinearLayoutManager(requireContext())
         }
+
+        binding.rvApplications.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val layoutManager = recyclerView.layoutManager as? LinearLayoutManager ?: return
+                val totalItemCount = layoutManager.itemCount
+                val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
+                if (lastVisibleItemPosition >= totalItemCount - 1) { getAllJobs() }
+            }
+        })
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -109,13 +120,36 @@ class ApplicationEmployerFragment : Fragment() {
             onSuccess = { response ->
                 allJobs.clear()
                 response?.let { allJobs.addAll(it) }
-                if (binding.searchView.query.isNullOrEmpty()) {
+
+                if(!complete) { loadMoreJobs() }
+                if(binding.searchView.query.isNullOrEmpty() && complete) {
                     jobList.clear()
-                    jobList.addAll(allJobs)
+                    jobList.addAll(allJobs.distinctBy { it.jobId })
                 }
-                jobAdapter.notifyDataSetChanged()
             }
         )
+    }
+
+    private fun loadMoreJobs() {
+        if (currentIndex >= allJobs.size) {
+            complete = true
+            return
+        }
+
+        binding.progressBar.visibility = View.VISIBLE
+        Handler(Looper.getMainLooper()).postDelayed({
+            val nextIndex = minOf(currentIndex + 2, allJobs.size)
+            val newJobs = allJobs.subList(currentIndex, nextIndex)
+            val existingIds = jobList.map { it.jobId }.toSet()
+
+            val jobsToAdd = newJobs.filter { it.jobId !in existingIds }
+
+            jobList.addAll(jobsToAdd)
+            jobAdapter.notifyItemRangeInserted(jobList.size - jobsToAdd.size, jobsToAdd.size)
+
+            currentIndex = nextIndex
+            binding.progressBar.visibility = View.GONE
+        }, 1000)
     }
 
     private fun deleteJob(jobId: Int) {
@@ -197,7 +231,7 @@ class ApplicationEmployerFragment : Fragment() {
             return
         }
 
-        val filteredList = allJobs.filter { job -> job.title.contains(query, ignoreCase = true) || job.location.contains(query, ignoreCase = true) }.toMutableList()
+        val filteredList = allJobs.filter { job -> job.title.contains(query, ignoreCase = true) }.toMutableList()
 
         jobList.clear()
         jobList.addAll(filteredList)

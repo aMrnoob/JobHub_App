@@ -20,7 +20,8 @@ data class ItemJobDTO(
     @SerializedName("requiredSkills")
     var requiredSkills: Set<SkillDTO>,
     @SerializedName("applications")
-    var applications: List<ApplicationDTO> = emptyList(),
-    @Transient var expirationDateStr: String? = null,
-    var isExpanded: Boolean = false
+    var applications: List<ApplicationDTO>,
+    @Transient var expirationDateStr: String,
+    var isExpanded: Boolean = false,
 )
+

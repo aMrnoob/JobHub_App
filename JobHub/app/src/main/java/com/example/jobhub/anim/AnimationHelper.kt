@@ -7,7 +7,7 @@ import android.view.View
 class AnimationHelper {
 
     companion object {
-        fun animateScale(view: View, duration: Long = 400) {
+        fun animateScale(view: View, duration: Long = 100) {
             ObjectAnimator.ofPropertyValuesHolder(
                 view,
                 PropertyValuesHolder.ofFloat(View.SCALE_X, 1f, 1.1f, 1f),
