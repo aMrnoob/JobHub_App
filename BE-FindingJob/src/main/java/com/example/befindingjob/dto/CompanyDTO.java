@@ -1,14 +1,12 @@
 package com.example.befindingjob.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Data
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class CompanyDTO {
     private int companyId;
     private String companyName;

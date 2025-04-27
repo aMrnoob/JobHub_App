@@ -35,7 +35,7 @@ class LoginActivity : BaseActivity() {
 
     private lateinit var binding: LoginScreenBinding
     private lateinit var googleSignInClient: GoogleSignInClient
-    private lateinit var callbackManager: CallbackManager
+    private var callbackManager: CallbackManager? = null
     private lateinit var sharedPrefs: SharedPrefsManager
 
     private val userService: UserService by lazy { RetrofitClient.createRetrofit().create(UserService::class.java) }
@@ -50,6 +50,7 @@ class LoginActivity : BaseActivity() {
         setContentView(binding.root)
         sharedPrefs = SharedPrefsManager(this)
 
+        FacebookSdk.fullyInitialize()
         callbackManager = CallbackManager.Factory.create()
 
         if (sharedPrefs.isRemembered) {
@@ -58,6 +59,10 @@ class LoginActivity : BaseActivity() {
             binding.cbRememberPassword.isChecked = true
         }
 
+        setupClickListeners()
+    }
+
+    private fun setupClickListeners() {
         binding.invisiblePwd.setOnClickListener {
             AnimationHelper.animateScale(it)
             togglePasswordVisibility()
@@ -65,33 +70,12 @@ class LoginActivity : BaseActivity() {
 
         binding.btnGoogle.setOnClickListener {
             AnimationHelper.animateScale(it)
-            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("856354548077-e00ibmh0ojbv416s43qldd8ec0j4o43m.apps.googleusercontent.com") // Thay bằng Web Client ID
-                .requestEmail()
-                .build()
-            googleSignInClient = GoogleSignIn.getClient(this, gso)
-
-            val signInIntent = googleSignInClient.signInIntent
-            signInLauncher.launch(signInIntent)
+            initGoogleSignIn()
         }
 
         binding.btnFacebook.setOnClickListener {
             AnimationHelper.animateScale(it)
-            FacebookSdk.fullyInitialize()
-
-            LoginManager.getInstance().logOut()
-            LoginManager.getInstance().logInWithReadPermissions(this, emptyList())
-            LoginManager.getInstance().registerCallback(callbackManager,
-                object : FacebookCallback<LoginResult> {
-                    override fun onSuccess(result: LoginResult) {
-                        val accessToken = result.accessToken
-                        getFacebookId(accessToken)
-                    }
-
-                    override fun onCancel() { Toast.makeText(this@LoginActivity, "Facebook login canceled", Toast.LENGTH_SHORT).show() }
-
-                    override fun onError(error: FacebookException) { Toast.makeText(this@LoginActivity, "Facebook login error: ${error.message}", Toast.LENGTH_SHORT).show() }
-                })
+            initFacebookLogin()
         }
 
         binding.btnForgetPwd.setOnClickListener {
@@ -101,23 +85,7 @@ class LoginActivity : BaseActivity() {
 
         binding.btnLogin.setOnClickListener {
             AnimationHelper.animateScale(it)
-            val email = binding.edtEmail.text.toString()
-            val password = binding.edtPassword.text.toString()
-
-            if(email.isBlank()) {
-                Toast.makeText(this@LoginActivity, "Please enter your email.", Toast.LENGTH_SHORT).show()
-            } else if (password.isBlank()){
-                Toast.makeText(this@LoginActivity, "Please enter your password", Toast.LENGTH_SHORT).show()
-            } else {
-                if (binding.cbRememberPassword.isChecked) {
-                    sharedPrefs.email = email
-                    sharedPrefs.password = password
-                    sharedPrefs.isRemembered = true
-                } else {
-                    sharedPrefs.clearRemembered()
-                }
-                login(email, password)
-            }
+            handleLogin()
         }
 
         binding.btnRegister.setOnClickListener {
@@ -126,17 +94,87 @@ class LoginActivity : BaseActivity() {
         }
     }
 
+    private fun initGoogleSignIn() {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken("856354548077-e00ibmh0ojbv416s43qldd8ec0j4o43m.apps.googleusercontent.com")
+            .requestEmail()
+            .build()
+        googleSignInClient = GoogleSignIn.getClient(this, gso)
+
+        googleSignInClient.signOut().addOnCompleteListener {
+            val signInIntent = googleSignInClient.signInIntent
+            try {
+                signInLauncher.launch(signInIntent)
+            } catch (e: Exception) {
+                Log.e("GoogleSignIn", "Error launching sign in: ${e.message}")
+                Toast.makeText(this, "Error launching Google Sign In", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun initFacebookLogin() {
+        if (callbackManager == null) {
+            callbackManager = CallbackManager.Factory.create()
+        }
+
+        LoginManager.getInstance().logOut()
+        LoginManager.getInstance().logInWithReadPermissions(this, listOf("public_profile", "email"))
+        LoginManager.getInstance().registerCallback(callbackManager!!,
+            object : FacebookCallback<LoginResult> {
+                override fun onSuccess(result: LoginResult) {
+                    val accessToken = result.accessToken
+                    getFacebookId(accessToken)
+                }
+
+                override fun onCancel() {
+                    Toast.makeText(this@LoginActivity, "Facebook login canceled", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onError(error: FacebookException) {
+                    Toast.makeText(this@LoginActivity, "Facebook login error: ${error.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
+    }
+
+    private fun handleLogin() {
+        val email = binding.edtEmail.text.toString()
+        val password = binding.edtPassword.text.toString()
+
+        if (email.isBlank()) {
+            Toast.makeText(this@LoginActivity, "Please enter your email.", Toast.LENGTH_SHORT).show()
+        } else if (password.isBlank()) {
+            Toast.makeText(this@LoginActivity, "Please enter your password", Toast.LENGTH_SHORT).show()
+        } else {
+            if (binding.cbRememberPassword.isChecked) {
+                sharedPrefs.email = email
+                sharedPrefs.password = password
+                sharedPrefs.isRemembered = true
+            } else {
+                sharedPrefs.clearRemembered()
+            }
+            login(email, password)
+        }
+    }
+
     private val signInLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
             try {
                 val account = task.getResult(ApiException::class.java)
-                val idToken = account.idToken
+                val idToken = account?.idToken
                 Log.d("GoogleSignIn", "ID Token: $idToken")
-                sendTokenToBackend(idToken)
+
+                if (idToken != null) {
+                    sendTokenToBackend(idToken)
+                } else {
+                    Toast.makeText(this, "Failed to get ID token", Toast.LENGTH_SHORT).show()
+                }
             } catch (e: ApiException) {
-                Log.w("GoogleSignIn", "Login failed: ${e.statusCode}")
+                Log.e("GoogleSignIn", "Login failed: ${e.statusCode}, ${e.message}")
+                Toast.makeText(this, "Google Sign-In failed: ${e.message}", Toast.LENGTH_SHORT).show()
             }
+        } else {
+            Log.d("GoogleSignIn", "Sign-in canceled. Result code: ${result.resultCode}")
         }
     }
 
@@ -146,6 +184,7 @@ class LoginActivity : BaseActivity() {
 
             if (!id.isNullOrBlank()) {
                 facebookId = "$id@facebook.com"
+
                 checkAccountExist(facebookId) { exist ->
                     if (exist) {
                         login(facebookId, "")
@@ -164,19 +203,30 @@ class LoginActivity : BaseActivity() {
         request.executeAsync()
     }
 
-    private fun sendTokenToBackend(idToken: String?) {
-        if (idToken.isNullOrBlank()) return
+    private fun sendTokenToBackend(idToken: String) {
         val request = TokenRequest(idToken)
 
+        binding.progressBar.visibility = View.VISIBLE
         ApiHelper().callApi(
             context = this,
             call = apiService.sendGoogleToken(request),
+            onStart = { binding.progressBar.visibility = View.VISIBLE },
+            onComplete = { binding.progressBar.visibility = View.GONE },
             onSuccess = { apiResponse ->
                 apiResponse?.let {
+                    Log.d("GoogleAuth", "Token response: $it")
                     sharedPrefs.authToken = it.token
-                    startActivity(Intent(this, SelectProfileActivity::class.java))
+                    sharedPrefs.userId = it.userId
+                    sharedPrefs.role = it.role
+                    sharedPrefs.fullName = it.fullName
+
+                    navigateToNextScreen(it.role)
                     finish()
                 }
+            },
+            onError = { errorMessage ->
+                Log.e("GoogleAuth", "Error: $errorMessage")
+                Toast.makeText(this, "Authentication error: $errorMessage", Toast.LENGTH_SHORT).show()
             }
         )
     }
@@ -213,7 +263,7 @@ class LoginActivity : BaseActivity() {
         val nextActivity = when (role) {
             Role.UNDEFINED -> SelectProfileActivity::class.java
             Role.EMPLOYER, Role.JOB_SEEKER, Role.ADMIN -> MainActivity::class.java
-            else -> null
+            else -> SelectProfileActivity::class.java
         }
         nextActivity?.let { startActivity(Intent(this, it)) }
     }
@@ -240,9 +290,9 @@ class LoginActivity : BaseActivity() {
         )
     }
 
-    @Deprecated("This method has been deprecated in favor of using the Activity Result API\n      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt\n      contracts for common intents available in\n      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for\n      testing, and allow receiving results in separate, testable classes independent from your\n      activity. Use\n      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)}\n      with the appropriate {@link ActivityResultContract} and handling the result in the\n      {@link ActivityResultCallback#onActivityResult(Object) callback}.")
+    @Deprecated("This method has been deprecated in favor of using the Activity Result API")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        callbackManager.onActivityResult(requestCode, resultCode, data)
+        callbackManager?.onActivityResult(requestCode, resultCode, data)
     }
 }

@@ -9,7 +9,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Base64
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.result.contract.ActivityResultContracts
 import com.example.jobhub.anim.AnimationHelper
 import com.example.jobhub.config.ApiHelper
@@ -198,5 +200,14 @@ class ProfileActivity : BaseActivity() {
             datePicker.maxDate = System.currentTimeMillis()
             show()
         }
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        if (currentFocus != null) {
+            val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
+            currentFocus!!.clearFocus()
+        }
+        return super.dispatchTouchEvent(ev)
     }
 }

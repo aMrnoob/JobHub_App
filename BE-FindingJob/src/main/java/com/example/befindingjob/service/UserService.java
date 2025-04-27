@@ -3,6 +3,7 @@ package com.example.befindingjob.service;
 import com.example.befindingjob.dto.UserDTO;
 import com.example.befindingjob.dto.auth.*;
 import com.example.befindingjob.entity.User;
+import com.example.befindingjob.entity.enumm.Role;
 import com.example.befindingjob.model.ApiResponse;
 
 public interface UserService {

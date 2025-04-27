@@ -6,6 +6,7 @@ import com.example.jobhub.dto.auth.LoginRequest
 import com.example.jobhub.dto.auth.LoginResponse
 import com.example.jobhub.dto.auth.OtpVerifyRequest
 import com.example.jobhub.dto.auth.Register_ResetPwdRequest
+import com.example.jobhub.entity.enumm.Role
 import com.example.jobhub.model.ApiResponse
 import retrofit2.Call
 import retrofit2.http.Body
@@ -13,6 +14,7 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface UserService {
     @POST("api/auth/register")
@@ -44,4 +46,5 @@ interface UserService {
 
     @DELETE("api/users/delete-account")
     fun deleteAccount(@Header("token") token: String): Call<ApiResponse<UserDTO>>
+
 }

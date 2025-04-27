@@ -135,6 +135,10 @@ class HomeFragment : Fragment() {
     private fun getAllJobs() {
         val token = sharedPrefs.authToken ?: return
 
+        binding.progressBar.visibility = View.VISIBLE
+        binding.rvJob.visibility = View.GONE
+        binding.tvNoResults.visibility = View.GONE
+
         ApiHelper().callApi(
             context = requireContext(),
             call = jobService.getAllJobsByUser("Bearer $token"),
@@ -145,7 +149,26 @@ class HomeFragment : Fragment() {
                     jobList.clear()
                     jobList.addAll(allJobs)
                 }
+
+                binding.progressBar.visibility = View.GONE
+                binding.rvJob.visibility = View.VISIBLE
+
+                if (jobList.isEmpty()) {
+                    binding.tvNoResults.visibility = View.VISIBLE
+                } else {
+                    binding.tvNoResults.visibility = View.GONE
+                }
+
                 jobAdapter.notifyDataSetChanged()
+            },
+            onError = { error ->
+                binding.progressBar.visibility = View.GONE
+                binding.rvJob.visibility = View.VISIBLE
+
+                if (jobList.isEmpty()) {
+                    binding.tvNoResults.visibility = View.VISIBLE
+                    binding.tvNoResults.text = "Có lỗi xảy ra khi tải dữ liệu"
+                }
             }
         )
     }
@@ -202,6 +225,10 @@ class HomeFragment : Fragment() {
         categoryTextViews.filter { it != selected }.forEach { it.isSelected = false }
         selectedTextView = selected
 
+        binding.progressBar.visibility = View.VISIBLE
+        binding.rvJob.visibility = View.GONE
+        binding.tvNoResults.visibility = View.GONE
+
         val category = selected.tag as? String
 
         if (category == "All Job" || category == null) {
@@ -222,6 +249,9 @@ class HomeFragment : Fragment() {
             jobAdapter.notifyDataSetChanged()
             binding.tvNoResults.visibility = if (filtered.isEmpty()) View.VISIBLE else View.GONE
         }
+
+        binding.progressBar.visibility = View.GONE
+        binding.rvJob.visibility = View.VISIBLE
     }
 
     private fun setupSearchView() {
@@ -239,23 +269,30 @@ class HomeFragment : Fragment() {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun filterCompanies(query: String) {
+
+        binding.progressBar.visibility = View.VISIBLE
+        binding.rvJob.visibility = View.GONE
+        binding.tvNoResults.visibility = View.GONE
+
         if (query.isEmpty()) {
             jobList.clear()
             jobList.addAll(allJobs)
             jobAdapter.notifyDataSetChanged()
             binding.tvNoResults.visibility = View.GONE
-            return
+        } else {
+            val filteredList = allJobs.filter { job ->
+                job.title.contains(query, ignoreCase = true) || job.location.contains(query, ignoreCase = true)
+            }.toMutableList()
+
+            jobList.clear()
+            jobList.addAll(filteredList)
+            jobAdapter.notifyDataSetChanged()
+
+            binding.tvNoResults.visibility = if (filteredList.isEmpty()) View.VISIBLE else View.GONE
         }
 
-        val filteredList = allJobs.filter { job ->
-            job.title.contains(query, ignoreCase = true) || job.location.contains(query, ignoreCase = true)
-        }.toMutableList()
-
-        jobList.clear()
-        jobList.addAll(filteredList)
-        jobAdapter.notifyDataSetChanged()
-
-        binding.tvNoResults.visibility = if (filteredList.isEmpty()) View.VISIBLE else View.GONE
+        binding.progressBar.visibility = View.GONE
+        binding.rvJob.visibility = View.VISIBLE
     }
 
     private val categoryKeywords: Map<String, List<String>> = mapOf(

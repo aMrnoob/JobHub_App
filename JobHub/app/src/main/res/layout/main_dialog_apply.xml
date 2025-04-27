@@ -227,6 +227,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:checked="true"
+                android:textStyle="bold"
                 android:text="Sử dụng thông tin từ hồ sơ của tôi"
                 app:layout_constraintTop_toBottomOf="@id/tvCurrentStatus"
                 app:layout_constraintStart_toStartOf="parent"

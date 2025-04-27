@@ -116,7 +116,7 @@ public class ApplicationServiceImpl implements ApplicationService {
             if (!dir.exists()) {
                 boolean created = dir.mkdirs();
                 if (!created) {
-                    throw new RuntimeException("Không thể tạo thư mục lưu resume: " + uploadDir);
+                    throw new RuntimeException("No create folder to save resume: " + uploadDir);
                 }
             }
 
@@ -195,12 +195,9 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public ApiResponse<List<ApplicationDTO>> getApplicationsByUserId(String token, Integer userId) {
         try {
-            logger.info("Validating token: {}", token);
             Integer tokenUserId = jwtService.extractUserId(token);
-            logger.debug("Token userId: {}, Requested userId: {}", tokenUserId, userId);
-            
+
             if (!Objects.equals(tokenUserId, userId)) {
-                logger.info("Requested userId doesn't match token. Using userId from token instead.");
                 userId = tokenUserId;
             }
 
@@ -208,7 +205,6 @@ public class ApplicationServiceImpl implements ApplicationService {
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             List<Application> applications = applicationRepository.findByUser(user);
-            logger.info("Found {} applications for userId {}", applications.size(), userId);
 
             List<ApplicationDTO> applicationDTOs = applications.stream()
                     .map(this::convertToDTO)
@@ -217,10 +213,8 @@ public class ApplicationServiceImpl implements ApplicationService {
             return new ApiResponse< >(true, "", applicationDTOs);
 
         } catch (ExpiredJwtException e) {
-            logger.error("JWT expired when retrieving applications: {}", e.getMessage());
             return new ApiResponse<>(false, "Token has expired, please login again", null);
         } catch (Exception e) {
-            logger.error("Exception while retrieving applications", e);
             return new ApiResponse<>(false, "Failed to retrieve applications: " + e.getMessage(), null);
         }
     }
@@ -353,12 +347,9 @@ public class ApplicationServiceImpl implements ApplicationService {
                 return new ApiResponse<>(false, "You can only access resumes for your own job listings", null);
             }
 
+            // No resume for in application
             Resume resume = resumeRepository.findByApplicationId(applicationId)
-                    .orElse(null);
-
-            if (resume == null) {
-                return new ApiResponse<>(false, "No resume found for this application", null);
-            }
+                    .orElseThrow();
 
             ResumeDTO resumeDTO = new ResumeDTO(
                     resume.getResumeId(),
@@ -367,7 +358,6 @@ public class ApplicationServiceImpl implements ApplicationService {
                     resume.getCreatedAt(),
                     resume.getUpdatedAt()
             );
-
             return new ApiResponse<>(true, "", resumeDTO);
         } catch (Exception e) {
             return new ApiResponse<>(false, "Failed to retrieve resume: " + e.getMessage(), null);
@@ -393,7 +383,7 @@ public class ApplicationServiceImpl implements ApplicationService {
             }
 
             applicationRepository.delete(application);
-            return new ApiResponse<>(true, "", true);
+            return new ApiResponse<>(true, "Application deleted successfully", true);
         } catch (Exception e) {
             return new ApiResponse<>(false, "Failed to delete application: " + e.getMessage(), null);
         }

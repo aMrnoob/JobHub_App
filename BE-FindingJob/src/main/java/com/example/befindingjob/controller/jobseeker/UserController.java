@@ -1,6 +1,8 @@
 package com.example.befindingjob.controller.jobseeker;
 
 import com.example.befindingjob.dto.UserDTO;
+import com.example.befindingjob.entity.User;
+import com.example.befindingjob.entity.enumm.Role;
 import com.example.befindingjob.model.ApiResponse;
 import com.example.befindingjob.service.JwtService;
 import com.example.befindingjob.service.UserService;
