@@ -1,6 +1,5 @@
 package com.example.jobhub.dto
 
-import com.example.jobhub.entity.Company
 import com.google.gson.annotations.SerializedName
 
 data class ItemCompanyDTO(
@@ -10,11 +9,3 @@ data class ItemCompanyDTO(
     @SerializedName("description") var description: String? = "",
 )
 
-fun ItemCompanyDTO.toCompany(): Company {
-    return Company(
-        companyId = this.companyId,
-        companyName = this.companyName,
-        description = this.description,
-        logoUrl = this.logoUrl
-    )
-}

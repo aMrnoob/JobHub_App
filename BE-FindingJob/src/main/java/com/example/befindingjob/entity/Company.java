@@ -7,8 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "companies")
@@ -50,5 +50,5 @@ public class Company {
 
     @JsonManagedReference
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Job> jobs = new HashSet<>();
+    private List<Job> jobs = new ArrayList<>();
 }

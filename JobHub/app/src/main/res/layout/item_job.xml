@@ -9,6 +9,17 @@
     android:layout_marginEnd="10dp"
     android:layout_marginBottom="15dp">
 
+    <TextView
+        android:id="@+id/tvListJobs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:visibility="gone"
+        android:text="List jobs"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

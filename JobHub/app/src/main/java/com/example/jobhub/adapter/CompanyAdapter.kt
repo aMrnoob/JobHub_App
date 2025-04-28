@@ -7,10 +7,12 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.jobhub.R
 import com.example.jobhub.anim.AnimationHelper
+import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.entity.Company
 import com.example.jobhub.entity.enumm.CompanyAction
 
@@ -19,19 +21,22 @@ class CompanyAdapter(
     private val onActionClick: ((Company, CompanyAction) -> Unit)? = null
 ) : RecyclerView.Adapter<CompanyAdapter.CompanyViewHolder>() {
 
+    private lateinit var sharedPrefs: SharedPrefsManager
     private var expandedPosition = RecyclerView.NO_POSITION
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CompanyViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_company, parent, false)
+        sharedPrefs = SharedPrefsManager(parent.context)
         return CompanyViewHolder(view)
     }
 
-    @SuppressLint("NotifyDataSetChanged")
+    @SuppressLint("NotifyDataSetChanged", "SetTextI18n")
     override fun onBindViewHolder(holder: CompanyViewHolder, @SuppressLint("RecyclerView") position: Int) {
         val company = companyList[position]
         holder.tvCompanyName.text = company.companyName
         holder.tvAddress.text = company.address
-        holder.tvDescription.text = company.description
+        val jobCount = company.jobs?.size ?: 0
+        holder.tvAmount.text = "Amount of jobs: $jobCount"
 
         Glide.with(holder.itemView.context)
             .load(company.logoUrl)
@@ -40,7 +45,13 @@ class CompanyAdapter(
             .into(holder.ivImgCompany)
 
         val isExpanded = position == expandedPosition
-        holder.tvDescription.visibility = if (isExpanded) View.VISIBLE else View.GONE
+        holder.rvJobs.visibility = if (isExpanded) View.VISIBLE else View.GONE
+        holder.rvJobs.apply {
+            layoutManager = LinearLayoutManager(holder.itemView.context)
+            adapter = company.jobs?.let {
+                JobEntityAdapter(it, company.logoUrl)
+            }
+        }
 
         holder.itemView.setOnClickListener {
             AnimationHelper.animateScale(it)
@@ -69,8 +80,9 @@ class CompanyAdapter(
         val ivImgCompany: ImageView = itemView.findViewById(R.id.ivImgCompany)
         val tvCompanyName: TextView = itemView.findViewById(R.id.tvCompanyName)
         val tvAddress: TextView = itemView.findViewById(R.id.tvAddress)
-        val tvDescription: TextView = itemView.findViewById(R.id.tvDescription)
+        val tvAmount: TextView = itemView.findViewById(R.id.tvAmount)
         val btnEdit: LinearLayout = itemView.findViewById(R.id.btnEdit)
         val btnRemove: LinearLayout = itemView.findViewById(R.id.btnRemove)
+        val rvJobs: RecyclerView = itemView.findViewById(R.id.rvJobs)
     }
 }

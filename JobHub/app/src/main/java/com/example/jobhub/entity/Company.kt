@@ -15,6 +15,6 @@ data class Company(
     var createdAt: LocalDateTime? = null,
     var updatedAt: LocalDateTime? = null,
     var user: User? = null,
-    var jobs: Set<Job>? = emptySet()
+    var jobs: List<Job>? = emptyList()
 ) : Parcelable
 

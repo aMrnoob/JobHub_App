@@ -3,6 +3,7 @@ package com.example.jobhub.dto
 import com.example.jobhub.entity.enumm.JobType
 import com.google.gson.annotations.SerializedName
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 data class ItemJobDTO(
     @SerializedName("jobId") var jobId: Int,
@@ -24,4 +25,3 @@ data class ItemJobDTO(
     @Transient var expirationDateStr: String,
     var isExpanded: Boolean = false,
 )
-

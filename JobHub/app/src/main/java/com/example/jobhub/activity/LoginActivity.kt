@@ -96,7 +96,7 @@ class LoginActivity : BaseActivity() {
 
     private fun initGoogleSignIn() {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken("856354548077-e00ibmh0ojbv416s43qldd8ec0j4o43m.apps.googleusercontent.com")
+            .requestIdToken("264261988951-sc4t0kkmjbi2vnlr0c9g2jpu3tv3egcl.apps.googleusercontent.com")
             .requestEmail()
             .build()
         googleSignInClient = GoogleSignIn.getClient(this, gso)
@@ -265,7 +265,7 @@ class LoginActivity : BaseActivity() {
             Role.EMPLOYER, Role.JOB_SEEKER, Role.ADMIN -> MainActivity::class.java
             else -> SelectProfileActivity::class.java
         }
-        nextActivity?.let { startActivity(Intent(this, it)) }
+        startActivity(Intent(this, nextActivity))
     }
 
     private fun togglePasswordVisibility() {

@@ -13,13 +13,13 @@ public class WebSecurity {
     @Bean
     public WebMvcConfigurer webMvcConfigurer() {
         return new WebMvcConfigurer() {
-            /*@Override
+            @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://192.168.37.63:8080", "http://10.0.2.2:8080")
+                        .allowedOrigins("http://192.168.1.12:8080", "http://10.0.2.2:8080")
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
                         .allowCredentials(true);
-            }*/
+            }
 
             @Override
             public void addResourceHandlers(ResourceHandlerRegistry registry) {

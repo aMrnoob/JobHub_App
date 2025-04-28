@@ -18,5 +18,6 @@ data class Job(
     var expirationDate: String? = null,
     var requiredSkills: Set<Skill>? = null,
     var company: Company? = null,
-    var applications: Set<Application>? = null
+    var applications: Set<Application>? = null,
+    var isExpanded: Boolean = false
 ) : Parcelable

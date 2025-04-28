@@ -107,15 +107,11 @@ class JobAdapter(
             }
         }
 
-        private fun handleAction(item: ItemJobDTO, action: JobAction) {
-            //AnimationHelper.animateScale(binding.root)
-            onActionClick?.invoke(item, action)
-        }
+        private fun handleAction(item: ItemJobDTO, action: JobAction) { onActionClick?.invoke(item, action) }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): JobViewHolder {
-        val binding =
-            ItemJobBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemJobBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return JobViewHolder(binding)
     }
 
