@@ -1,212 +1,247 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFAF0"
+    android:background="@drawable/gradient_background"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <ImageButton
-        android:id="@+id/btnComeBack"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
-        android:background="@color/blue_100"
-        android:scaleType="fitXY"
-        android:src="@drawable/comeback_icon"
-        app:layout_constraintHorizontal_bias="0.047"
-        app:layout_constraintVertical_bias="0.07"
-        app:layout_constraintWidth_percent="0.8"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/tvCompany"
-        android:layout_width="wrap_content"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardHeader"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Add Company"
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintHorizontal_bias="0.23"
-        app:layout_constraintVertical_bias="0.075"
-        app:layout_constraintWidth_percent="0.8"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:elevation="4dp"
+        app:cardBackgroundColor="@color/white"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Company Name*"
-        android:textColor="@color/gray_700"
-        android:textSize="20sp"
-        app:layout_constraintHorizontal_bias="0.168"
-        app:layout_constraintVertical_bias="0.15"
-        app:layout_constraintWidth_percent="0.8"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
 
-    <EditText
-        android:id="@+id/edtCompanyName"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:paddingStart="15dp"
-        android:background="@drawable/bg_edittext"
-        android:hint="Company name"
-        android:textColorHint="@color/gray_500"
-        android:textColor="@color/black"
-        android:inputType="text"
-        app:layout_constraintVertical_bias="0.2"
-        app:layout_constraintWidth_percent="0.8"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+            <ImageButton
+                android:id="@+id/btnComeBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/rounded_button_bg"
+                android:scaleType="centerInside"
+                android:src="@drawable/comeback_icon"
+                android:contentDescription="Quay lại"
+                android:padding="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Address*"
-        android:textColor="@color/gray_700"
-        android:textSize="20sp"
-        app:layout_constraintHorizontal_bias="0.14"
-        app:layout_constraintVertical_bias="0.28"
-        app:layout_constraintWidth_percent="0.8"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+            <TextView
+                android:id="@+id/tvCompany"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add Company"
+                android:textColor="@color/text_primary"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginStart="16dp"
+                app:layout_constraintBottom_toBottomOf="@id/btnComeBack"
+                app:layout_constraintStart_toEndOf="@id/btnComeBack"
+                app:layout_constraintTop_toTopOf="@id/btnComeBack" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
 
-    <EditText
-        android:id="@+id/edtAddress"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:paddingStart="15dp"
-        android:background="@drawable/bg_edittext"
-        android:hint="Address"
-        android:textColorHint="@color/gray_500"
-        android:textColor="@color/black"
-        app:layout_constraintVertical_bias="0.33"
-        app:layout_constraintWidth_percent="0.8"
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:scrollbars="none"
+        android:fillViewport="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/cardHeader">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Logo Url*"
-        android:textColor="@color/gray_700"
-        android:textSize="20sp"
-        app:layout_constraintHorizontal_bias="0.14"
-        app:layout_constraintVertical_bias="0.4"
-        app:layout_constraintWidth_percent="0.8"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="16dp">
 
-    <EditText
-        android:id="@+id/edtLogoUrl"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:paddingStart="15dp"
-        android:background="@drawable/bg_edittext"
-        android:hint="Logo url"
-        android:textColorHint="@color/gray_500"
-        android:textColor="@color/black"
-        android:inputType="text"
-        app:layout_constraintVertical_bias="0.453"
-        app:layout_constraintWidth_percent="0.8"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:id="@+id/tvCompanyNameLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Company Name*"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginTop="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Website Url*"
-        android:textColor="@color/gray_700"
-        android:textSize="20sp"
-        app:layout_constraintHorizontal_bias="0.145"
-        app:layout_constraintVertical_bias="0.52"
-        app:layout_constraintWidth_percent="0.8"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+            <EditText
+                android:id="@+id/edtCompanyName"
+                android:layout_width="369dp"
+                android:layout_height="57dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/input_bg_rounded"
+                android:drawableStart="@drawable/ic_company"
+                android:drawablePadding="12dp"
+                android:hint="Company name"
+                android:inputType="text"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/gray_600"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvCompanyNameLabel" />
 
-    <EditText
-        android:id="@+id/edtWebsite"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:paddingStart="15dp"
-        android:background="@drawable/bg_edittext"
-        android:hint="Website url"
-        android:textColorHint="@color/gray_500"
-        android:textColor="@color/black"
-        android:inputType="text"
-        app:layout_constraintVertical_bias="0.576"
-        app:layout_constraintWidth_percent="0.8"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:id="@+id/tvAddressLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Address*"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginTop="24dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/edtCompanyName" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Description*"
-        android:textColor="@color/gray_700"
-        android:textSize="20sp"
-        app:layout_constraintHorizontal_bias="0.15"
-        app:layout_constraintVertical_bias="0.64"
-        app:layout_constraintWidth_percent="0.8"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+            <EditText
+                android:id="@+id/edtAddress"
+                android:layout_width="0dp"
+                android:layout_height="55dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/input_bg_rounded"
+                android:hint="Address"
+                android:inputType="textPostalAddress"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:drawableStart="@drawable/ic_location"
+                android:drawablePadding="12dp"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/gray_600"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvAddressLabel" />
 
-    <EditText
-        android:id="@+id/edtDescription"
-        android:layout_width="0dp"
-        android:layout_height="100dp"
-        android:paddingStart="15dp"
-        android:background="@drawable/bg_edittext"
-        android:hint="Description"
-        android:padding="10dp"
-        android:textColorHint="@color/gray_500"
-        android:textColor="@color/black"
-        android:inputType="textMultiLine"
-        android:gravity="top|start"
-        android:minLines="3"
-        android:maxLines="5"
-        android:scrollbars="vertical"
-        app:layout_constraintVertical_bias="0.75"
-        app:layout_constraintWidth_percent="0.8"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:id="@+id/tvLogoUrlLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Logo Url*"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginTop="24dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/edtAddress" />
 
-    <Button
-        android:id="@+id/btnAdd"
-        android:layout_width="0dp"
-        android:layout_height="60dp"
-        android:backgroundTint="@color/blue_700"
-        android:text="Add"
-        android:textColor="@color/white"
-        android:textSize="24sp"
-        app:layout_constraintWidth_percent="0.8"
-        app:layout_constraintVertical_bias="0.8"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/edtAddress"
-        app:layout_constraintBottom_toBottomOf="parent" />
+            <EditText
+                android:id="@+id/edtLogoUrl"
+                android:layout_width="372dp"
+                android:layout_height="55dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/input_bg_rounded"
+                android:drawableStart="@drawable/icon_image"
+                android:drawablePadding="12dp"
+                android:hint="Logo url"
+                android:inputType="textUri"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/gray_600"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvLogoUrlLabel" />
+
+
+            <TextView
+                android:id="@+id/tvWebsiteLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Website Url*"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginTop="24dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/edtLogoUrl" />
+
+            <EditText
+                android:id="@+id/edtWebsite"
+                android:layout_width="0dp"
+                android:layout_height="55dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/input_bg_rounded"
+                android:hint="Website url"
+                android:inputType="textUri"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:drawableStart="@drawable/icon_web"
+                android:drawablePadding="12dp"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/gray_600"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvWebsiteLabel" />
+
+            <TextView
+                android:id="@+id/tvDescriptionLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Description*"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginTop="24dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/edtWebsite" />
+
+            <EditText
+                android:id="@+id/edtDescription"
+                android:layout_width="370dp"
+                android:layout_height="110dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/input_bg_rounded"
+                android:drawableStart="@drawable/icon_description"
+                android:drawablePadding="12dp"
+                android:hint="Description"
+                android:inputType="textMultiLine"
+                android:maxLines="5"
+                android:minLines="3"
+                android:padding="16dp"
+                android:scrollbars="vertical"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/gray_600"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvDescriptionLabel" />
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="25dp"
+                app:cardElevation="4dp"
+                app:layout_constraintWidth_percent="0.8"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/edtDescription"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <Button
+                    android:id="@+id/btnAdd"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:background="@drawable/gradient_button"
+                    android:text="Add"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:iconGravity="textStart"
+                    app:iconPadding="8dp"
+                    app:backgroundTint="@color/blue_600"/>
+            </androidx.cardview.widget.CardView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

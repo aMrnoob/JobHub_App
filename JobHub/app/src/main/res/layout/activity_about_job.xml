@@ -3,186 +3,206 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFAF0">
+    android:background="@drawable/gradient_background">
 
-    <ImageButton
-        android:id="@+id/btnComeBack"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
-        android:background="@color/blue_100"
-        android:scaleType="fitXY"
-        android:src="@drawable/comeback_icon"
-        app:layout_constraintHorizontal_bias="0.047"
-        app:layout_constraintVertical_bias="0.07"
-        app:layout_constraintWidth_percent="0.8"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/tvCompany"
-        android:layout_width="wrap_content"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardHeader"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="About Job"
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintHorizontal_bias="0.23"
-        app:layout_constraintVertical_bias="0.075"
-        app:layout_constraintWidth_percent="0.8"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:elevation="4dp"
+        app:cardBackgroundColor="@color/white"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <ImageButton
+                android:id="@+id/btnComeBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/rounded_button_bg"
+                android:scaleType="centerInside"
+                android:src="@drawable/comeback_icon"
+                android:contentDescription="Quay lại"
+                android:padding="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvCompany"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="About Job"
+                android:textColor="@color/text_primary"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginStart="16dp"
+                app:layout_constraintBottom_toBottomOf="@id/btnComeBack"
+                app:layout_constraintStart_toEndOf="@id/btnComeBack"
+                app:layout_constraintTop_toTopOf="@id/btnComeBack" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
 
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintHorizontal_bias="0.168"
-        app:layout_constraintVertical_bias="1"
-        app:layout_constraintWidth_percent="0.8"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:scrollbars="none"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/cardHeader">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_marginHorizontal="10dp">
+            android:padding="20dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="5dp"
+                android:layout_marginBottom="8dp"
                 android:text="Title*"
-                android:textColor="@color/gray_700"
-                android:textSize="20sp" />
+                android:textColor="@color/text_primary"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/edtTitle"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginBottom="20dp"
-                android:paddingStart="15dp"
-                android:background="@drawable/bg_edittext"
+                android:layout_height="55dp"
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/input_bg_rounded"
                 android:hint="Job name"
-                android:textColorHint="@color/gray_500"
-                android:textColor="@color/black"
-                android:inputType="text" />
+                android:inputType="text"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/gray_600"
+                android:drawableStart="@drawable/icon_job_title"
+                android:drawablePadding="12dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="10dp"
+                android:layout_marginBottom="8dp"
                 android:text="Requirements*"
-                android:textColor="@color/gray_700"
-                android:textSize="20sp" />
+                android:textColor="@color/text_primary"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/edtRequirements"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:paddingTop="5dp"
-                android:paddingStart="15dp"
-                android:background="@drawable/bg_edittext"
+                android:layout_width="370dp"
+                android:layout_height="115dp"
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/input_bg_rounded"
+                android:drawableStart="@drawable/icon_requirements"
+                android:drawablePadding="12dp"
                 android:hint="Requirements"
-                android:textColorHint="@color/gray_500"
-                android:textColor="@color/black"
-                android:minHeight="70dp"
-                android:gravity="top"
-                android:inputType="textMultiLine" />
+                android:inputType="textMultiLine"
+                android:minHeight="100dp"
+                android:padding="16dp"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/gray_600" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="5dp"
+                android:layout_marginBottom="8dp"
                 android:text="Salary*"
-                android:textColor="@color/gray_700"
-                android:textSize="20sp" />
+                android:textColor="@color/text_primary"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/edtSalary"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginBottom="20dp"
-                android:paddingStart="15dp"
-                android:background="@drawable/bg_edittext"
+                android:layout_height="55dp"
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/input_bg_rounded"
+                android:drawableStart="@drawable/icon_salary"
                 android:drawableEnd="@drawable/icon_dollar"
+                android:drawablePadding="12dp"
                 android:hint="Salary"
-                android:textColorHint="@color/gray_500"
-                android:textColor="@color/black"
-                android:inputType="numberDecimal" />
+                android:inputType="numberDecimal"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/gray_600" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="5dp"
+                android:layout_marginBottom="8dp"
                 android:text="Address*"
-                android:textColor="@color/gray_700"
-                android:textSize="20sp" />
+                android:textColor="@color/text_primary"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/edtLocation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:paddingTop="5dp"
-                android:paddingStart="15dp"
-                android:background="@drawable/bg_edittext"
+                android:layout_width="372dp"
+                android:layout_height="57dp"
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/input_bg_rounded"
+                android:drawableStart="@drawable/icon_location"
+                android:drawablePadding="12dp"
+                android:gravity="top"
                 android:hint="Work's address"
-                android:textColorHint="@color/gray_500"
-                android:textColor="@color/black"
                 android:inputType="text"
                 android:minHeight="100dp"
-                android:gravity="top"/>
+                android:padding="16dp"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/gray_600" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="5dp"
+                android:layout_marginBottom="8dp"
                 android:text="Description*"
-                android:textColor="@color/gray_700"
-                android:textSize="20sp" />
+                android:textColor="@color/text_primary"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/edtDescription"
+                android:layout_width="372dp"
+                android:layout_height="150dp"
+                android:layout_marginBottom="32dp"
+                android:background="@drawable/input_bg_rounded"
+                android:drawableStart="@drawable/icon_description"
+                android:drawablePadding="12dp"
+                android:hint="Description"
+                android:inputType="textMultiLine"
+                android:minHeight="100dp"
+                android:padding="16dp"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/gray_600" />
+
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="35dp"
-                android:paddingTop="5dp"
-                android:paddingStart="15dp"
-                android:background="@drawable/bg_edittext"
-                android:hint="Description"
-                android:textColorHint="@color/gray_500"
-                android:textColor="@color/black"
-                android:minHeight="100dp"
-                android:gravity="top"
-                android:inputType="textMultiLine" />
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="25dp"
+                app:cardElevation="4dp">
 
-            <Button
-                android:id="@+id/btnNext"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginHorizontal="50dp"
-                android:backgroundTint="@color/blue_700"
-                android:text="Next"
-                android:textColor="@color/white"
-                android:textSize="24sp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="40dp" />
+                <Button
+                    android:id="@+id/btnNext"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:background="@drawable/gradient_button"
+                    android:text="Next"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@color/blue_600" />
+            </androidx.cardview.widget.CardView>
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,149 +3,225 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFAF0">
+    android:background="@color/white">
 
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintWidth_percent="0.8"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_marginHorizontal="10dp">
+            android:padding="24dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="5dp"
-                android:text="Title*"
-                android:textColor="@color/gray_700"
-                android:textSize="20sp" />
-
-            <EditText
-                android:id="@+id/edtTitle"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginBottom="20dp"
-                android:paddingStart="15dp"
-                android:background="@drawable/bg_edittext"
-                android:hint="Job name"
-                android:textColorHint="@color/gray_500"
-                android:textColor="@color/black"
-                android:inputType="text" />
-
-
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="10dp"
-                android:text="Requirements*"
-                android:textColor="@color/gray_700"
-                android:textSize="20sp" />
-
-            <EditText
-                android:id="@+id/edtRequirements"
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:layout_marginBottom="20dp"
-                android:paddingTop="5dp"
-                android:paddingStart="15dp"
-                android:background="@drawable/bg_edittext"
-                android:hint="Requirements"
-                android:textColorHint="@color/gray_500"
-                android:textColor="@color/black"
-                android:gravity="top|start"
-                android:inputType="textMultiLine"
-                android:scrollbars="vertical"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="5dp"
-                android:text="Salary*"
-                android:textColor="@color/gray_700"
-                android:textSize="20sp" />
-
-            <EditText
-                android:id="@+id/edtSalary"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_marginBottom="20dp"
-                android:paddingStart="15dp"
-                android:background="@drawable/bg_edittext"
-                android:drawableEnd="@drawable/icon_dollar"
-                android:hint="Salary"
-                android:textColorHint="@color/gray_500"
-                android:textColor="@color/black"
-                android:inputType="numberDecimal" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="5dp"
-                android:text="Address*"
-                android:textColor="@color/gray_700"
-                android:textSize="20sp" />
-
-            <EditText
-                android:id="@+id/edtLocation"
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:layout_marginBottom="20dp"
-                android:paddingTop="5dp"
-                android:paddingStart="15dp"
-                android:background="@drawable/bg_edittext"
-                android:hint="Work's address"
-                android:textColorHint="@color/gray_500"
-                android:textColor="@color/black"
-                android:inputType="textMultiLine"
-                android:gravity="top|start"
-                android:scrollbars="vertical"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="5dp"
-                android:text="Description*"
-                android:textColor="@color/gray_700"
-                android:textSize="20sp" />
-
-            <EditText
-                android:id="@+id/edtDescription"
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:gravity="top|start"
-                android:minHeight="100dp"
-                android:paddingTop="5dp"
-                android:paddingStart="15dp"
-                android:background="@drawable/bg_edittext"
-                android:hint="Description"
-                android:textColorHint="@color/gray_500"
-                android:textColor="@color/black" />
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
 
-            <Button
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="101dp"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Job Title*"
+                        android:textColor="@color/gray_700"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/edtTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/white"
+                        android:drawableStart="@drawable/icon_job_title"
+                        android:drawablePadding="12dp"
+                        android:hint="Enter job title"
+                        android:inputType="text"
+                        android:minHeight="50dp"
+                        android:paddingHorizontal="16dp"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/gray_500" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Requirements*"
+                        android:textColor="@color/gray_700"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/edtRequirements"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/white"
+                        android:drawableStart="@drawable/icon_requirements"
+                        android:drawablePadding="12dp"
+                        android:paddingHorizontal="16dp"
+                        android:hint="List all job requirements"
+                        android:inputType="textMultiLine"
+                        android:minHeight="120dp"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/gray_500" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Salary*"
+                        android:textColor="@color/gray_700"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/edtSalary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/white"
+                        android:drawableStart="@drawable/icon_dollar"
+                        android:drawablePadding="12dp"
+                        android:hint="Enter salary range"
+                        android:inputType="numberDecimal"
+                        android:minHeight="50dp"
+                        android:paddingHorizontal="16dp"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/gray_500" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="118dp"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Address*"
+                        android:textColor="@color/gray_700"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/edtLocation"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/white"
+                        android:drawableStart="@drawable/icon_location"
+                        android:drawablePadding="12dp"
+                        android:gravity="top|start"
+                        android:hint="Enter work location"
+                        android:inputType="textMultiLine"
+                        android:minHeight="100dp"
+                        android:padding="16dp"
+                        android:scrollbars="vertical"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/gray_500" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="164dp"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Description*"
+                        android:textColor="@color/gray_700"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/edtDescription"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/white"
+                        android:drawableStart="@drawable/icon_description"
+                        android:drawablePadding="12dp"
+                        android:paddingHorizontal="16dp"
+                        android:hint="Provide detailed job description"
+                        android:inputType="textMultiLine"
+                        android:minHeight="150dp"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/gray_500" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnUpdate"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginHorizontal="50dp"
+                android:layout_height="56dp"
                 android:backgroundTint="@color/blue_700"
-                android:text="Update"
+                android:text="Save Changes"
+                android:textAllCaps="false"
                 android:textColor="@color/white"
-                android:textSize="24sp" />
+                android:textSize="18sp"
+                app:cornerRadius="12dp"
+                app:elevation="6dp" />
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

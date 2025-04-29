@@ -6,271 +6,340 @@
     android:layout_height="match_parent"
     android:background="#FFFAF0">
 
-    <ImageButton
-        android:id="@+id/btnComeBack"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
-        android:background="@color/blue_100"
-        android:scaleType="fitXY"
-        android:src="@drawable/comeback_icon"
-        app:layout_constraintHorizontal_bias="0.047"
-        app:layout_constraintVertical_bias="0.07"
-        app:layout_constraintWidth_percent="0.8"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/tvApplicant"
-        android:layout_width="wrap_content"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvAppBar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Applicant"
-        android:textColor="@color/black"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintHorizontal_bias="0.23"
-        app:layout_constraintVertical_bias="0.073"
-        app:layout_constraintWidth_percent="0.8"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:cardElevation="4dp"
+        app:cardBackgroundColor="#FFFFFF"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:paddingHorizontal="16dp">
+
+            <ImageButton
+                android:id="@+id/btnComeBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/border_btn"
+                android:backgroundTint="@color/blue_100"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/comeback_icon"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvApplicant"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="Applicant Profile"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/btnComeBack"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="60dp"
-        app:layout_constraintHorizontal_bias="0.5"
+        android:fillViewport="true"
+        android:paddingTop="16dp"
+        android:clipToPadding="false"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvApplicant"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/cvAppBar">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="24dp">
 
-            <LinearLayout
-                android:id="@+id/llApplicant"
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cvApplicantProfile"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
-                android:background="@drawable/item_company"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:orientation="vertical">
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
 
                 <LinearLayout
+                    android:id="@+id/llApplicant"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <com.google.android.material.imageview.ShapeableImageView
-                        android:id="@+id/userAvatar"
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
-                        android:layout_marginVertical="10dp"
-                        android:layout_marginEnd="15dp"
-                        android:layout_marginStart="20dp"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/icon_upload_image"
-                        app:shapeAppearanceOverlay="@style/circleImageView" />
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:background="@drawable/item_company">
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:paddingBottom="5dp"
-                        android:orientation="vertical"
-                        android:paddingTop="5dp"
-                        android:paddingEnd="10dp"
-                        tools:ignore="RtlSymmetry">
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.imageview.ShapeableImageView
+                            android:id="@+id/userAvatar"
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:layout_marginEnd="16dp"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/icon_upload_image"
+                            app:shapeAppearanceOverlay="@style/circleImageView"
+                            app:strokeColor="@color/blue_500"
+                            app:strokeWidth="2dp" />
 
                         <LinearLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
+                            android:layout_weight="1"
+                            android:orientation="vertical">
 
-                            <TextView
-                                android:id="@+id/tvFullName"
-                                android:layout_width="0dp"
+                            <LinearLayout
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginEnd="10dp"
-                                android:layout_weight="1"
-                                android:text="Full name"
-                                android:textColor="@color/black"
-                                android:textSize="15sp"
-                                android:textStyle="bold"
-                                tools:ignore="NestedWeights" />
+                                android:orientation="horizontal"
+                                android:layout_marginBottom="8dp">
+
+                                <TextView
+                                    android:id="@+id/tvFullName"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="John Smith"
+                                    android:textColor="@color/black"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tvStatus"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/border_status"
+                                    android:paddingHorizontal="12dp"
+                                    android:paddingVertical="4dp"
+                                    android:text="New"
+                                    android:textColor="@color/blue_500"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
 
                             <TextView
-                                android:id="@+id/tvStatus"
+                                android:id="@+id/tvEmail"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginEnd="10dp"
-                                android:text="Status"
-                                android:textColor="@color/blue_500"
-                                android:textSize="18sp"
-                                android:textStyle="bold"
-                                tools:ignore="NestedWeights" />
+                                android:drawableStart="@drawable/icon_email"
+                                android:drawablePadding="8dp"
+                                android:gravity="center_vertical"
+                                android:text="myemail@email.com"
+                                android:textColor="@color/gray_700"
+                                android:textSize="14sp"
+                                android:layout_marginBottom="4dp" />
+
+                            <TextView
+                                android:id="@+id/tvPhone"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:drawableStart="@drawable/icon_phone"
+                                android:drawablePadding="8dp"
+                                android:gravity="center_vertical"
+                                android:text="0123 456 789"
+                                android:textColor="@color/gray_700"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="16dp"
+                        android:background="@color/gray_300" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnDownloadCV"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:backgroundTint="@color/blue_600"
+                        android:text="Download CV"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        app:cornerRadius="8dp"
+                        app:iconGravity="textStart"
+                        app:iconTint="@color/white" />
+
+                    <!-- Status Selection -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="8dp"
+                        android:text="Applicant Status"
+                        android:textColor="@color/gray_700"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border_select_profile"
+                        android:orientation="horizontal"
+                        android:padding="12dp">
+
+                        <TextView
+                            android:id="@+id/tvSelectedStatus"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Schedule to Interview"
+                            android:textColor="@color/gray_700"
+                            android:textSize="16sp" />
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/icon_arrow_down" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="16dp"
+                        android:background="@color/gray_300" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Interview Time"
+                        android:textColor="@color/gray_700"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:id="@+id/interviewDate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="16dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="8dp"
+                            android:background="@drawable/border_select_profile"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="12dp">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_marginEnd="8dp"
+                                android:src="@drawable/ic_calendar" />
+
+                            <EditText
+                                android:id="@+id/edtDate"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@null"
+                                android:clickable="true"
+                                android:focusable="false"
+                                android:hint="Date"
+                                android:inputType="date"
+                                android:textColor="@color/gray_700"
+                                android:textColorHint="@color/gray_500"
+                                android:textSize="16sp" />
                         </LinearLayout>
 
-                        <TextView
-                            android:id="@+id/tvEmail"
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Email: myemail@email.com"
-                            android:textColor="@color/gray_700"
-                            android:textSize="15sp" />
+                            android:layout_weight="1"
+                            android:background="@drawable/border_select_profile"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="12dp">
 
-                        <TextView
-                            android:id="@+id/tvPhone"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Phone number:"
-                            android:textColor="@color/gray_700"
-                            android:textSize="15sp" />
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_marginEnd="8dp"
+                                android:src="@drawable/icon_clock" />
+
+                            <EditText
+                                android:id="@+id/edtHour"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@null"
+                                android:clickable="true"
+                                android:focusable="false"
+                                android:hint="Hour"
+                                android:inputType="time"
+                                android:textColor="@color/gray_700"
+                                android:textColorHint="@color/gray_500"
+                                android:textSize="16sp" />
+                        </LinearLayout>
                     </LinearLayout>
-                </LinearLayout>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginHorizontal="20dp"
-                    android:background="@color/gray_300"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Interview Message*"
+                        android:textColor="@color/gray_700"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
 
-                <Button
-                    android:id="@+id/btnDownloadCV"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginHorizontal="20dp"
-                    android:backgroundTint="@color/blue_600"
-                    android:layout_marginBottom="10dp"
-                    android:text="Download CV"
-                    android:textColor="@color/white"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="20dp"
-                    android:layout_marginTop="10dp"
-                    android:background="@drawable/border_select_profile"
-                    android:backgroundTint="#E8E8E8"
-                    app:endIconMode="dropdown_menu">
-
-                    <AutoCompleteTextView
-                        android:id="@+id/actvStatus"
+                    <androidx.cardview.widget.CardView
                         android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:background="@drawable/border_select_profile"
-                        android:backgroundTint="#E8E8E8"
-                        android:paddingStart="10dp"
-                        android:paddingEnd="10dp"
-                        android:textColor="@color/gray_700"
-                        android:textSize="18sp"
-                        android:text="Schedule to Interview"
-                        android:inputType="none" />
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:layout_height="wrap_content"
+                        app:cardCornerRadius="8dp"
+                        app:cardElevation="0dp"
+                        app:cardBackgroundColor="#FFEBCD">
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginHorizontal="20dp"
-                    android:background="@color/gray_300"/>
-
-                <LinearLayout
-                    android:id="@+id/interviewDate"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="20dp"
-                    android:orientation="horizontal">
-
-                    <EditText
-                        android:id="@+id/edtDate"
-                        android:layout_width="0dp"
-                        android:layout_height="40dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="10dp"
-                        android:paddingStart="10dp"
-                        android:hint="Date"
-                        android:inputType="date"
-                        android:textColor="@color/gray_700"
-                        android:focusable="false"
-                        android:clickable="true"
-                        android:textColorHint="@color/gray_700"
-                        android:backgroundTint="#E8E8E8"
-                        android:background="@drawable/border_select_profile" />
-
-                    <EditText
-                        android:id="@+id/edtHour"
-                        android:layout_width="0dp"
-                        android:layout_height="40dp"
-                        android:layout_weight="1"
-                        android:paddingStart="10dp"
-                        android:hint="Hour"
-                        android:inputType="time"
-                        android:textColor="@color/gray_700"
-                        android:focusable="false"
-                        android:clickable="true"
-                        android:textColorHint="@color/gray_700"
-                        android:backgroundTint="#E8E8E8"
-                        android:background="@drawable/border_select_profile"/>
+                        <EditText
+                            android:id="@+id/edtMessage"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:gravity="top"
+                            android:hint="Enter interview message content..."
+                            android:minLines="6"
+                            android:padding="16dp"
+                            android:textColor="@color/gray_600"
+                            android:textColorHint="@color/gray_500"
+                            android:textSize="16sp" />
+                    </androidx.cardview.widget.CardView>
                 </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="40dp"
-                    android:layout_marginTop="10dp"
-                    android:text="Message*"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/gray_600"/>
-
-                <EditText
-                    android:id="@+id/edtMessage"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginHorizontal="20sp"
-                    android:layout_marginTop="5dp"
-                    android:paddingStart="10dp"
-                    android:paddingVertical="10dp"
-                    android:text="Message"
-                    android:gravity="top"
-                    android:textSize="16sp"
-                    android:minLines="6"
-                    android:textColor="@color/gray_600"
-                    android:background="@drawable/bg_edittext"
-                    android:backgroundTint="#FFEBCD"/>
-            </LinearLayout>
-
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSendMessage"
                 android:layout_width="match_parent"
-                android:layout_height="55dp"
-                android:layout_marginTop="40dp"
-                android:layout_marginHorizontal="50dp"
+                android:layout_height="60dp"
+                android:layout_marginHorizontal="32dp"
+                android:layout_marginTop="16dp"
                 android:backgroundTint="@color/blue_600"
-                android:layout_marginBottom="5dp"
                 android:text="Send to Applicant"
+                android:textAllCaps="false"
                 android:textColor="@color/white"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="40dp"/>
+                android:textSize="16sp"
+                app:cornerRadius="8dp"
+                app:icon="@drawable/icon_send"
+                app:iconGravity="textStart"
+                app:iconTint="@color/white" />
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

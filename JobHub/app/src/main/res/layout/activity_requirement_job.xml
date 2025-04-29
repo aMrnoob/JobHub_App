@@ -1,89 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
 
-    <ImageButton
-        android:id="@+id/btnComeBack"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
-        android:background="@color/blue_100"
-        android:scaleType="fitXY"
-        android:src="@drawable/comeback_icon"
-        app:layout_constraintHorizontal_bias="0.047"
-        app:layout_constraintVertical_bias="0.07"
-        app:layout_constraintWidth_percent="0.8"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:elevation="4dp"
+        app:cardBackgroundColor="@color/white"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="16dp">
+
+            <ImageButton
+                android:id="@+id/btnComeBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="16dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Back button"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/comeback_icon"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvJobTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:text="Job Requirements"
+                android:textColor="@color/blue_700"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/btnComeBack"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
 
     <TextView
-        android:id="@+id/tvCompany"
-        android:layout_width="wrap_content"
+        android:id="@+id/tvInstructions"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Requirements Job"
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintHorizontal_bias="0.23"
-        app:layout_constraintVertical_bias="0.075"
-        app:layout_constraintWidth_percent="0.8"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="16dp"
+        android:text="Please add all requirements for this job position"
+        android:textColor="@color/gray_800"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/cardHeader" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvSkillJob"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardRequirements"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintVertical_bias="0.15"
-        app:layout_constraintHorizontal_bias="0.85"
-        app:layout_constraintHeight_percent="0.65"
-        app:layout_constraintWidth_percent="0.85"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="2dp"
+        app:layout_constraintBottom_toTopOf="@id/tvAddSkill"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvCompany"/>
+        app:layout_constraintTop_toBottomOf="@id/tvInstructions">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvSkillJob"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:padding="12dp" />
+    </androidx.cardview.widget.CardView>
 
     <TextView
         android:id="@+id/tvAddSkill"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginBottom="16dp"
         android:background="@drawable/edittext_background"
-        android:backgroundTint="@color/blue_200"
+        android:backgroundTint="@color/blue_100"
         android:drawableStart="@drawable/icon_plus"
-        android:text="   Add New Requirements"
-        android:textSize="15sp"
+        android:drawablePadding="16dp"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:text="Add New Requirements"
+        android:textColor="@color/blue_700"
+        android:textSize="16sp"
         android:textStyle="bold"
-        android:textColor="@color/gray_800"
-        android:paddingVertical="10dp"
-        android:paddingStart="65dp"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintVertical_bias="0.02"
-        app:layout_constraintWidth_percent="0.75"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/btnComplete"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rvSkillJob"/>
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/btnComplete"
         android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginHorizontal="50dp"
+        android:layout_height="56dp"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginBottom="24dp"
         android:backgroundTint="@color/blue_700"
+        android:elevation="2dp"
         android:text="Complete"
+        android:textAllCaps="false"
         android:textColor="@color/white"
-        android:textSize="24sp"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintVertical_bias="0.07"
-        app:layout_constraintWidth_percent="0.6"
+        android:textSize="18sp"
+        app:cornerRadius="28dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvAddSkill"/>
+        app:layout_constraintStart_toStartOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
