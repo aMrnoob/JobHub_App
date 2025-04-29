@@ -11,6 +11,7 @@
         android:id="@+id/toolbar"
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
+        android:layout_marginTop="35dp"
         android:background="@color/blue_700"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -137,7 +138,7 @@
             <EditText
                 android:id="@+id/edtCoverLetter"
                 android:layout_width="0dp"
-                android:layout_height="150dp"
+                android:layout_height="140dp"
                 android:layout_marginTop="8dp"
                 android:background="@drawable/edittext_background"
                 android:gravity="top"

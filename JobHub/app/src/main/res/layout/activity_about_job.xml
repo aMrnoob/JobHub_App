@@ -9,6 +9,7 @@
         android:id="@+id/cardHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
         android:elevation="4dp"
         app:cardBackgroundColor="@color/white"
         app:layout_constraintTop_toTopOf="parent">
@@ -98,7 +99,7 @@
             <EditText
                 android:id="@+id/edtRequirements"
                 android:layout_width="370dp"
-                android:layout_height="115dp"
+                android:layout_height="100dp"
                 android:layout_marginBottom="24dp"
                 android:background="@drawable/input_bg_rounded"
                 android:drawableStart="@drawable/icon_requirements"
@@ -172,14 +173,14 @@
             <EditText
                 android:id="@+id/edtDescription"
                 android:layout_width="372dp"
-                android:layout_height="150dp"
-                android:layout_marginBottom="32dp"
+                android:layout_height="120dp"
+                android:layout_marginBottom="25dp"
                 android:background="@drawable/input_bg_rounded"
                 android:drawableStart="@drawable/icon_description"
                 android:drawablePadding="12dp"
                 android:hint="Description"
                 android:inputType="textMultiLine"
-                android:minHeight="100dp"
+                android:minHeight="80dp"
                 android:padding="16dp"
                 android:textColor="@color/text_primary"
                 android:textColorHint="@color/gray_600" />
