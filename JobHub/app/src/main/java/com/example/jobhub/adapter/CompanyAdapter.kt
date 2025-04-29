@@ -36,7 +36,7 @@ class CompanyAdapter(
         holder.tvCompanyName.text = company.companyName
         holder.tvAddress.text = company.address
         val jobCount = company.jobs?.size ?: 0
-        holder.tvAmount.text = "Amount of jobs: $jobCount"
+        //holder.tvAmount.text = "Amount of jobs: $jobCount"
 
         Glide.with(holder.itemView.context)
             .load(company.logoUrl)
@@ -45,13 +45,13 @@ class CompanyAdapter(
             .into(holder.ivImgCompany)
 
         val isExpanded = position == expandedPosition
-        holder.rvJobs.visibility = if (isExpanded) View.VISIBLE else View.GONE
-        holder.rvJobs.apply {
+        //holder.rvJobs.visibility = if (isExpanded) View.VISIBLE else View.GONE
+        /*holder.rvJobs.apply {
             layoutManager = LinearLayoutManager(holder.itemView.context)
             adapter = company.jobs?.let {
                 JobEntityAdapter(it, company.logoUrl)
             }
-        }
+        }*/
 
         holder.itemView.setOnClickListener {
             AnimationHelper.animateScale(it)
@@ -80,9 +80,9 @@ class CompanyAdapter(
         val ivImgCompany: ImageView = itemView.findViewById(R.id.ivImgCompany)
         val tvCompanyName: TextView = itemView.findViewById(R.id.tvCompanyName)
         val tvAddress: TextView = itemView.findViewById(R.id.tvAddress)
-        val tvAmount: TextView = itemView.findViewById(R.id.tvAmount)
+        //val tvAmount: TextView = itemView.findViewById(R.id.tvAmount)
         val btnEdit: LinearLayout = itemView.findViewById(R.id.btnEdit)
         val btnRemove: LinearLayout = itemView.findViewById(R.id.btnRemove)
-        val rvJobs: RecyclerView = itemView.findViewById(R.id.rvJobs)
+        //val rvJobs: RecyclerView = itemView.findViewById(R.id.rvJobs)
     }
 }
