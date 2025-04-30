@@ -20,6 +20,7 @@ public class ApplicationDTO {
     private String resumeUrl;
     private ApplicationStatus status;
     private LocalDateTime applicationDate;
+    private LocalDateTime interviewDate;
 
     public ApplicationDTO(Integer applicationId, Job job, UserDTO userDTO, String coverLetter, ApplicationStatus status, LocalDateTime applicationDate) {
         this.applicationId = applicationId;
@@ -41,6 +42,7 @@ public class ApplicationDTO {
         this.status = application.getStatus();
         this.applicationDate = application.getApplicationDate();
         this.resumeUrl = application.getResume() != null ? application.getResume().getResumeUrl() : null;
+        this.interviewDate = application.getInterviewDate();
 
         if (includeJob) {
             this.jobDTO = ItemJobDTO.convertFromJob(application.getJob(), false);

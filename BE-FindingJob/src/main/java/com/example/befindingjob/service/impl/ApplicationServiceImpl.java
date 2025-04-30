@@ -463,7 +463,7 @@ public class ApplicationServiceImpl implements ApplicationService {
         if (optionalApplication.isPresent()) {
             Application application = optionalApplication.get();
             application.setStatus(statusApplicantDTO.getStatus());
-            application.setCoverLetter(statusApplicantDTO.getMessage());
+            //application.setCoverLetter(statusApplicantDTO.getMessage());
             application.setInterviewDate(statusApplicantDTO.getInterviewDate());
 
             applicationRepository.save(application);

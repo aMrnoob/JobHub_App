@@ -14,6 +14,8 @@ import java.util.Optional;
 
 @Repository
 public interface ApplicationRepository extends JpaRepository<Application, Integer> {
+    List<Application> findByUser_UserId(int userId);
+
     List<Application> findByUser(User user);
 
     List<Application> findByJob(Job job);

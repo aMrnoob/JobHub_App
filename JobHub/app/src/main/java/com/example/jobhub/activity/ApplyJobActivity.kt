@@ -16,10 +16,12 @@ import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.MainDialogApplyBinding
 import com.example.jobhub.dto.ApplicationDTO
 import com.example.jobhub.dto.ItemJobDTO
+import com.example.jobhub.dto.NotificationDTO
 import com.example.jobhub.dto.ResumeDTO
 import com.example.jobhub.dto.UserDTO
 import com.example.jobhub.entity.enumm.ApplicationStatus
 import com.example.jobhub.service.ApplicationService
+import com.example.jobhub.service.NotificationService
 import com.example.jobhub.service.ResumeService
 import com.google.gson.Gson
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -36,18 +38,15 @@ import java.util.Locale
 class ApplyJobActivity : BaseActivity() {
 
     private lateinit var binding: MainDialogApplyBinding
+    private lateinit var sharedPrefs: SharedPrefsManager
+
     private var resumeUri: Uri? = null
     private var currentJob: ItemJobDTO? = null
     private var currentUser: UserDTO? = null
-    private lateinit var sharedPrefs: SharedPrefsManager
 
-    private val jobApplicationService by lazy {
-        RetrofitClient.createRetrofit().create(ApplicationService::class.java)
-    }
-
-    private val resumeService by lazy {
-        RetrofitClient.createRetrofit().create(ResumeService::class.java)
-    }
+    private val jobApplicationService by lazy { RetrofitClient.createRetrofit().create(ApplicationService::class.java) }
+    private val resumeService by lazy { RetrofitClient.createRetrofit().create(ResumeService::class.java) }
+    private val notificationService by lazy { RetrofitClient.createRetrofit().create(NotificationService::class.java) }
 
     private val getResumeFile = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -261,12 +260,10 @@ class ApplyJobActivity : BaseActivity() {
             call = resumeService.createResume("Bearer $token", resumeDTO),
             onSuccess = { _ ->
                 showToast("Nộp đơn và CV thành công!")
-                binding.progressBar.visibility = View.GONE
-                finish()
+                createNotification(applicationId)
             },
             onError = { error ->
                 showToast("Nộp đơn thành công nhưng lưu CV thất bại: $error")
-                binding.progressBar.visibility = View.GONE
                 finish()
             }
         )
@@ -309,5 +306,27 @@ class ApplyJobActivity : BaseActivity() {
             }
             else -> null
         }
+    }
+
+    private fun createNotification(applicationId: Int) {
+        val notificationDTO = NotificationDTO(
+            senderId = currentUser?.userId ?: 0,
+            companyId = currentJob?.company?.companyId ?: 0,
+            applicationId = applicationId,
+            content = "${currentUser?.fullName} applied this job: ${currentJob?.title}"
+        )
+
+        ApiHelper().callApi(
+            context = this,
+            call = notificationService.createNotification(notificationDTO),
+            onSuccess = {
+                binding.progressBar.visibility = View.GONE
+                finish()
+            },
+            onError = {
+                binding.progressBar.visibility = View.GONE
+                finish()
+            }
+        )
     }
 }

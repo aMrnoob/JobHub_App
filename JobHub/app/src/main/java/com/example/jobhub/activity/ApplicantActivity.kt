@@ -5,7 +5,6 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.text.Editable
 import android.util.Base64
 import android.util.Log
 import android.widget.ArrayAdapter
@@ -56,13 +55,12 @@ class ApplicantActivity : BaseActivity() {
             val selectedStatusText = binding.tvSelectedStatus.text.toString()
             val status = mapStatusFromText(selectedStatusText)
             val message = binding.edtMessage.text.toString()
-            Log.e("statusav", status.toString())
             statusApplicantDTO.applicationId = applicationDTO?.applicationId
             statusApplicantDTO.interviewDate = applicationDTO?.interviewDate
 
             if (status != null) {
                 statusApplicantDTO.status = status
-                statusApplicantDTO.message += " ^^ $message"
+                statusApplicantDTO.message = message
             }
 
             updateStatusApplicant()
@@ -88,7 +86,6 @@ class ApplicantActivity : BaseActivity() {
         binding.tvEmail.text = applicationDTO?.userDTO?.email
         binding.tvPhone.text = applicationDTO?.userDTO?.phone
         binding.tvStatus.text = applicationDTO?.status.toString()
-        binding.edtMessage.text = Editable.Factory.getInstance().newEditable(applicationDTO?.coverLetter?.substringAfterLast("^^")?.trim())
     }
 
     @SuppressLint("InflateParams")
@@ -201,7 +198,7 @@ class ApplicantActivity : BaseActivity() {
         ApiHelper().callApi(
             context = this,
             call = applicationService.updateStatusApplication("Bearer $token", statusApplicantDTO),
-            onSuccess = { }
+            onSuccess = { finish() }
         )
     }
 }

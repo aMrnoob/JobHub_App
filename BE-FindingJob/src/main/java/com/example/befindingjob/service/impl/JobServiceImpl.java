@@ -121,11 +121,11 @@ public class JobServiceImpl implements JobService {
                     .collect(Collectors.toList());
         } else if (role == Role.JOB_SEEKER) {
             jobs = jobRepository.findAll().stream()
-//                    .filter(job -> job.getExpirationDate().isAfter(LocalDateTime.now()))
-//                    .filter(job -> !userRepository.isBookmarked(userId, job.getJobId()))
-//                    .filter(job -> !applicationRepository.existsByUserIdAndJobId(userId, job.getJobId()))
+                    .filter(job -> job.getExpirationDate().isAfter(LocalDateTime.now()))
+                    .filter(job -> !userRepository.isBookmarked(userId, job.getJobId()))
+                    .filter(job -> !applicationRepository.existsByUserIdAndJobId(userId, job.getJobId()))
                     .map(ItemJobDTO::new)
-//                    .sorted(Comparator.comparing(ItemJobDTO::getExpirationDate))
+                    .sorted(Comparator.comparing(ItemJobDTO::getExpirationDate))
                     .collect(Collectors.toList());
         } else {
             return new ApiResponse<>(false, "", null);

@@ -1,16 +1,16 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
 
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintVertical_bias="0"
-        app:layout_constraintWidth_percent="0.8"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:paddingBottom="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -20,77 +20,122 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_marginHorizontal="10dp">
+            android:padding="16dp">
 
-            <ImageView
-                android:id="@+id/ivImgJob"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:layout_marginBottom="30dp"
-                android:src="@drawable/icon_upload_image"
-                android:layout_gravity="center_horizontal"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:text="Company Name"
-                android:textColor="@color/gray_700"
-                android:textSize="20sp" />
-
-            <EditText
-                android:id="@+id/edtCompanyName"
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginBottom="20dp"
-                android:background="@drawable/edittext_background"
-                android:hint="Company name"
-                android:textColorHint="@color/gray_500"
-                android:textColor="@color/black"
-                android:inputType="text"
-                app:layout_constraintVertical_bias="0.25"
-                app:layout_constraintWidth_percent="0.8"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:text="Description"
-                android:textColor="@color/gray_700"
-                android:textSize="20sp" />
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
 
-            <EditText
-                android:id="@+id/edtDescription"
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <FrameLayout
+                        android:layout_width="140dp"
+                        android:layout_height="140dp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginBottom="16dp">
+
+                        <com.google.android.material.imageview.ShapeableImageView
+                            android:id="@+id/ivImgJob"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/icon_upload_image"
+                            app:shapeAppearanceOverlay="@style/CircleImageView" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Company Name"
+                        android:textColor="@color/gray_700"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="20dp"
+                        app:boxBackgroundMode="outline"
+                        app:boxStrokeColor="@color/blue_500"
+                        app:hintEnabled="false">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edtCompanyName"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Enter company name"
+                            android:inputType="text"
+                            android:padding="16dp"
+                            android:textColor="@color/black"
+                            android:textColorHint="@color/gray_500" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
-                android:layout_height="250dp"
-                android:layout_marginBottom="20dp"
-                android:background="@drawable/edittext_background"
-                android:hint="Description"
-                android:padding="10dp"
-                android:textColorHint="@color/gray_500"
-                android:textColor="@color/black"
-                android:inputType="textMultiLine"
-                android:gravity="top|start"
-                android:scrollbars="vertical" />
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
 
-            <Button
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="Description"
+                        android:textColor="@color/gray_700"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:boxBackgroundMode="outline"
+                        app:boxStrokeColor="@color/blue_500"
+                        app:hintEnabled="false">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edtDescription"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                            android:gravity="top|start"
+                            android:hint="Enter company description"
+                            android:inputType="textMultiLine"
+                            android:padding="16dp"
+                            android:scrollbars="vertical"
+                            android:textColor="@color/black"
+                            android:textColorHint="@color/gray_500" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnUpdate"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginHorizontal="40dp"
+                android:layout_height="56dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="8dp"
                 android:backgroundTint="@color/blue_700"
-                android:text="Update"
+                android:text="UPDATE PROFILE"
                 android:textColor="@color/white"
-                android:textSize="24sp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="40dp"/>
+                android:textSize="16sp"
+                app:cornerRadius="12dp"
+                app:elevation="4dp" />
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

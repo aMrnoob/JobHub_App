@@ -3,13 +3,11 @@ package com.example.jobhub.adapter
 import android.annotation.SuppressLint
 import android.content.res.ColorStateList
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.example.jobhub.R
-import com.example.jobhub.databinding.ItemJobBinding
+import com.example.jobhub.databinding.ItemEntityJobBinding
 import com.example.jobhub.entity.Job
 import com.example.jobhub.entity.enumm.JobType
 import java.time.LocalDateTime
@@ -17,20 +15,12 @@ import java.time.format.DateTimeFormatter
 
 class JobEntityAdapter(
     private val jobList: List<Job>,
-    private val companyLogoUrl: String?
 ) : RecyclerView.Adapter<JobEntityAdapter.JobViewHolder>() {
 
-    inner class JobViewHolder(private val binding: ItemJobBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class JobViewHolder(private val binding: ItemEntityJobBinding) : RecyclerView.ViewHolder(binding.root) {
         @SuppressLint("SetTextI18n")
         fun bind(job: Job) {
             with(binding) {
-                Glide.with(root.context)
-                    .load(companyLogoUrl)
-                    .placeholder(R.drawable.error_image)
-                    .error(R.drawable.error_image)
-                    .into(ivImgJob)
-
-                tvListJobs.visibility = View.VISIBLE
                 tvTitle.text = job.title
                 tvLocationJobType.text = "${job.location} - ${job.jobType?.let { formatJobType(it) }}"
                 tvSalary.text = job.salary
@@ -46,9 +36,6 @@ class JobEntityAdapter(
                     R.color.green_500 to R.color.green_200
                 }
 
-                layoutApply.visibility = View.GONE
-                layoutActions.visibility = View.GONE
-
                 tvStatus.setTextColor(ContextCompat.getColor(root.context, textColor))
                 tvStatus.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(root.context, bgColor))
             }
@@ -56,7 +43,7 @@ class JobEntityAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): JobViewHolder {
-        val binding = ItemJobBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ItemEntityJobBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return JobViewHolder(binding)
     }
 

@@ -198,7 +198,7 @@
             <EditText
                 android:id="@+id/edtDescription"
                 android:layout_width="370dp"
-                android:layout_height="110dp"
+                android:layout_height="150dp"
                 android:layout_marginTop="8dp"
                 android:background="@drawable/input_bg_rounded"
                 android:drawableStart="@drawable/icon_description"
@@ -219,7 +219,7 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
+                android:layout_marginTop="15dp"
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="25dp"
                 app:cardElevation="4dp"

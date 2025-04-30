@@ -1,6 +1,7 @@
 package com.example.jobhub.service
 
 import com.example.jobhub.dto.ApplicationDTO
+import com.example.jobhub.dto.NotificationDTO
 import com.example.jobhub.dto.ResumeDTO
 import com.example.jobhub.dto.StatusApplicantDTO
 import com.example.jobhub.model.ApiResponse

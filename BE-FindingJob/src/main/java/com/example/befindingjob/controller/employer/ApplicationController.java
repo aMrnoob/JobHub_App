@@ -1,6 +1,7 @@
 package com.example.befindingjob.controller.employer;
 
 import com.example.befindingjob.dto.ApplicationDTO;
+import com.example.befindingjob.dto.NotificationDTO;
 import com.example.befindingjob.dto.ResumeDTO;
 import com.example.befindingjob.dto.StatusApplicantDTO;
 import com.example.befindingjob.model.ApiResponse;

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_rounded_dialog">
+
+    <TextView
+        android:id="@+id/tvDialogTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="Notifications"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#E0E0E0"
+        app:layout_constraintTop_toBottomOf="@id/tvDialogTitle" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvNotifications"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:maxHeight="400dp"
+        android:padding="8dp"
+        app:layout_constraintHeight_max="400dp"
+        app:layout_constraintTop_toBottomOf="@id/divider" />
+
+    <TextView
+        android:id="@+id/tvEmptyNotifications"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="No new notifications"
+        android:textAlignment="center"
+        android:textColor="@android:color/darker_gray"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/divider" />
+
+    <View
+        android:id="@+id/bottomDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#E0E0E0"
+        app:layout_constraintTop_toBottomOf="@id/rvNotifications" />
+
+    <Button
+        android:id="@+id/btnViewAll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:text="View All"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/bottomDivider" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

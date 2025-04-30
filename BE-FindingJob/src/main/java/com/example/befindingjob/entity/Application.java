@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "applications")
@@ -48,4 +49,8 @@ public class Application {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime interviewDate;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "application", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notification> notifications;
 }

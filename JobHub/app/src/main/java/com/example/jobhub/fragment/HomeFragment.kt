@@ -2,32 +2,43 @@ package com.example.jobhub.fragment
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.app.Dialog
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
+import android.widget.Button
 import android.widget.SearchView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.jobhub.R
 import com.example.jobhub.activity.ApplyJobActivity
 import com.example.jobhub.activity.InforJobActivity
 import com.example.jobhub.activity.VacancyActivity
 import com.example.jobhub.adapter.JobAdapter
+import com.example.jobhub.adapter.NotificationAdapter
 import com.example.jobhub.anim.AnimationHelper
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.MainHomeBinding
 import com.example.jobhub.dto.ItemJobDTO
+import com.example.jobhub.dto.NotificationEntityDTO
 import com.example.jobhub.entity.enumm.JobAction
 import com.example.jobhub.entity.enumm.Role
 import com.example.jobhub.service.JobService
+import com.example.jobhub.service.NotificationService
+import com.google.gson.Gson
 
 class HomeFragment : Fragment() {
     private lateinit var jobAdapter: JobAdapter
@@ -36,11 +47,13 @@ class HomeFragment : Fragment() {
     private var _binding: MainHomeBinding? = null
     private var selectedTextView: TextView? = null
     private var allJobs: MutableList<ItemJobDTO> = mutableListOf()
+    private var listNotification: List<NotificationEntityDTO> = emptyList()
     private var jobList: MutableList<ItemJobDTO> = mutableListOf()
     private var isFragmentVisible = false
 
     private val binding get() = _binding!!
     private val jobService: JobService by lazy { RetrofitClient.createRetrofit().create(JobService::class.java) }
+    private val notificationService: NotificationService by lazy { RetrofitClient.createRetrofit().create(NotificationService::class.java) }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,6 +68,7 @@ class HomeFragment : Fragment() {
         getAllJobs()
         setupCategorySelection()
         setupSearchView()
+        fetchNotifications()
 
         val categoryMap = mapOf(
             binding.tvAllJob to "All Job",
@@ -70,6 +84,11 @@ class HomeFragment : Fragment() {
 
         categoryMap.forEach { (textView, category) ->
             textView.tag = category
+        }
+
+        binding.ivNotification.setOnClickListener {
+            AnimationHelper.animateScale(it)
+            showNotificationsDialog()
         }
 
         binding.tvViewMore.setOnClickListener {
@@ -131,7 +150,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
+    @SuppressLint("NotifyDataSetChanged", "SetTextI18n")
     private fun getAllJobs() {
         val token = sharedPrefs.authToken ?: return
 
@@ -161,7 +180,7 @@ class HomeFragment : Fragment() {
 
                 jobAdapter.notifyDataSetChanged()
             },
-            onError = { error ->
+            onError = {
                 binding.progressBar.visibility = View.GONE
                 binding.rvJob.visibility = View.VISIBLE
 
@@ -197,8 +216,7 @@ class HomeFragment : Fragment() {
 
     private fun setupAnimation() {
         listOf(
-            binding.ivNotification, binding.ivMenu,
-            binding.tvTips, binding.tvViewMore1, binding.tvViewMore
+            binding.ivMenu, binding.tvTips, binding.tvViewMore1, binding.tvViewMore
         ).forEach { it.setOnClickListener { AnimationHelper.animateScale(it) } }
     }
 
@@ -295,6 +313,19 @@ class HomeFragment : Fragment() {
         binding.rvJob.visibility = View.VISIBLE
     }
 
+    private fun fetchNotifications() {
+        val token = sharedPrefs.authToken ?: return
+
+        ApiHelper().callApi(
+            context = requireContext(),
+            call = notificationService.getAllNotifications("Bearer $token"),
+            onSuccess = {
+                response -> listNotification = (response ?: emptyList())
+                println("RAW JSON: ${Gson().toJson(response)}")
+            }
+        )
+    }
+
     private val categoryKeywords: Map<String, List<String>> = mapOf(
         "Software Development" to listOf("Developer", "Software", "Programmer", "Backend", "Frontend", "Full-stack", "C++", "Java", "Python"),
         "Data Science" to listOf("Data Scientist", "Data Analyst", "Big Data", "Data Visualization", "Data Modeling", "SQL", "Predictive Modeling", "Statistical Analysis", "Data Mining"),
@@ -325,4 +356,64 @@ class HomeFragment : Fragment() {
         isFragmentVisible = false
         refreshHandler.removeCallbacks(refreshRunnable)
     }
+
+    private fun showNotificationsDialog() {
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.dialog_notifications)
+
+        val window = dialog.window
+        window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        window?.setGravity(Gravity.TOP)
+
+        val recyclerView = dialog.findViewById<RecyclerView>(R.id.rvNotifications)
+        val emptyView = dialog.findViewById<TextView>(R.id.tvEmptyNotifications)
+        val btnViewAll = dialog.findViewById<Button>(R.id.btnViewAll)
+
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        if (listNotification.isEmpty()) {
+            recyclerView.visibility = View.GONE
+            emptyView.visibility = View.VISIBLE
+        } else {
+            recyclerView.visibility = View.VISIBLE
+            emptyView.visibility = View.GONE
+
+            val recentNotifications = listNotification.take(5)
+
+            val adapter = NotificationAdapter(recentNotifications, object : NotificationAdapter.OnItemClickListener {
+                override fun onItemClick(notificationEntityDTO: NotificationEntityDTO) {
+                    //markNotificationAsRead(notification.id)
+                    dialog.dismiss()
+                }
+            })
+            recyclerView.adapter = adapter
+        }
+
+        btnViewAll.setOnClickListener {
+            //startActivity(Intent(requireContext(), NotificationsActivity::class.java))
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+    /*private fun markNotificationAsRead(notificationId: Long?) {
+        notificationId?.let {
+            val token = sharedPrefs.authToken ?: return
+
+            ApiHelper().callApi(
+                context = requireContext(),
+                call = notificationService.markAsRead("Bearer $token", it),
+                onSuccess = {
+                    val notification = listNotification.find { n -> n.id == notificationId }
+                    notification?.isRead = true
+                }
+            )
+        }
+    }*/
 }
