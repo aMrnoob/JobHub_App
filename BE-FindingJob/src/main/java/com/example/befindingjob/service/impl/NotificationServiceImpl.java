@@ -1,9 +1,6 @@
 package com.example.befindingjob.service.impl;
 
-import com.example.befindingjob.dto.ApplicationDTO;
-import com.example.befindingjob.dto.NotificationDTO;
-import com.example.befindingjob.dto.NotificationEntityDTO;
-import com.example.befindingjob.dto.UserDTO;
+import com.example.befindingjob.dto.*;
 import com.example.befindingjob.entity.Application;
 import com.example.befindingjob.entity.Company;
 import com.example.befindingjob.entity.Notification;
@@ -43,20 +40,34 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public ApiResponse<Void> createNotification(NotificationDTO notificationDTO) {
         try {
-            User sender = userRepository.findById(notificationDTO.getSenderId())
-                    .orElseThrow(() -> new RuntimeException("Sender not found"));
-
-            Company company = companyRepository.findById(notificationDTO.getCompanyId())
-                    .orElseThrow(() -> new RuntimeException("Company not found"));
-
-            User receiver = company.getUser();
+            Notification notification = new Notification();
 
             Application application = applicationRepository.findById(notificationDTO.getApplicationId())
                     .orElseThrow(() -> new RuntimeException("Application not found"));
 
-            Notification notification = new Notification();
+            User sender;
+            User receiver;
+
+            if(notificationDTO.getReceiverId() == 0) {
+                sender = userRepository.findById(notificationDTO.getSenderId())
+                        .orElseThrow(() -> new RuntimeException("Sender not found"));
+
+                Company company = companyRepository.findById(notificationDTO.getCompanyId())
+                        .orElseThrow(() -> new RuntimeException("Company not found"));
+
+                receiver = company.getUser();
+            } else {
+                sender = userRepository.findById(notificationDTO.getSenderId())
+                        .orElseThrow(() -> new RuntimeException("Sender not found"));
+
+                receiver = userRepository.findById(notificationDTO.getReceiverId())
+                        .orElseThrow(() -> new RuntimeException("Sender not found"));
+
+            }
+
             notification.setSender(sender);
             notification.setReceiver(receiver);
+            notification.setRead(false);
             notification.setApplication(application);
             notification.setContent(notificationDTO.getContent());
             notification.setCreatedAt(LocalDateTime.now());
@@ -92,6 +103,37 @@ public class NotificationServiceImpl implements NotificationService {
         } catch (Exception e) {
             e.printStackTrace();
             return new ApiResponse<>(false, "", null);
+        }
+    }
+
+    @Override
+    public ApiResponse<Void> markAsRead(MarkAsReadDTO markAsReadDTO) {
+        try {
+            if (markAsReadDTO == null) {
+                return new ApiResponse<>(false, "Request data cannot be null", null);
+            }
+
+            String token = markAsReadDTO.getToken();
+            Long notificationId = markAsReadDTO.getNotificationId();
+
+            if (notificationId == null) {
+                return new ApiResponse<>(false, "", null);
+            }
+
+            if (!jwtService.isValidToken(token)) {
+                return new ApiResponse<>(false, "", null);
+            }
+
+            Notification notification = notificationRepository.findById(notificationId)
+                    .orElseThrow(() -> new RuntimeException("Notification not found"));
+
+            notification.setRead(true);
+            notificationRepository.save(notification);
+
+            return new ApiResponse<>(true, "", null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ApiResponse<>(false, "Error: " + e.getMessage(), null);
         }
     }
 

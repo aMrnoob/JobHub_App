@@ -26,9 +26,7 @@ class ApplyFragment: Fragment() {
     private var applications = mutableListOf<ApplicationDTO>()
     private lateinit var sharedPrefs: SharedPrefsManager
 
-    private val applicationService by lazy {
-        RetrofitClient.createRetrofit().create(ApplicationService::class.java)
-    }
+    private val applicationService by lazy { RetrofitClient.createRetrofit().create(ApplicationService::class.java) }
 
     private val resumeService by lazy {
         RetrofitClient.createRetrofit().create(ResumeService::class.java)

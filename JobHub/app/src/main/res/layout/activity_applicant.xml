@@ -9,7 +9,7 @@
         android:id="@+id/cvAppBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="50dp"
         app:cardElevation="4dp"
         app:cardBackgroundColor="#FFFFFF"
         app:layout_constraintTop_toTopOf="parent"
@@ -166,11 +166,11 @@
                         android:background="@color/gray_300" />
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnDownloadCV"
+                        android:id="@+id/btnReviewCV"
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
                         android:backgroundTint="@color/blue_600"
-                        android:text="Download CV"
+                        android:text="Review CV"
                         android:textAllCaps="false"
                         android:textColor="@color/white"
                         android:textSize="16sp"

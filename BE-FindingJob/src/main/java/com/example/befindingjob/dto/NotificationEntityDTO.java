@@ -10,7 +10,7 @@ import lombok.*;
 public class NotificationEntityDTO {
     private Long id;
     private String content;
-    private boolean isRead;
+    private boolean read;
     private String createdAt;
     private UserDTO receiver;
     private UserDTO sender;

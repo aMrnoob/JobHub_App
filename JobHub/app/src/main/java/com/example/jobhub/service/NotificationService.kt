@@ -1,5 +1,6 @@
 package com.example.jobhub.service
 
+import com.example.jobhub.dto.MarkAsReadDTO
 import com.example.jobhub.dto.NotificationDTO
 import com.example.jobhub.dto.NotificationEntityDTO
 import com.example.jobhub.entity.Notification
@@ -19,4 +20,7 @@ interface NotificationService {
     fun getAllNotifications(
         @Header("token") token: String
     ): Call<ApiResponse<List<NotificationEntityDTO>>>
+
+    @POST("api/notifications/mark-as-read")
+    fun markAsRead(@Body markAsReadDTO: MarkAsReadDTO): Call<ApiResponse<Void>>
 }

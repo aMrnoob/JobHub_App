@@ -9,6 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 public class NotificationDTO {
     private int senderId;
+    private int receiverId;
     private int companyId;
     private int applicationId;
     private String content;
