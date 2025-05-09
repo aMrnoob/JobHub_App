@@ -200,6 +200,18 @@
             app:iconTint="@color/black" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/tvListResume"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:visibility="gone"
+        android:text="List Applicants"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvResumes"
         android:layout_width="match_parent"

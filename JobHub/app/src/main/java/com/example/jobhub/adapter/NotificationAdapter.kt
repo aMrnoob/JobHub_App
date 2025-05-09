@@ -10,17 +10,12 @@ import com.example.jobhub.dto.NotificationEntityDTO
 
 class NotificationAdapter(
     private val notifications: List<NotificationEntityDTO>,
-    private val onItemClickListener: OnItemClickListener? = null
+    private val listener: OnNotificationListener
 ) : RecyclerView.Adapter<NotificationAdapter.ViewHolder>() {
 
-    interface OnItemClickListener { fun onItemClick(notificationEntityDTO: NotificationEntityDTO) }
-
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val tvSenderName: TextView = itemView.findViewById(R.id.tvSenderName)
-        val tvDate: TextView = itemView.findViewById(R.id.tvDate)
-        val tvContent: TextView = itemView.findViewById(R.id.tvContent)
-        val tvUnread: TextView = itemView.findViewById(R.id.tvUnread)
-        val tvAction: TextView = itemView.findViewById(R.id.tvAction)
+    interface OnNotificationListener {
+        fun onItemClick(notification: NotificationEntityDTO)
+        fun onViewDetailClick(notification: NotificationEntityDTO)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -32,22 +27,35 @@ class NotificationAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val notification = notifications[position]
         holder.tvSenderName.text = notification.receiver?.fullName ?: "System"
-        holder.tvDate.text = notification.createdAt
+        val rawDate = notification.createdAt
+        val formattedDate = rawDate?.replace("T", " ")?.dropLast(7)
+        holder.tvDate.text = formattedDate
         holder.tvContent.text = notification.content
-        if (!notification.isRead) {
+
+        if (!notification.read) {
             holder.tvUnread.visibility = View.VISIBLE
         } else {
             holder.tvUnread.visibility = View.GONE
         }
 
         holder.tvAction.setOnClickListener {
-            onItemClickListener?.onItemClick(notification)
+            notification.read = true
+            listener.onViewDetailClick(notification)
         }
 
         holder.itemView.setOnClickListener {
-            onItemClickListener?.onItemClick(notification)
+            notification.read = true
+            listener.onItemClick(notification)
         }
     }
 
     override fun getItemCount(): Int = notifications.size
+
+    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val tvSenderName: TextView = itemView.findViewById(R.id.tvSenderName)
+        val tvDate: TextView = itemView.findViewById(R.id.tvDate)
+        val tvContent: TextView = itemView.findViewById(R.id.tvContent)
+        val tvUnread: TextView = itemView.findViewById(R.id.tvUnread)
+        val tvAction: TextView = itemView.findViewById(R.id.tvAction)
+    }
 }

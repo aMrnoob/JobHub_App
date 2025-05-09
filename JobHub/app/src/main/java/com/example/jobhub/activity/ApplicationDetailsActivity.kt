@@ -35,7 +35,6 @@ class ApplicationDetailsActivity : BaseActivity() {
         setContentView(binding.root)
 
         sharedPrefs = SharedPrefsManager(this)
-
         applicationId = intent.getIntExtra("applicationId", 0)
 
         if (applicationId == 0) {

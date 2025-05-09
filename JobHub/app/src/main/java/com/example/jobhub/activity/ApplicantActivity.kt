@@ -9,16 +9,22 @@ import android.util.Base64
 import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.ListView
+import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import com.example.jobhub.R
 import com.example.jobhub.config.ApiHelper
 import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.ActivityApplicantBinding
 import com.example.jobhub.dto.ApplicationDTO
+import com.example.jobhub.dto.NotificationDTO
 import com.example.jobhub.dto.StatusApplicantDTO
 import com.example.jobhub.entity.enumm.ApplicationStatus
 import com.example.jobhub.service.ApplicationService
+import com.example.jobhub.service.NotificationService
+import com.example.jobhub.utils.ResumeViewerUtils
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
@@ -32,6 +38,7 @@ class ApplicantActivity : BaseActivity() {
     private var applicationDTO: ApplicationDTO? = null
 
     private val applicationService: ApplicationService by lazy { RetrofitClient.createRetrofit().create(ApplicationService::class.java) }
+    private val notificationService by lazy { RetrofitClient.createRetrofit().create(NotificationService::class.java) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +72,8 @@ class ApplicantActivity : BaseActivity() {
 
             updateStatusApplicant()
         }
+
+        binding.btnReviewCV.setOnClickListener { applicationDTO?.let { it1 -> openResume(it1.resumeUrl) } }
     }
 
     private fun showApplication() {
@@ -90,7 +99,18 @@ class ApplicantActivity : BaseActivity() {
 
     @SuppressLint("InflateParams")
     private fun setUpSpinner() {
-        val statusList = listOf("Schedule to Interview", "Accept Application", "Reject Application")
+        val statusList = when (applicationDTO?.status) {
+            ApplicationStatus.INTERVIEW -> { listOf("Accept Application", "Reject Application") }
+            ApplicationStatus.ACCEPTED, ApplicationStatus.REJECTED -> { listOf() }
+            else -> { listOf("Schedule to Interview", "Accept Application", "Reject Application") }
+        }
+
+        if (statusList.isEmpty()) {
+            binding.tvSelectedStatus.isEnabled = false
+            binding.btnSendMessage.isEnabled = false
+            return
+        }
+
         val dialogView = layoutInflater.inflate(R.layout.dialog_select_status, null)
         val listView = dialogView.findViewById<ListView>(R.id.listStatus)
         val dialog = BottomSheetDialog(this)
@@ -114,56 +134,63 @@ class ApplicantActivity : BaseActivity() {
     private fun setUpInterviewDate() {
         val status = applicationDTO?.status
 
-        if (status != ApplicationStatus.APPLIED) {
-            binding.edtDate.isEnabled = true
-            binding.edtHour.isEnabled = false
-            return
-        }
+        binding.edtDate.isEnabled = false
+        binding.edtHour.isEnabled = false
 
-        val updateInterviewDate = {
-            val dateStr = binding.edtDate.text.toString()
-            val timeStr = binding.edtHour.text.toString()
-            if (dateStr.isNotEmpty() && timeStr.isNotEmpty()) {
-                val interviewDate = getInterviewDateTime(dateStr, timeStr)
-                if (interviewDate != null) {
-                    applicationDTO?.interviewDate = interviewDate
+        if (status == ApplicationStatus.APPLIED || status == null) {
+            val updateInterviewDate = {
+                val dateStr = binding.edtDate.text.toString()
+                val timeStr = binding.edtHour.text.toString()
+                if (dateStr.isNotEmpty() && timeStr.isNotEmpty()) {
+                    val interviewDate = getInterviewDateTime(dateStr, timeStr)
+                    if (interviewDate != null) {
+                        applicationDTO?.interviewDate = interviewDate
+                        statusApplicantDTO.interviewDate = interviewDate
+                    }
                 }
             }
-        }
 
-        binding.edtDate.setOnClickListener {
-            val calendar = Calendar.getInstance()
-            val datePicker = DatePickerDialog(
-                this,
-                { _, year, month, dayOfMonth ->
-                    val selectedDate = "%02d/%02d/%04d".format(dayOfMonth, month + 1, year)
-                    binding.edtDate.setText(selectedDate)
-                    updateInterviewDate()
-                },
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH)
-            )
-            datePicker.show()
-        }
+            binding.edtDate.setOnClickListener {
+                val calendar = Calendar.getInstance()
+                val datePicker = DatePickerDialog(
+                    this,
+                    { _, year, month, dayOfMonth ->
+                        val selectedDate = "%02d/%02d/%04d".format(dayOfMonth, month + 1, year)
+                        binding.edtDate.setText(selectedDate)
+                        updateInterviewDate()
+                    },
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH)
+                )
+                datePicker.show()
+            }
 
-        binding.edtHour.setOnClickListener {
-            val calendar = Calendar.getInstance()
-            val timePicker = TimePickerDialog(
-                this,
-                { _, hourOfDay, minute ->
-                    val selectedTime = "%02d:%02d".format(hourOfDay, minute)
-                    binding.edtHour.setText(selectedTime)
-                    updateInterviewDate()
-                },
-                calendar.get(Calendar.HOUR_OF_DAY),
-                calendar.get(Calendar.MINUTE),
-                true
-            )
-            timePicker.show()
+            binding.edtHour.setOnClickListener {
+                val calendar = Calendar.getInstance()
+                val timePicker = TimePickerDialog(
+                    this,
+                    { _, hourOfDay, minute ->
+                        val selectedTime = "%02d:%02d".format(hourOfDay, minute)
+                        binding.edtHour.setText(selectedTime)
+                        updateInterviewDate()
+                    },
+                    calendar.get(Calendar.HOUR_OF_DAY),
+                    calendar.get(Calendar.MINUTE),
+                    true
+                )
+                timePicker.show()
+            }
+        } else if ((status == ApplicationStatus.INTERVIEW || status == ApplicationStatus.ACCEPTED ||
+                    status == ApplicationStatus.REJECTED) && applicationDTO?.interviewDate != null) {
+            val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+            val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+
+            binding.edtMessage.isEnabled = false
+            binding.edtDate.setText(applicationDTO?.interviewDate?.format(formatter))
+            binding.edtHour.setText(applicationDTO?.interviewDate?.format(timeFormatter))
         }
     }
-
 
     private fun getInterviewDateTime(dateStr: String, timeStr: String): LocalDateTime? {
         return try {
@@ -198,7 +225,71 @@ class ApplicantActivity : BaseActivity() {
         ApiHelper().callApi(
             context = this,
             call = applicationService.updateStatusApplication("Bearer $token", statusApplicantDTO),
+            onSuccess = {
+                createNotificationForCandidate()
+                finish()
+            }
+        )
+    }
+
+    private fun createNotificationForCandidate() {
+        val appId = applicationDTO?.applicationId ?: return
+        val companyId = applicationDTO?.jobDTO?.company?.companyId ?: return
+        val userId = applicationDTO?.userDTO?.userId ?: return
+        val receiverId = applicationDTO?.userDTO?.userId ?: return
+        val status = statusApplicantDTO.status
+        val message = binding.edtMessage.text.toString().trim()
+
+        val notificationContent = when (status) {
+            ApplicationStatus.INTERVIEW -> {
+                val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+                val dateStr = statusApplicantDTO.interviewDate?.format(dateFormatter) ?: "chưa xác định"
+                "Bạn đã được mời phỏng vấn cho vị trí ${applicationDTO?.jobDTO?.title} vào lúc $dateStr."
+            }
+            ApplicationStatus.ACCEPTED -> "Chúc mừng! Đơn ứng tuyển cho vị trí ${applicationDTO?.jobDTO?.title} đã được chấp nhận."
+            ApplicationStatus.REJECTED -> "Đơn ứng tuyển cho vị trí ${applicationDTO?.jobDTO?.title} đã bị từ chối."
+            else -> "Có cập nhật mới cho đơn ứng tuyển vị trí ${applicationDTO?.jobDTO?.title}."
+        }
+
+        val finalContent = if (message.isNotEmpty()) {
+            "$notificationContent\nGhi chú: $message"
+        } else {
+            notificationContent
+        }
+
+        val notificationDTO = NotificationDTO(
+            senderId = userId,
+            receiverId = receiverId,
+            companyId = companyId,
+            applicationId = appId,
+            content = finalContent
+        )
+
+        ApiHelper().callApi(
+            context = this,
+            call = notificationService.createNotification(notificationDTO),
             onSuccess = { finish() }
         )
+    }
+
+    private fun openResume(url: String) {
+        val fullUrl = if (url.startsWith("./") || url.startsWith("../")) {
+            val baseUrl = RetrofitClient.getBaseUrl()
+            val relativePath = url.replaceFirst("./", "")
+            "$baseUrl$relativePath"
+        } else if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            val baseUrl = RetrofitClient.getBaseUrl()
+            "$baseUrl$url"
+        } else {
+            url
+        }
+
+        lifecycleScope.launch {
+            try {
+                ResumeViewerUtils.downloadAndOpenResume(this@ApplicantActivity, fullUrl)
+            } catch (e: Exception) {
+                Toast.makeText(this@ApplicantActivity, "Không thể mở CV: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }

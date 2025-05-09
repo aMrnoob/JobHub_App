@@ -1,12 +1,10 @@
 package com.example.jobhub.adapter
 
 import android.annotation.SuppressLint
-import android.app.DownloadManager
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
-import android.net.Uri
-import android.os.Environment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.jobhub.R
 import com.example.jobhub.activity.ApplicantActivity
+import com.example.jobhub.config.RetrofitClient
 import com.example.jobhub.config.SharedPrefsManager
 import com.example.jobhub.databinding.ItemJobBinding
 import com.example.jobhub.dto.ItemJobDTO
@@ -24,6 +23,10 @@ import com.example.jobhub.entity.enumm.ApplicationAction
 import com.example.jobhub.entity.enumm.JobAction
 import com.example.jobhub.entity.enumm.JobType
 import com.example.jobhub.entity.enumm.Role
+import com.example.jobhub.utils.ResumeViewerUtils
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -31,6 +34,8 @@ class JobAdapter(
     private val jobList: List<ItemJobDTO>,
     private val onActionClick: ((ItemJobDTO, JobAction) -> Unit)? = null
 ) : RecyclerView.Adapter<JobAdapter.JobViewHolder>() {
+
+    private var expandedPosition = RecyclerView.NO_POSITION
 
     inner class JobViewHolder(private val binding: ItemJobBinding) : RecyclerView.ViewHolder(binding.root) {
         @SuppressLint("SetTextI18n")
@@ -74,7 +79,9 @@ class JobAdapter(
                     }
                 }
 
-                rvResumes.visibility = if (itemJobDTO.isExpanded) View.VISIBLE else View.GONE
+                val isExpanded = position == expandedPosition
+                rvResumes.visibility = if (isExpanded) View.VISIBLE else View.GONE
+                tvListResume.visibility = if (isExpanded && getUserRole(root.context) == Role.EMPLOYER) View.VISIBLE else View.GONE
 
                 rvResumes.apply {
                     layoutManager = LinearLayoutManager(root.context)
@@ -85,21 +92,30 @@ class JobAdapter(
                                 ApplicationAction.DOWNLOAD_CV -> {
                                     val resumeUrl = application.resumeUrl
                                     if (resumeUrl.isNotEmpty()) {
-                                        val fullUrl = "https://yourdomain.com$resumeUrl"
-                                        val fileName = "cv_${application.userDTO.fullName}.pdf"
-                                        downloadFile(context, fullUrl, fileName)
+                                        openResume(root.context, resumeUrl)
                                     }
                                 }
                                 ApplicationAction.SEE_RESUME -> {
                                     SharedPrefsManager(context).saveCurrentApplication(application)
-                                    context.startActivity(Intent(context, ApplicantActivity::class.java))
+                                    context.startActivity(Intent(binding.root.context, ApplicantActivity::class.java))
                                 }
                             }
                         }
                     )
                 }
 
-                root.setOnClickListener { handleAction(itemJobDTO, JobAction.CLICK) }
+                root.setOnClickListener {
+                    val previousExpandedPosition = expandedPosition
+                    expandedPosition = if (isExpanded) {
+                        RecyclerView.NO_POSITION
+                    } else {
+                        position
+                    }
+                    notifyItemChanged(previousExpandedPosition)
+                    notifyItemChanged(expandedPosition)
+
+                    handleAction(itemJobDTO, JobAction.CLICK)
+                }
                 btnBookmark.setOnClickListener { handleAction(itemJobDTO, JobAction.BOOKMARK) }
                 btnApply.setOnClickListener { handleAction(itemJobDTO, JobAction.APPLY) }
                 btnEdit.setOnClickListener { handleAction(itemJobDTO, JobAction.EDIT) }
@@ -131,23 +147,24 @@ class JobAdapter(
         return sharedPrefs.role
     }
 
-    private fun downloadFile(context: Context, url: String, fileName: String) {
-        try {
-            val request = DownloadManager.Request(Uri.parse(url)).apply {
-                setTitle("Đang tải xuống $fileName")
-                setDescription("CV đang được lưu vào thư mục Tải xuống")
-                setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-                setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
-                setAllowedOverMetered(true)
-                setAllowedOverRoaming(true)
+    private fun openResume(viewContext: Context, url: String) {
+        val fullUrl = if (url.startsWith("./") || url.startsWith("../")) {
+            val baseUrl = RetrofitClient.getBaseUrl()
+            val relativePath = url.replaceFirst("./", "")
+            "$baseUrl$relativePath"
+        } else if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            val baseUrl = RetrofitClient.getBaseUrl()
+            "$baseUrl$url"
+        } else {
+            url
+        }
+
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                ResumeViewerUtils.downloadAndOpenResume(viewContext, fullUrl)
+            } catch (e: Exception) {
+                Toast.makeText(viewContext, "Không thể mở CV: ${e.message}", Toast.LENGTH_SHORT).show()
             }
-
-            val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-            downloadManager.enqueue(request)
-            Toast.makeText(context, "Đang tải xuống CV...", Toast.LENGTH_SHORT).show()
-
-        } catch (e: Exception) {
-            Toast.makeText(context, "Tải xuống thất bại: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
 }

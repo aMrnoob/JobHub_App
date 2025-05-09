@@ -1,10 +1,10 @@
 package com.example.jobhub.activity
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -109,6 +109,7 @@ class ApplyJobActivity : BaseActivity() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun setupUI() {
         binding.ivBack.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
@@ -149,7 +150,7 @@ class ApplyJobActivity : BaseActivity() {
                     uploadResumeAndSubmit()
                 }
             },
-            onError = { error ->
+            onError = {
                 uploadResumeAndSubmit()
             }
         )
@@ -179,7 +180,7 @@ class ApplyJobActivity : BaseActivity() {
                 val file = File(cacheDir, "resume.pdf")
                 contentResolver.openInputStream(uri)?.use { input ->
                     FileOutputStream(file).use { output ->
-                        val bytesCopied = input.copyTo(output)
+                        input.copyTo(output)
                     }
                 }
 
@@ -235,7 +236,7 @@ class ApplyJobActivity : BaseActivity() {
             context = this,
             call = jobApplicationService.applyForJob("Bearer $token", applicationDTO),
             onSuccess = { submittedApp ->
-                if (submittedApp != null && submittedApp.applicationId != null) {
+                if (submittedApp?.applicationId != null) {
                     createResumeEntry(token, submittedApp.applicationId, resumeUrl)
                 } else {
                     showToast("Nộp đơn thành công nhưng thiếu ID ứng dụng.")
@@ -311,6 +312,7 @@ class ApplyJobActivity : BaseActivity() {
     private fun createNotification(applicationId: Int) {
         val notificationDTO = NotificationDTO(
             senderId = currentUser?.userId ?: 0,
+            receiverId = 0,
             companyId = currentJob?.company?.companyId ?: 0,
             applicationId = applicationId,
             content = "${currentUser?.fullName} applied this job: ${currentJob?.title}"

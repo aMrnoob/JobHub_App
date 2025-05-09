@@ -1,5 +1,6 @@
 package com.example.befindingjob.controller.admin;
 
+import com.example.befindingjob.dto.MarkAsReadDTO;
 import com.example.befindingjob.dto.NotificationDTO;
 import com.example.befindingjob.dto.NotificationEntityDTO;
 import com.example.befindingjob.entity.Notification;
@@ -26,5 +27,10 @@ public class NotificationController {
     public ApiResponse<List<NotificationEntityDTO>> getAllNotications(
             @RequestHeader("token") String token) {
         return notificationService.getNotification(token);
+    }
+
+    @PostMapping("/mark-as-read")
+    public ApiResponse<Void> markAsRead(@RequestBody MarkAsReadDTO markAsReadDTO) {
+        return notificationService.markAsRead(markAsReadDTO);
     }
 }
