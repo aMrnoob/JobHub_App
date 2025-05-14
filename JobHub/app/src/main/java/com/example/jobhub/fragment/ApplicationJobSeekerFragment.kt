@@ -1,5 +1,4 @@
 package com.example.jobhub.fragment
-
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -33,12 +32,9 @@ import com.example.jobhub.entity.enumm.JobType
 import com.example.jobhub.service.BookmarkService
 import com.example.jobhub.service.JobService
 import com.google.gson.Gson
-
 class ApplicationJobSeekerFragment : Fragment() {
-
     private lateinit var sharedPrefs: SharedPrefsManager
     private lateinit var jobAdapter: JobAdapter
-
     private var userDTO: UserDTO? = null
     private var _binding: MainApplicationJobSeekerBinding? = null
     private var selectedExpertise: List<String>? = null
@@ -48,46 +44,41 @@ class ApplicationJobSeekerFragment : Fragment() {
     private var isFragmentVisible = false
     private var currentIndex = 0
     private var complete = false
+    private var isFragmentActive = true
 
     private val binding get() = _binding!!
     private val jobService: JobService by lazy { RetrofitClient.createRetrofit().create(JobService::class.java) }
     private val bookmarkService: BookmarkService by lazy { RetrofitClient.createRetrofit().create(BookmarkService::class.java) }
     private val originalJobs: MutableList<ItemJobDTO> = mutableListOf()
     private val filteredJobs: MutableList<ItemJobDTO> = mutableListOf()
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = MainApplicationJobSeekerBinding.inflate(inflater, container, false)
+        isFragmentActive = true
         return binding.root
     }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         sharedPrefs = SharedPrefsManager(requireContext())
         refreshHandler.post(refreshRunnable)
-
         binding.ivMenu.setOnClickListener { showFilterLayout() }
         binding.root.isFocusableInTouchMode = true
         binding.root.requestFocus()
         binding.btnBookmark.setOnClickListener { startActivity(Intent(requireContext(), BookmarkActivity::class.java)) }
-
         loadUserFromPrefs()
         setupRecyclerView()
         loadAppliedJobs()
         setupSearchView()
     }
-
     private fun loadUserFromPrefs() {
         val json = activity?.getSharedPreferences("JobHubPrefs", Context.MODE_PRIVATE)
             ?.getString("currentUser", null)
-
         if (!json.isNullOrEmpty()) {
             userDTO = Gson().fromJson(json, UserDTO::class.java)
         }
     }
-
     private fun setupRecyclerView() {
         jobAdapter = JobAdapter(
             filteredJobs,
@@ -97,13 +88,11 @@ class ApplicationJobSeekerFragment : Fragment() {
                         sharedPrefs.saveCurrentJob(selectedJob)
                         startActivity(Intent(requireContext(), InforJobActivity::class.java))
                     }
-
                     JobAction.BOOKMARK -> {
                         val userId = sharedPrefs.userId
                         val jobId = selectedJob.jobId
                         bookMark(BookmarkRequest(userId, jobId))
                     }
-
                     JobAction.APPLY -> {
                         sharedPrefs.saveCurrentJob(selectedJob)
                         startActivity(Intent(requireContext(), ApplyJobActivity::class.java))
@@ -111,12 +100,10 @@ class ApplicationJobSeekerFragment : Fragment() {
                 }
             }
         )
-
         binding.rvApplications.apply {
             adapter = jobAdapter
             layoutManager = LinearLayoutManager(requireContext())
         }
-
         binding.rvApplications.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -127,28 +114,30 @@ class ApplicationJobSeekerFragment : Fragment() {
             }
         })
     }
-
     @SuppressLint("NotifyDataSetChanged")
     private fun loadAppliedJobs() {
-        val token = sharedPrefs.authToken ?: return
+        if (!isFragmentActive) return
 
+        val token = sharedPrefs.authToken ?: return
         ApiHelper().callApi(
             context = requireContext(),
             call = jobService.getAllJobsByUser("Bearer $token"),
             onSuccess = { response ->
+                if (!isFragmentActive) return@callApi
+
                 originalJobs.clear()
                 response?.let { originalJobs.addAll(it) }
-
                 if(!complete) { loadMoreJobs() }
-                if (binding.searchView.query.isNullOrEmpty() && complete) {
+                if (_binding != null && binding.searchView.query.isNullOrEmpty() && complete) {
                     filteredJobs.clear()
                     filteredJobs.addAll(originalJobs)
                 }
             },
         )
     }
-
     private fun loadMoreJobs() {
+        if (!isFragmentActive || _binding == null) return
+
         if (currentIndex >= originalJobs.size) {
             complete = true
             return
@@ -156,44 +145,45 @@ class ApplicationJobSeekerFragment : Fragment() {
         Log.e("currentIndex", currentIndex.toString())
         binding.progressBar.visibility = View.VISIBLE
         Handler(Looper.getMainLooper()).postDelayed({
+            if (!isFragmentActive || _binding == null) {
+                return@postDelayed
+            }
+
             val nextIndex = minOf(currentIndex + 2, originalJobs.size)
             val newJobs = originalJobs.subList(currentIndex, nextIndex)
             val existingIds = filteredJobs.map { it.jobId }.toSet()
-
             val jobsToAdd = newJobs.filter { it.jobId !in existingIds }
-
             filteredJobs.addAll(jobsToAdd)
             jobAdapter.notifyItemRangeInserted(filteredJobs.size - jobsToAdd.size, jobsToAdd.size)
-
             currentIndex = nextIndex
             binding.progressBar.visibility = View.GONE
         }, 1000)
     }
-
     @SuppressLint("NotifyDataSetChanged")
     private fun bookMark(bookmarkRequest: BookmarkRequest) {
+        if (!isFragmentActive) return
+
         ApiHelper().callApi(
             context = requireContext(),
             call = bookmarkService.bookMark(bookmarkRequest),
             onSuccess = { }
         )
     }
-
     private fun setupSearchView() {
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
             }
-
             override fun onQueryTextChange(newText: String?): Boolean {
                 filterJobs(newText.orEmpty())
                 return true
             }
         })
     }
-
     @SuppressLint("NotifyDataSetChanged")
     private fun filterJobs(query: String) {
+        if (!isFragmentActive || _binding == null) return
+
         if (query.isEmpty()) {
             filteredJobs.clear()
             filteredJobs.addAll(originalJobs)
@@ -201,20 +191,18 @@ class ApplicationJobSeekerFragment : Fragment() {
             binding.tvNoResults.visibility = View.GONE
             return
         }
-
         val filteredList = originalJobs.filter { job ->
             job.title.contains(query, ignoreCase = true) || job.location.contains(query, ignoreCase = true)
         }.toMutableList()
-
         filteredJobs.clear()
         filteredJobs.addAll(filteredList)
         jobAdapter.notifyDataSetChanged()
-
         binding.tvNoResults.visibility = if (filteredList.isEmpty()) View.VISIBLE else View.GONE
     }
-
     @SuppressLint("NotifyDataSetChanged", "InflateParams")
     private fun showFilterLayout() {
+        if (!isFragmentActive || _binding == null) return
+
         val container = binding.root as ViewGroup
         val newView = layoutInflater.inflate(R.layout.dialog_menu_job, null)
         newView.layoutParams = ViewGroup.LayoutParams(
@@ -222,7 +210,6 @@ class ApplicationJobSeekerFragment : Fragment() {
             ViewGroup.LayoutParams.MATCH_PARENT
         )
         container.addView(newView)
-
         val btnApply = newView.findViewById<Button>(R.id.btnApply)
         btnApply.setOnClickListener {
             filteredJobs.clear()
@@ -235,26 +222,22 @@ class ApplicationJobSeekerFragment : Fragment() {
             selectedLocation = null
             binding.tvNoResults.visibility = if (filteredJobs.isEmpty()) View.VISIBLE else View.GONE
         }
-
         val tvSoftwareDev = newView.findViewById<TextView>(R.id.tvSoftwareDev)
         val tvDataScience = newView.findViewById<TextView>(R.id.tvDataScience)
         val tvMachineLearning = newView.findViewById<TextView>(R.id.tvMachineLearning)
         val tvWebDevelopment = newView.findViewById<TextView>(R.id.tvWebDevelopment)
         val tvCybersecurity = newView.findViewById<TextView>(R.id.tvCybersecurity)
         val expertiseViews = listOf(tvSoftwareDev, tvDataScience, tvMachineLearning, tvWebDevelopment, tvCybersecurity)
-
         val tvFullTime = newView.findViewById<TextView>(R.id.tvFullTime)
         val tvPartTime = newView.findViewById<TextView>(R.id.tvPartTime)
         val tvInternship = newView.findViewById<TextView>(R.id.tvInternship)
         val tvContract = newView.findViewById<TextView>(R.id.tvContract)
         val jobTypeViews = listOf(tvFullTime, tvPartTime, tvInternship, tvContract)
-
         val tvSalary1 = newView.findViewById<TextView>(R.id.tvSalary1)
         val tvSalary2 = newView.findViewById<TextView>(R.id.tvSalary2)
         val tvSalary3 = newView.findViewById<TextView>(R.id.tvSalary3)
         val tvSalary4 = newView.findViewById<TextView>(R.id.tvSalary4)
         val salaryViews = listOf(tvSalary1, tvSalary2, tvSalary3, tvSalary4)
-
         val tvLocation1 = newView.findViewById<TextView>(R.id.tvLocation1)
         val tvLocation2 = newView.findViewById<TextView>(R.id.tvLocation2)
         val tvLocation3 = newView.findViewById<TextView>(R.id.tvLocation3)
@@ -263,12 +246,10 @@ class ApplicationJobSeekerFragment : Fragment() {
         val tvLocation6 = newView.findViewById<TextView>(R.id.tvLocation6)
         val tvLocation7 = newView.findViewById<TextView>(R.id.tvLocation7)
         val locationViews = listOf(tvLocation1, tvLocation2, tvLocation3, tvLocation4, tvLocation5, tvLocation6, tvLocation7)
-
         fun highlightSelected(view: TextView, group: List<TextView>) {
             group.forEach { it.isSelected = false }
             view.isSelected = true
         }
-
         val expertiseMap = mapOf(
             tvSoftwareDev to listOf("Developer", "Software Engineer", "Programmer", "Backend Developer", "Frontend Developer", "Full-stack Developer", "C++ Developer", "Java Developer", "Python Developer"),
             tvDataScience to listOf("Data Scientist", "Data Analyst", "Big Data", "Data Visualization", "Data Modeling", "SQL", "Predictive Modeling", "Statistical Analysis", "Data Mining"),
@@ -282,7 +263,6 @@ class ApplicationJobSeekerFragment : Fragment() {
                 selectedExpertise = keywords
             }
         }
-
         val jobTypeMap = mapOf(
             tvFullTime to JobType.FULL_TIME,
             tvPartTime to JobType.PART_TIME,
@@ -295,7 +275,6 @@ class ApplicationJobSeekerFragment : Fragment() {
                 selectedJobType = type
             }
         }
-
         val salaryMap = mapOf<TextView, (String) -> Boolean>(
             tvSalary1 to { s -> extractSalary(s) < 1000 },
             tvSalary2 to { s -> extractSalary(s) < 2000 },
@@ -308,7 +287,6 @@ class ApplicationJobSeekerFragment : Fragment() {
                 selectedSalaryCondition = condition
             }
         }
-
         locationViews.forEach { textView ->
             textView.setOnClickListener {
                 highlightSelected(textView, locationViews)
@@ -316,48 +294,43 @@ class ApplicationJobSeekerFragment : Fragment() {
             }
         }
     }
-
     private fun applyFilter(): List<ItemJobDTO> {
         return originalJobs.filter { job ->
             val matchExpertise = selectedExpertise?.any { job.title.contains(it, ignoreCase = true) } ?: true
             val matchType = selectedJobType?.let { job.jobType == it } ?: true
             val matchSalary = selectedSalaryCondition?.invoke(job.salary) ?: true
             val matchLocation = selectedLocation?.let { job.location.contains(it, ignoreCase = true) } ?: true
-
             matchExpertise && matchType && matchSalary && matchLocation
         }
     }
-
     private fun extractSalary(salaryStr: String): Int {
         val salaryRange = salaryStr.split("-")
         val salary = salaryRange[0].filter { it.isDigit() }.toIntOrNull() ?: 0
         return salary
     }
-
     private val refreshHandler = Handler(Looper.getMainLooper())
     private val refreshRunnable = object : Runnable {
         override fun run() {
-            if (isFragmentVisible && binding.searchView.query.isNullOrEmpty()) {
+            if (isFragmentActive && isFragmentVisible && _binding != null && binding.searchView.query.isNullOrEmpty()) {
                 loadAppliedJobs()
             }
             refreshHandler.postDelayed(this, 60000)
         }
     }
-
     override fun onResume() {
         super.onResume()
         isFragmentVisible = true
         refreshHandler.post(refreshRunnable)
     }
-
     override fun onPause() {
         super.onPause()
         isFragmentVisible = false
         refreshHandler.removeCallbacks(refreshRunnable)
     }
-
     override fun onDestroyView() {
         super.onDestroyView()
+        refreshHandler.removeCallbacks(refreshRunnable)
+        isFragmentActive = false
         _binding = null
     }
 }

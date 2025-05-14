@@ -74,6 +74,8 @@ class HomeFragment : Fragment() {
         sharedPrefs = SharedPrefsManager(requireContext())
         refreshHandler.post(refreshRunnable)
 
+        binding.tvName.text =  "Hello, " + sharedPrefs.fullName
+
         setupAnimation()
         setupRecyclerView()
         getAllJobs()
@@ -102,17 +104,17 @@ class HomeFragment : Fragment() {
             showNotificationsDialog()
         }
 
+        val tipsUrl = RetrofitClient.getBaseUrl() + "api/admin/tips"
+
         binding.tvViewMore.setOnClickListener {
-            val url = "http://192.168.83.233:8080/api/admin/tips"
             val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse(url)
+            intent.data = Uri.parse(tipsUrl)
             startActivity(intent)
         }
 
         binding.btnReadMore.setOnClickListener {
-            val url = "http://192.168.83.233:8080/api/admin/tips"
             val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse(url)
+            intent.data = Uri.parse(tipsUrl)
             startActivity(intent)
         }
     }

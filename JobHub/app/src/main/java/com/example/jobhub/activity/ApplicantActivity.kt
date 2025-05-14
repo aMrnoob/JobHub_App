@@ -138,6 +138,8 @@ class ApplicantActivity : BaseActivity() {
         binding.edtHour.isEnabled = false
 
         if (status == ApplicationStatus.APPLIED || status == null) {
+            binding.edtDate.isEnabled = true
+            binding.edtHour.isEnabled = true
             val updateInterviewDate = {
                 val dateStr = binding.edtDate.text.toString()
                 val timeStr = binding.edtHour.text.toString()
@@ -146,6 +148,7 @@ class ApplicantActivity : BaseActivity() {
                     if (interviewDate != null) {
                         applicationDTO?.interviewDate = interviewDate
                         statusApplicantDTO.interviewDate = interviewDate
+
                     }
                 }
             }

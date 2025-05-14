@@ -167,7 +167,7 @@
                 android:background="@drawable/border_select_profile"
                 android:drawableTop="@drawable/icon_findjob"
                 android:gravity="center"
-                android:text="I want a job"
+                android:text="JOB SEEKER"
                 android:textColor="@color/black"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -181,7 +181,7 @@
                 android:background="@drawable/border_select_profile"
                 android:drawableTop="@drawable/icon_findstaff"
                 android:gravity="center"
-                android:text="I want an employee"
+                android:text="EMPLOYER"
                 android:textColor="@color/black"
                 android:textSize="20sp"
                 android:textStyle="bold" />
