@@ -5,6 +5,7 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.text.SpannableStringBuilder
 import android.util.Base64
 import android.util.Log
 import android.widget.ArrayAdapter
@@ -123,6 +124,16 @@ class ApplicantActivity : BaseActivity() {
             val selectedStatus = statusList[position]
             binding.tvSelectedStatus.text = selectedStatus
             binding.edtMessage.setText("")
+
+            if(selectedStatus == "Accept Application" || selectedStatus == "Reject Application") {
+                binding.edtDate.isEnabled = false
+                binding.edtHour.isEnabled = false
+                binding.edtDate.text = SpannableStringBuilder("20/5/2025")
+                binding.edtHour.text = SpannableStringBuilder("12:00")
+            } else {
+                binding.edtDate.isEnabled = true
+                binding.edtHour.isEnabled = true
+            }
             dialog.dismiss()
         }
 
