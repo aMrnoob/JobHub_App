@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -79,9 +78,12 @@ class JobAdapter(
                     }
                 }
 
-                val isExpanded = position == expandedPosition
+                val role = getUserRole(root.context)
+                val isEmployer = role == Role.EMPLOYER
+                val isExpanded = if (isEmployer) position == expandedPosition else false
+
                 rvResumes.visibility = if (isExpanded) View.VISIBLE else View.GONE
-                tvListResume.visibility = if (isExpanded && getUserRole(root.context) == Role.EMPLOYER) View.VISIBLE else View.GONE
+                tvListResume.visibility = if (isExpanded) View.VISIBLE else View.GONE
 
                 rvResumes.apply {
                     layoutManager = LinearLayoutManager(root.context)
