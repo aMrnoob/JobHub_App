@@ -26,6 +26,7 @@ import com.example.jobhub.service.NotificationService
 import com.example.jobhub.utils.ResumeViewerUtils
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
@@ -98,10 +99,11 @@ class ApplicantActivity : BaseActivity() {
         binding.tvStatus.text = applicationDTO?.status.toString()
     }
 
-    @SuppressLint("InflateParams")
+    @SuppressLint("InflateParams", "SimpleDateFormat")
     private fun setUpSpinner() {
         val statusList = when (applicationDTO?.status) {
-            ApplicationStatus.INTERVIEW -> { listOf("Accept Application", "Reject Application") }
+            ApplicationStatus.INTERVIEW -> {
+                listOf("Accept Application", "Reject Application") }
             ApplicationStatus.ACCEPTED, ApplicationStatus.REJECTED -> { listOf() }
             else -> { listOf("Schedule to Interview", "Accept Application", "Reject Application") }
         }
@@ -117,6 +119,10 @@ class ApplicantActivity : BaseActivity() {
         val dialog = BottomSheetDialog(this)
         dialog.setContentView(dialogView)
 
+        if(applicationDTO?.status == ApplicationStatus.REJECTED || applicationDTO?.status == ApplicationStatus.ACCEPTED) {
+            listView.isEnabled = false
+        }
+
         val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, statusList)
         listView.adapter = adapter
 
@@ -125,15 +131,25 @@ class ApplicantActivity : BaseActivity() {
             binding.tvSelectedStatus.text = selectedStatus
             binding.edtMessage.setText("")
 
-            if(selectedStatus == "Accept Application" || selectedStatus == "Reject Application") {
-                binding.edtDate.isEnabled = false
-                binding.edtHour.isEnabled = false
-                binding.edtDate.text = SpannableStringBuilder("20/5/2025")
-                binding.edtHour.text = SpannableStringBuilder("12:00")
-            } else {
-                binding.edtDate.isEnabled = true
-                binding.edtHour.isEnabled = true
+            when (selectedStatus) {
+                "Accept Application" -> {
+                    binding.edtDate.isEnabled = false
+                    binding.edtHour.isEnabled = false
+                    /*binding.edtDate.text = SpannableStringBuilder("20/05/2025")
+                    binding.edtHour.text = SpannableStringBuilder("9:00")*/
+                }
+                "Reject Application" -> {
+                    binding.edtDate.isEnabled = false
+                    binding.edtHour.isEnabled = false
+                    binding.edtDate.text = SpannableStringBuilder("Date")
+                    binding.edtHour.text = SpannableStringBuilder("Hour")
+                }
+                "Schedule to Interview" -> {
+                    binding.edtDate.isEnabled = true
+                    binding.edtHour.isEnabled = true
+                }
             }
+
             dialog.dismiss()
         }
 
@@ -197,12 +213,20 @@ class ApplicantActivity : BaseActivity() {
             }
         } else if ((status == ApplicationStatus.INTERVIEW || status == ApplicationStatus.ACCEPTED ||
                     status == ApplicationStatus.REJECTED) && applicationDTO?.interviewDate != null) {
+            binding.edtMessage.isEnabled = false
+
+            val interviewDate = LocalDateTime.now()
+                .plusDays(4)
+                .withHour(8)
+                .withMinute(0)
+                .withSecond(0)
+                .withNano(0)
+
             val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
             val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
-            binding.edtMessage.isEnabled = false
-            binding.edtDate.setText(applicationDTO?.interviewDate?.format(formatter))
-            binding.edtHour.setText(applicationDTO?.interviewDate?.format(timeFormatter))
+            binding.edtDate.setText(interviewDate.format(formatter))
+            binding.edtHour.setText(interviewDate.format(timeFormatter))
         }
     }
 

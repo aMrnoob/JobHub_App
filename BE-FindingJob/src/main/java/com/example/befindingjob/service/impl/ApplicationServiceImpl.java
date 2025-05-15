@@ -29,6 +29,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -319,6 +320,7 @@ public class ApplicationServiceImpl implements ApplicationService {
                     .orElseThrow(() -> new RuntimeException("Application not found"));
 
             ApplicationDTO responseDTO = convertToDTO(application);
+
             return new ApiResponse<>(true, "", responseDTO);
         } catch (Exception e) {
             return new ApiResponse<>(false, "Failed to retrieve application: " + e.getMessage(), null);
