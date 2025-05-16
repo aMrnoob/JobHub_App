@@ -54,7 +54,7 @@
    spring.datasource.username=root
    spring.datasource.password=yourpassword
    ```
-3. Chạy lớp `JobhubApplication.java` để khởi động API backend.
+3. Chạy lớp `BeFindingJobApplication.java` để khởi động API backend.
 
 ### 📱 Cài đặt frontend (Android)
 1. Mở thư mục `JobHub` bằng Android Studio.
