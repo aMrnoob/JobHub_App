@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
 
-    private const val BASE_URL = "http://192.168.1.5:8080/"
+    private const val BASE_URL = "http://192.168.99.63:8080/"
 
     private val gson: Gson = GsonBuilder()
         .registerTypeAdapter(LocalDateTime::class.java, LocalDateTimeConfig())
